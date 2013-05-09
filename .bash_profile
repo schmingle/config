@@ -2,7 +2,8 @@ export DEV=/data
 
 
 # setup command prompt
-PS1="\u@\h:\w> "
+export PS1="\u@\h:\w> "
+#export PS1="\e[0;31m\u@\h:\w> \e[m "
 
 # history searching
 bind '"\e[A": history-search-backward'
