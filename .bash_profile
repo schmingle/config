@@ -1,6 +1,5 @@
 export DEV=/data
 
-
 # setup command prompt
 #export PS1="\u@\h:\w> "
 #export PS1="\e[0;31m\u@\h:\w> \e[m "
@@ -20,16 +19,8 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias cdd='cd $DEV'
 alias vi='vim'
-alias ls='ls -F'
-alias ll='ls -lah'
+alias ls='ls -aF'
+alias ll='ls -laFHh'
 alias lls='ll -trh'
 alias bzip='bzip2'
 alias bunzip='bunzip2'
-alias rr='redis-cli get'
-alias rk='redis-cli keys "*" | sort'
-alias start_nginx='sudo service nginx start'
-alias stop_nginx='sudo service nginx stop'
-alias restart_nginx='sudo service nginx restart'
-alias start_memcache='sudo service memcached start'
-alias stop_memcache='sudo service memcached stop'
-alias restart_memcache='sudo service memcached restart'
