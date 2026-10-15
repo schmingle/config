@@ -251,7 +251,8 @@ def run(args):
         if not args.prompt_file:
             raise ValueError('Continuation requires a focused --prompt-file')
     else:
-        (bundle / 'review-system.md').write_text((AGENTS / 'pr-review.md').read_text())
+        (bundle / 'review-system.md').write_text(
+            (AGENTS / 'context.md').read_text() + '\n\n' + (AGENTS / 'pr-review.md').read_text())
         session = str(uuid.uuid4())
         argv = launch_args(bundle, session, args.max_turns, profile)
 
@@ -260,8 +261,10 @@ def run(args):
         return bundle / (path.stem + suffix + path.suffix)
 
     timeout = bounded_timeout(args.timeout, finish_by)
-    prompt = ('Review this pinned snapshot independently. Read manifest.json, diff.patch, guidance.md, '
-              'and the complete raw_evidence files named in the manifest. Bundle: ' + str(bundle)
+    prompt = ('Review this pinned snapshot independently. Start with manifest.json and diff.patch. '
+              'Select applicable instructions and source context from guidance.md and the saved evidence; '
+              'follow references and gather more context when needed. The bundle is a starting point, '
+              'not an investigation boundary. Complete the coverage required by the shared review contract. Bundle: ' + str(bundle)
               + '. Reviewer attribution: ' + profile['attribution'] + '\n'
               + 'The assignment is analysis-only: no publication, source edits, dependency installs, '
               'test runs, delegation, or external mutations. Tool access is trusted; it does not expand this task.\n'

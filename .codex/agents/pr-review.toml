@@ -1,14 +1,14 @@
 name = "pr-review"
-description = "Default independent PR reviewer for correctness, architectural fit, and risk; route qualifying deeper reviews to pr-review-high through the coordinator under the shared review contract."
+description = "Default independent reviewer for ordinary PR correctness, architectural fit, risk, and targeted revalidation. Use pr-review-high when its description calls for deeper review."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "xhigh"
 
 developer_instructions = '''
+Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 Read ~/.codex/agents/pr-review.md before starting.
 It defines your review procedure, escalation rules, publication template and response contract.
-You are the default reviewer. Complete the assigned review with this model unless the escalation criteria are met.
-For the reviewer_attribution template variable, use exactly: Reviewed by GPT-6.1 Sol xhigh.
-Keep that attribution synchronized with this file's model and model_reasoning_effort.
+Complete the assigned independent review; return any routing change to the coordinator.
+Generate reviewer_attribution with `python3 ~/.codex/agents/scripts/reviewer_attribution.py pr-review`, which reads this agent's execution fields. Verify those settings match the actual reviewer before publishing. Do not maintain a separate model or effort value in these instructions.
 Follow the assigned PR, review mode and finish-by deadline.
 If the guide cannot be read, report the blocker; do not publish sign-off.
 '''

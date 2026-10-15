@@ -4,6 +4,8 @@ The helper runs the Claude-backed `pr-review-high`; the default reviewer runs
 natively. Review definitions and the posted template remain in
 [the shared contract](../pr-review.md). [The execution profile](claude-review.toml)
 is the single source for Claude's model, effort, display name, and allowed tools.
+Native review signoffs come from `reviewer_attribution.py pr-review`, which reads
+the native agent's `model` and `model_reasoning_effort` fields.
 
 ## Prepare and run
 
@@ -34,7 +36,9 @@ prepared again; they are never silently migrated.
 
 Claude has trusted local shell/file access. Review instructions still prohibit
 source edits, tests/installs, delegation, publication, and external mutations.
-The caller owns live eligibility, required Linear reads, review-coverage verification,
+The reviewer chooses applicable instructions and source context, using the bundle as
+a starting point and gathering more evidence when needed. Required review coverage
+still applies. The caller owns live eligibility, required Linear reads, review-coverage verification,
 publication/readback, and worktree cleanup. The helper checks initial and final HEAD
 and cleanliness, validates the report envelope, and settles its owned process on
 normal completion, timeout, interruption, or error. After a hard kill or crash,

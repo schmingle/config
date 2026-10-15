@@ -13,6 +13,7 @@ EFFORTS = {'none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'}
 SECRET = re.compile(r'(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|'
                     r'sk-(?:proj-|ant-)?[A-Za-z0-9_-]{30,}|AKIA[A-Z0-9]{16}|'
                     r'xox[baprs]-[A-Za-z0-9-]{20,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----)')
+EXECUTION_PROSE = re.compile(r'(?i)\b(?:gpt-\d[\w.-]*|claude-(?:opus|sonnet|haiku)[\w.-]*|Sol|Astra|Luna|Terra|Opus|Sonnet|Haiku)\b|\b(?:low|medium|high|xhigh|max|ultra)\s+effort\b')
 PRIVATE_ROOTS = {'auth.json', 'config.toml', 'writing', 'sessions', 'memories', 'automations',
                  'worktrees', 'history.jsonl', 'cache', 'backups', 'logs'}
 
@@ -64,6 +65,13 @@ def validate():
                       name + ': duplicate or mismatched agent name')
                 check(value.get('model_reasoning_effort') in EFFORTS, name + ': invalid effort')
                 check(bool(value.get('model')), name + ': missing model')
+                check(not EXECUTION_PROSE.search(value['description']),
+                      name + ': keep routing descriptions free of model/effort settings')
+                if value['name'] != 'pr-review-high':
+                    check(not EXECUTION_PROSE.search(value['developer_instructions']),
+                          name + ': native execution values belong only in execution fields')
+                check('~/.codex/agents/context.md' in value['developer_instructions'],
+                      name + ': missing shared context-selection policy')
                 agents[value['name']] = value
         if path.suffix in ('.yaml', '.yml'):
             yaml_mapping(text, name)
@@ -93,10 +101,8 @@ def validate():
                 destination = (path.parent / target.split('#')[0]).resolve()
                 check(destination.exists(), name + ': broken local link: ' + target)
     reviewer = agents['pr-review']
-    match = re.fullmatch(r'gpt-(.+)-(sol|astra|luna)', reviewer['model'])
-    check(match is not None, 'Default reviewer model needs an explicit attribution check')
-    attribution = f"Reviewed by GPT-{match[1]} {match[2].title()} {reviewer['model_reasoning_effort']}."
-    check(attribution in reviewer['developer_instructions'], 'Default reviewer attribution differs from settings')
+    check('reviewer_attribution.py' in reviewer['developer_instructions'],
+          'Default reviewer must derive its signoff from execution fields')
     profile_path = ROOT / '.codex/agents/scripts/claude-review.toml'
     profile = tomllib.loads(profile_path.read_text())
     check('-'.join(profile['label'].lower().split()).replace('.', '-') == profile['model'],

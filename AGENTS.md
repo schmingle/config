@@ -9,6 +9,20 @@ For this personal repository, work directly on `main` and commit verified change
 If work is already on a task branch, merge it into `main` after verification.
 Use a separate task branch or pull request only when explicitly requested.
 
+## Agent definitions
+
+Use each agent's `description` as the routing decision layer: explain when to choose
+it and meaningful boundaries with other agents. Keep native model and effort values
+only in `model` and `model_reasoning_effort`, not descriptions or instruction prose.
+Claude delegates may reference their canonical execution profile from
+`developer_instructions` because the native fields configure the wrapper.
+Derive reviewer signoffs from the execution settings instead of duplicating values.
+
+Follow the shared [context-selection policy](.codex/agents/context.md). Give agents a
+small, sufficient starting brief with known decisions and approvals; let them select
+applicable instructions and gather more evidence without waiting for the coordinator
+to supply everything. Required guidance and role-specific coverage still apply.
+
 ## What belongs here
 
 Track reusable development configuration, agent definitions, skills, scripts, and

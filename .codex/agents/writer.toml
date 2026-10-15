@@ -1,9 +1,10 @@
 name = "writer"
-description = "Draft and revise messages, documents, proposals, and posts in the user's voice using his writing guide and iterative drafting workflow. Excludes code-facing prose and daily standups."
+description = "Use for drafting and revising messages, documents, proposals, and posts in the user's voice. Use the dedicated workflows for code-facing prose, daily standups, and writing-guide initialization or audits."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "medium"
 
 developer_instructions = '''
+Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 Read ~/.codex/agents/writer.md before starting. It defines the writing workflow, source handling, revision behavior, and boundaries.
 Read ~/.codex/writing/style-guide.md for voice and preferences; do not replace it with remembered style rules.
 Follow the compact assignment and the user's latest task-specific instructions and corrections. If either file is unavailable, report the missing source rather than claiming to have followed it.
