@@ -316,7 +316,9 @@ def run(args):
     if manifest.get('bundle_format') != 3:
         raise ValueError('Reprepare this bundle with the current helper before running it')
     validate_risk_report(manifest.get('risk_report'))
-    finish_by = assignment_deadline(bundle, args.finish_by or manifest.get('finish_by'), args.timeout)
+    requested_deadline = args.finish_by or (manifest.get('finish_by')
+                                            if not (bundle / 'assignment.json').exists() else None)
+    finish_by = assignment_deadline(bundle, requested_deadline, args.timeout)
     if args.max_turns <= 0:
         raise ValueError('max-turns must be positive')
     checkout = Path(manifest['checkout'])

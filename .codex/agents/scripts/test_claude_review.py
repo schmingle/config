@@ -428,6 +428,20 @@ class FixtureTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'cannot extend'):
             self.run_with_result(self.valid_report(), finish_by='2100-01-01T00:00:00Z')
 
+    def test_shortened_deadline_is_retained_when_resume_omits_override(self):
+        self.run_with_result(self.valid_report())
+        original = review.load(self.bundle / 'assignment.json')['finish_by']
+        manifest = review.load(self.bundle / 'manifest.json')
+        manifest['finish_by'] = original
+        review.dump(self.bundle / 'manifest.json', manifest)
+        from datetime import datetime, timedelta
+        shortened = (datetime.fromisoformat(original) - timedelta(seconds=10)).isoformat()
+        focused = self.root / 'focused.txt'
+        focused.write_text('Inspect remaining coverage.')
+        self.run_with_result(self.valid_report(), resume=True, prompt_file=str(focused), finish_by=shortened)
+        self.run_with_result(self.valid_report(), resume=True, prompt_file=str(focused))
+        self.assertEqual(review.load(self.bundle / 'assignment.json')['finish_by'], shortened)
+
     def test_recovery_cannot_change_recorded_execution_profile(self):
         with self.assertRaises(SystemExit):
             self.run_with_result('Broken output')
