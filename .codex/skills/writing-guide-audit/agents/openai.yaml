@@ -1,0 +1,5 @@
+interface:
+  display_name: "Writing Guide Audit"
+  short_description: "Review your writing samples and refine your guide"
+policy:
+  allow_implicit_invocation: true

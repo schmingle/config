@@ -1,0 +1,5 @@
+interface:
+  display_name: "Writing Guide init"
+  short_description: "Build a writing guide from your real samples"
+policy:
+  allow_implicit_invocation: true

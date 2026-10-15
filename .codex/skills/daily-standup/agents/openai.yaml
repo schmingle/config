@@ -1,0 +1,4 @@
+interface:
+  display_name: "Daily Standup"
+  short_description: "Generate an evidence-based daily standup"
+  default_prompt: "Generate my daily standup."
