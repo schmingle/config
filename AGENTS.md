@@ -3,6 +3,12 @@
 This repository and its Git history are public. These rules apply to every file,
 commit, generated artifact, and contribution, including work by delegated agents.
 
+## Workflow
+
+For this personal repository, work directly on `main` and commit verified changes.
+If work is already on a task branch, merge it into `main` after verification.
+Use a separate task branch or pull request only when explicitly requested.
+
 ## What belongs here
 
 Track reusable development configuration, agent definitions, skills, scripts, and
@@ -59,7 +65,6 @@ stop the affected commit/push and notify the owner with its location, without
 repeating the value. If already published, flag the exposure immediately and
 recommend credential revocation/rotation where applicable. Coordinate history
 cleanup with the owner; do not rewrite shared history unilaterally.
-
 
 ## Validate changes
 
