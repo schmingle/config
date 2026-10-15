@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
 """Prepare full review evidence and run one owned Claude session. Never publishes."""
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
-from pathlib import Path
 import re
+from pathlib import Path
 import shutil
 import signal
 import subprocess
 import time
+import tempfile
 import tomllib
 import uuid
 
 AGENTS = Path(__file__).resolve().parents[1]
 PROFILE = Path(__file__).with_name('claude-review.toml')
 REPORT_FIELDS = {'correctness', 'approach', 'risk', 'summary', 'findings', 'coverage',
-                 'gaps', 'validation', 'reviewer_attribution', 'risk_report_url', 'risk_discrepancies'}
+                 'gaps', 'validation', 'reviewer_attribution', 'risk_report_url', 'risk_discrepancies', 'prior_findings', 'open_questions'}
 
 
 def load(path):
@@ -163,11 +164,86 @@ def prepare(args):
     print(output)
 
 
+def report_schema():
+    """Constrain transport shape; the publisher still verifies review coverage."""
+    text = {'type': 'string'}
+    strings = {'type': 'array', 'items': text}
+    finding = {'type': 'object', 'properties': {
+        'priority': {'type': 'string', 'enum': ['P0', 'P1', 'P2', 'P3']},
+        'path': text, 'line': {'type': 'integer', 'minimum': 1},
+        'side': {'type': 'string', 'enum': ['LEFT', 'RIGHT']},
+        **{key: text for key in ('scenario', 'consequence', 'evidence', 'correction')}},
+        'required': ['priority', 'path', 'line', 'side', 'scenario', 'consequence', 'evidence', 'correction']}
+    coverage = {'scope_complete': {'type': 'boolean'}, 'inspected_sources': strings,
+                'interfaces': strings, 'deployment': strings, 'discussion': text, 'linear': text}
+    properties = {key: text for key in ('correctness', 'approach', 'risk', 'summary',
+                                       'validation', 'reviewer_attribution', 'risk_report_url')}
+    properties.update(findings={'type': 'array', 'items': finding},
+                      coverage={'type': 'object', 'properties': coverage, 'required': list(coverage)},
+                      gaps=strings, risk_discrepancies=strings, prior_findings=strings, open_questions=strings)
+    return {'type': 'object', 'properties': properties, 'required': sorted(REPORT_FIELDS)}
+
+
+def persistence_preflight(cli, checkout):
+    """Probe the real authenticated config directory under these launch permissions."""
+    if os.environ.get('CLAUDE_CODE_SKIP_PROMPT_HISTORY', '').lower() in ('1', 'true', 'yes'):
+        raise ValueError('Claude session persistence is disabled by CLAUDE_CODE_SKIP_PROMPT_HISTORY')
+    status = subprocess.run([cli, 'auth', 'status'], cwd=checkout, capture_output=True, text=True, timeout=15)
+    try:
+        identity = json.loads(status.stdout)
+    except ValueError:
+        raise ValueError('Claude authentication preflight returned no valid status; check launch permissions/login') from None
+    if status.returncode or not identity.get('loggedIn') or not identity.get('configDirectory'):
+        raise ValueError('Claude login/config directory unavailable under launch permissions; use authorized escalation or restore login')
+    config = Path(identity['configDirectory']).expanduser().resolve()
+    projects = config / 'projects'
+    project = projects / re.sub(r'[^a-zA-Z0-9]', '-', str(checkout.resolve()))
+    try:
+        for directory in (projects, project):
+            directory.mkdir(parents=True, exist_ok=True)
+            with tempfile.TemporaryFile(dir=directory) as probe:
+                probe.write(b'persistence probe')
+                probe.flush()
+    except OSError:
+        raise ValueError('Claude session storage is not writable under launch permissions; use authorized escalation') from None
+    return {'config_directory': str(config), 'projects_directory': str(projects)}
+
+
+def saved_transcript(storage, session):
+    matches = [path for path in Path(storage['projects_directory']).glob('*/' + session + '.jsonl')
+               if path.is_file() and path.stat().st_size]
+    if len(matches) > 1:
+        raise ValueError('Ambiguous persisted Claude session; reconcile transcript paths before resuming')
+    return str(matches[0]) if matches else None
+
+
+def assignment_deadline(bundle, requested, timeout):
+    """Continuations/recovery may shorten, but never reset, the original deadline."""
+    path = bundle / 'assignment.json'
+    deadline = requested or (datetime.now(timezone.utc) + timedelta(seconds=timeout)).isoformat()
+    bounded_timeout(timeout, deadline)
+    if path.exists():
+        original = load(path)['finish_by']
+        if requested and datetime.fromisoformat(deadline.replace('Z', '+00:00')) > datetime.fromisoformat(original.replace('Z', '+00:00')):
+            raise ValueError('Continuation/replacement cannot extend the original assignment deadline')
+        if requested and deadline != original:
+            dump(path, {'finish_by': deadline})
+        return original if not requested else deadline
+    dump(path, {'finish_by': deadline})
+    return deadline
+
+
+def ensure_settled(bundle):
+    for path in bundle.glob('process*.json'):
+        if load(path).get('running'):
+            raise ValueError('An owned reviewer process is not settled; reconcile it before another launch')
+
+
 def launch_args(bundle, session, max_turns, profile):
     settings = {'allowedMcpServers': [{'serverUrl': 'https://mcp.linear.app/mcp'}]}
     return [shutil.which('claude') or str(Path.home() / '.local/bin/claude'), '--print',
             '--model', profile['model'], '--effort', profile['effort'], '--session-id', session,
-            '--output-format', 'stream-json', '--verbose', '--permission-mode', 'dontAsk',
+            '--output-format', 'stream-json', '--json-schema', json.dumps(report_schema()), '--verbose', '--permission-mode', 'dontAsk',
             '--setting-sources', '', '--settings', json.dumps(settings), '--disable-slash-commands',
             '--tools', 'default', '--add-dir', str(bundle), '--append-system-prompt-file',
             str(bundle / 'review-system.md'), '--max-turns', str(max_turns),
@@ -240,8 +316,7 @@ def run(args):
     if manifest.get('bundle_format') != 3:
         raise ValueError('Reprepare this bundle with the current helper before running it')
     validate_risk_report(manifest.get('risk_report'))
-    finish_by = args.finish_by or manifest.get('finish_by')
-    bounded_timeout(args.timeout, finish_by)
+    finish_by = assignment_deadline(bundle, args.finish_by or manifest.get('finish_by'), args.timeout)
     if args.max_turns <= 0:
         raise ValueError('max-turns must be positive')
     checkout = Path(manifest['checkout'])
@@ -252,20 +327,60 @@ def run(args):
     if digest(bundle / 'guidance.md') != manifest['guidance_sha256']:
         raise ValueError('Saved guidance changed after preparation')
     profile = manifest['reviewer']
+    ensure_settled(bundle)
+    replace = getattr(args, 'replace_failed', False)
+    reason = getattr(args, 'recovery_reason', None)
+    if args.resume and replace:
+        raise ValueError('Choose continuation or replacement, not both')
+    if bool(reason) != bool(replace):
+        raise ValueError('Replacement requires --replace-failed and --recovery-reason')
+    initial = bundle / 'launch.json'
+    replacement = bundle / 'launch-replacement.json'
+    if initial.exists() and not args.resume and not replace:
+        raise ValueError('Initial session already launched; resume it or use the single bounded replacement')
+    if (args.resume or replace) and not initial.exists():
+        raise ValueError('No original review session exists')
+    if replace and replacement.exists():
+        raise ValueError('The single replacement session has already been used')
+    if args.resume and not args.prompt_file:
+        raise ValueError('Continuation requires a focused --prompt-file')
+    original_argv = load(replacement if replacement.exists() else initial) if initial.exists() else None
+    if original_argv and any(original_argv[original_argv.index(flag) + 1] != profile[field]
+                             for flag, field in (('--model', 'model'), ('--effort', 'effort'))):
+        raise ValueError('Review execution profile changed after initial launch')
+    cli = original_argv[0] if original_argv else shutil.which('claude') or str(Path.home() / '.local/bin/claude')
+    storage = persistence_preflight(cli, checkout)
+    previous_storage = bundle / 'persistence.json'
+    if previous_storage.exists() and load(previous_storage)['config_directory'] != storage['config_directory']:
+        raise ValueError('Claude config directory changed; preserve the original login and session storage')
     suffix = ''
     if args.resume:
-        argv = load(bundle / 'launch.json')
+        argv = list(original_argv)
         selector = argv.index('--session-id')
         session = argv[selector + 1]
-        argv[selector] = '--resume'
+        transcript = saved_transcript(storage, session)
+        if not transcript:
+            raise ValueError('Persisted Claude session is missing; do not spend tokens on a blind resume')
+        argv[selector:selector + 2] = ['--resume', transcript]
         suffix = '-continuation-' + str(len(list(bundle.glob('process-continuation-*.json'))) + 1)
-        if not args.prompt_file:
-            raise ValueError('Continuation requires a focused --prompt-file')
     else:
-        (bundle / 'review-system.md').write_text(
-            (AGENTS / 'context.md').read_text() + '\n\n' + (AGENTS / 'pr-review.md').read_text())
+        if replace:
+            prior_session = original_argv[original_argv.index('--session-id') + 1]
+            metrics_paths = sorted(bundle.glob('metrics*.json'), key=lambda path: path.stat().st_mtime_ns)
+            prior = load(metrics_paths[-1]) if metrics_paths else {}
+            justified = ((reason == 'missing-session' and not saved_transcript(storage, prior_session))
+                         or (reason in ('invalid-output', 'cli-error') and prior.get('failure_kind') == reason))
+            if not (bundle / 'process.json').exists() or not justified:
+                raise ValueError('Replacement requires evidence of the specified infrastructure failure')
+            suffix = '-replacement'
         session = str(uuid.uuid4())
-        argv = launch_args(bundle, session, args.max_turns, profile)
+        if replace:
+            argv = list(original_argv)
+            argv[argv.index('--session-id') + 1] = session
+        else:
+            (bundle / 'review-system.md').write_text(
+                (AGENTS / 'context.md').read_text() + '\n\n' + (AGENTS / 'pr-review.md').read_text())
+            argv = launch_args(bundle, session, args.max_turns, profile)
 
     def artifact(name):
         path = Path(name)
@@ -290,16 +405,26 @@ def run(args):
               + 'Use the shared review standards. Return one JSON object with these fields: '
               + ', '.join(sorted(REPORT_FIELDS)) + ', prior_findings, open_questions. '
               + 'Findings include priority, path, line, side, scenario, consequence, evidence, and correction. '
-              + 'Coverage identifies inspected source/guidance, discussion, and actual Linear reads.\n')
+              + 'Coverage must identify actual inspected sources, interfaces/retained implementations, deployment '
+              + 'boundaries, discussion, and actual Linear reads. Set scope_complete false for material missing '
+              + 'coverage and explain the gaps; searches for removed names alone do not prove surviving behavior. '
+              + 'Use string verdict/summaries for correctness and approach, string arrays for gaps, '
+              + 'prior_findings, open_questions, and risk_discrepancies, and the supplied structured-output schema.\n')
     if manifest.get('benchmark'):
         prompt += ('Blind historical benchmark: use the saved GitHub evidence; do not fetch current '
                    'GitHub discussion or previous review reports. Disclose live Linear temporal differences.\n')
+    if replace:
+        prompt += '\nThis is the single replacement for a settled infrastructure failure: ' + reason + '. Establish full coverage independently; a partial prior report is not sign-off.\n'
     if args.resume:
         prompt += '\nFocused continuation:\n' + Path(args.prompt_file).read_text()
     prompt += f'\nTime budget: {timeout:.0f} seconds.'
     if finish_by:
         prompt += '\nAbsolute finish-by: ' + finish_by
-    dump(artifact('launch.json'), argv)
+    dump(artifact('preflight.json'), storage)
+    # Exclusive attempt creation also prevents two racing callers from launching it.
+    with artifact('launch.json').open('x') as launch_file:
+        json.dump(argv, launch_file, indent=2)
+        launch_file.write('\n')
     artifact('prompt.txt').write_text(prompt)
     started = time.monotonic()
     state = run_process(argv, checkout, prompt, bounded_timeout(timeout, finish_by), artifact, session)
@@ -313,21 +438,30 @@ def run(args):
     complete = (state.get('exit_code') == 0 and not state['timed_out']
                 and not result.get('is_error', True) and profile['model'] in result.get('modelUsage', {}))
     text = result.get('result', '')
-    report = None
-    try:
-        report = json.loads(re.sub(r'^```(?:json)?\s*|\s*```$', '', text.strip()))
-    except ValueError:
-        pass
+    report = result.get('structured_output')
+    schema = report_schema()
     report_valid = (isinstance(report, dict) and REPORT_FIELDS <= report.keys()
-                    and isinstance(report.get('findings'), list)
+                    and all(isinstance(report.get(key), str) for key, spec in schema['properties'].items()
+                            if spec['type'] == 'string')
+                    and all(isinstance(report.get(key), list) for key, spec in schema['properties'].items()
+                            if spec['type'] == 'array')
+                    and isinstance(report.get('coverage'), dict)
+                    and isinstance(report['coverage'].get('scope_complete'), bool)
+                    and all(key in report['coverage'] for key in schema['properties']['coverage']['required'])
                     and report.get('risk') == manifest['risk_report']['rating']
                     and report.get('risk_report_url') == manifest['risk_report']['url']
-                    and isinstance(report.get('risk_discrepancies'), list)
                     and report.get('reviewer_attribution') == profile['attribution'])
+    transcript = saved_transcript(storage, session)
+    storage.update(session=session, transcript=transcript, transcript_persisted=bool(transcript))
+    dump(artifact('persistence.json'), storage)
+    failure_kind = ('timeout' if state['timed_out'] else
+                    'cli-error' if not complete else 'invalid-output' if not report_valid else None)
     checkout_matches = (git(checkout, 'rev-parse', 'HEAD') == manifest['head']
                         and not git(checkout, 'status', '--porcelain'))
     metrics = {'session': session, 'model': profile['model'], 'effort': profile['effort'],
                'execution_complete': complete, 'report_valid': report_valid,
+               'failure_kind': failure_kind, 'transcript_persisted': bool(transcript),
+               'coverage_complete_claimed': report.get('coverage', {}).get('scope_complete') if report_valid else False,
                'coverage_verification': 'Publisher must verify actual source coverage before sign-off',
                'elapsed_seconds': round(time.monotonic() - started, 2), 'turns': result.get('num_turns'),
                'usage': result.get('usage', {}), 'model_usage': result.get('modelUsage', {}),
@@ -354,6 +488,8 @@ def main():
     launch.add_argument('--timeout', type=int, default=900)
     launch.add_argument('--max-turns', type=int, default=80)
     launch.add_argument('--resume', action='store_true')
+    launch.add_argument('--replace-failed', action='store_true', help='Use the single replacement for a verified infrastructure failure')
+    launch.add_argument('--recovery-reason', choices=['missing-session', 'invalid-output', 'cli-error'])
     launch.add_argument('--prompt-file')
     launch.add_argument('--finish-by', help='ISO 8601 deadline with timezone; overrides manifest finish-by')
     args = parser.parse_args()

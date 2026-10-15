@@ -28,7 +28,8 @@ python3 ~/.codex/agents/scripts/claude_review.py prepare --spec /absolute/spec.j
 python3 ~/.codex/agents/scripts/claude_review.py run --bundle /new/bundle --timeout 900
 ```
 
-The deadline comes from the specification; `--finish-by` can override it. Reserve
+The initial deadline comes from the specification or `--finish-by` (or the initial
+timeout when omitted). Continuation/recovery can shorten but never extend it. Reserve
 publication/cleanup time before that deadline. Output belongs outside the checkout
 and public configuration repository because it can include private source material.
 
@@ -45,7 +46,13 @@ source edits, tests/installs, delegation, publication, and external mutations.
 The reviewer chooses applicable instructions and source context, using the bundle as
 a starting point and gathering more evidence when needed. Required review coverage
 still applies. The caller owns live eligibility, required Linear reads, review-coverage verification,
-publication/readback, and worktree cleanup. The helper checks initial and final HEAD
+publication/readback, and worktree cleanup. The helper checks authenticated `claude auth status` and probes write access to the
+actual session directory before model execution, without changing the login or
+configuration environment. Run under authorized command-level escalation when the
+sandbox cannot support those operations. It records preflight and final transcript
+status separately; an absent transcript cannot be blindly resumed. The helper uses
+`--json-schema` and reads `structured_output`, preserving human `result` text only
+for diagnostics. It checks initial and final HEAD
 and cleanliness, validates the report envelope and unchanged risk rating/report URL,
 and settles its owned process on normal completion, timeout, interruption, or error. After a hard kill or crash,
 inspect the saved process identity and reconcile it manually.
@@ -56,7 +63,8 @@ inspect the saved process identity and reconcile it manually.
 python3 ~/.codex/agents/scripts/claude_review.py run --bundle /new/bundle --resume --prompt-file /absolute/focused-request.txt --timeout 600
 ```
 
-Use a continuation only for a substantive gap or new evidence. Restore the same clean
+Use a continuation only for a substantive gap or new evidence, with a verified
+persisted transcript. The helper passes its absolute path to `--resume`. Restore the same clean
 pinned checkout if necessary. Original launch settings are retained; new deadline
 information is sent with the focused request. Each attempt has separate process,
 events, report, and metrics files. Execution/report success is never coverage sign-off.
@@ -64,6 +72,22 @@ The result includes `risk` (the supplied rating), `risk_report_url` (the supplie
 URL), and `risk_discrepancies` (a list of concrete contradictions, empty when none).
 The publisher must surface discrepancies and withhold sign-off for unresolved material
 contradictions; a structurally valid report is not sign-off.
+For a diagnosed infrastructure failure with all owned processes settled, use one
+replacement, within the original deadline and execution profile:
+
+```sh
+python3 ~/.codex/agents/scripts/claude_review.py run --bundle /new/bundle --replace-failed --recovery-reason missing-session --timeout 600
+```
+
+Other verified reasons are `invalid-output` and `cli-error`. A second replacement,
+unproven failure, concurrent owned process, or deadline extension is rejected. Do
+not reprepare a bundle to reset the assignment's recovery limit. Preserve all prior
+attempts. A replacement establishes full review coverage independently.
+
+Coverage explicitly records `scope_complete`, `inspected_sources`, `interfaces`,
+`deployment`, `discussion`, and `linear`; the publisher verifies these against actual
+inspection evidence. A valid schema or claimed completeness is not sign-off.
+
 Use the final cumulative cost once per session; do not sum it across continuations.
 
 ## Verification

@@ -80,6 +80,38 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(proc.wait.call_count, 2)
 
 
+class PersistenceTests(unittest.TestCase):
+    def test_actual_config_directory_is_probed_without_changing_login_environment(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            config = Path(temporary) / 'actual-cli-config'
+            checkout = Path(temporary) / 'checkout'
+            checkout.mkdir()
+            status = SimpleNamespace(returncode=0, stdout=json.dumps(
+                {'loggedIn': True, 'configDirectory': str(config)}))
+            with patch.object(review.subprocess, 'run', return_value=status) as authenticate:
+                storage = review.persistence_preflight('fake-cli', checkout)
+            self.assertEqual(storage['config_directory'], str(config.resolve()))
+            self.assertTrue((config / 'projects').is_dir())
+            self.assertEqual(authenticate.call_args.args[0], ['fake-cli', 'auth', 'status'])
+            self.assertNotIn('env', authenticate.call_args.kwargs)
+
+    def test_disabled_history_missing_login_and_unwritable_storage_fail_fast(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            checkout = Path(temporary)
+            status = SimpleNamespace(returncode=0, stdout=json.dumps(
+                {'loggedIn': True, 'configDirectory': temporary}))
+            with patch.dict(os.environ, {'CLAUDE_CODE_SKIP_PROMPT_HISTORY': '1'}), \
+                    self.assertRaisesRegex(ValueError, 'persistence is disabled'):
+                review.persistence_preflight('fake-cli', checkout)
+            with patch.object(review.subprocess, 'run', return_value=SimpleNamespace(
+                    returncode=1, stdout='{"loggedIn": false}')), self.assertRaisesRegex(ValueError, 'login/config'):
+                review.persistence_preflight('fake-cli', checkout)
+            with patch.object(review.subprocess, 'run', return_value=status), \
+                    patch.object(review.tempfile, 'TemporaryFile', side_effect=PermissionError()), \
+                    self.assertRaisesRegex(ValueError, 'not writable'):
+                review.persistence_preflight('fake-cli', checkout)
+
+
 class FixtureTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
@@ -110,6 +142,12 @@ class FixtureTests(unittest.TestCase):
                                      'pageInfo': {'hasNextPage': False}}}],
              'pageInfo': {'hasNextPage': False}},
         ], indent=2) + '\n')
+        self.storage = {'config_directory': str(self.root / 'claude'),
+                        'projects_directory': str(self.root / 'claude/projects')}
+        Path(self.storage['projects_directory']).mkdir(parents=True)
+        preflight = patch.object(review, 'persistence_preflight', return_value=self.storage.copy())
+        preflight.start()
+        self.addCleanup(preflight.stop)
         self.bundle = self.root / 'bundle'
         self.spec = self.root / 'spec.json'
         self.risk_report = {'rating': 'Medium high',
@@ -196,7 +234,11 @@ class FixtureTests(unittest.TestCase):
         binary = self.root / 'bin'
         binary.mkdir()
         fake = binary / 'claude'
-        fake.write_text('#!' + sys.executable + '\nimport time\ntime.sleep(60)\n')
+        fake.write_text('#!' + sys.executable + '\nimport json,sys,time\n'
+                        + 'if sys.argv[1:] == ["auth", "status"]:\n'
+                        + ' print(json.dumps(' + repr({'loggedIn': True,
+                            'configDirectory': self.storage['config_directory']}) + ')); sys.exit(0)\n'
+                        + 'time.sleep(60)\n')
         fake.chmod(0o755)
         environment = dict(os.environ, PATH=str(binary) + os.pathsep + os.environ['PATH'])
         proc = subprocess.Popen([sys.executable, str(MODULE), 'run', '--bundle', str(self.bundle),
@@ -224,16 +266,29 @@ class FixtureTests(unittest.TestCase):
             proc.stdout.close()
             proc.stderr.close()
 
-    def run_with_result(self, text, mutate=None):
-        self.prepare()
+    def run_with_result(self, text, mutate=None, persist=True, **options):
+        if not self.bundle.exists():
+            self.prepare()
         args = SimpleNamespace(bundle=str(self.bundle), finish_by=None, timeout=60,
-                               resume=False, max_turns=80, prompt_file=None)
+                               resume=False, max_turns=80, prompt_file=None,
+                               replace_failed=False, recovery_reason=None)
+        vars(args).update(options)
 
         def finish(argv, checkout, prompt, timeout, artifact, session):
             if mutate:
                 mutate()
-            artifact('events.jsonl').write_text(json.dumps({'type': 'result', 'is_error': False,
-                'modelUsage': {review.reviewer_profile()['model']: {}}, 'result': text}) + '\n')
+            result = {'type': 'result', 'is_error': False,
+                      'modelUsage': {review.reviewer_profile()['model']: {}}, 'result': 'Human prose around the report.'}
+            try:
+                result['structured_output'] = json.loads(text)
+            except ValueError:
+                result['result'] = text
+            artifact('events.jsonl').write_text(json.dumps(result) + '\n')
+            review.dump(artifact('process.json'), {'session': session, 'running': False, 'exit_code': 0})
+            if persist:
+                transcript = Path(self.storage['projects_directory']) / 'fixture' / (session + '.jsonl')
+                transcript.parent.mkdir(exist_ok=True)
+                transcript.write_text('{"type":"user","message":"fixture"}\n')
             return {'exit_code': 0, 'timed_out': False}
 
         with patch.object(review, 'run_process', side_effect=finish), contextlib.redirect_stdout(io.StringIO()):
@@ -241,7 +296,11 @@ class FixtureTests(unittest.TestCase):
 
     def valid_report(self):
         report = dict.fromkeys(review.REPORT_FIELDS, '')
-        report.update(findings=[], coverage={}, gaps=[], risk=self.risk_report['rating'],
+        report.update(findings=[], coverage={'scope_complete': True,
+                      'inspected_sources': ['source.txt'], 'interfaces': ['caller inspected'],
+                      'deployment': ['runtime boundary inspected'], 'discussion': 'All pages read',
+                      'linear': 'Live issue/comments read'}, gaps=[], prior_findings=[], open_questions=[],
+                      risk=self.risk_report['rating'],
                       risk_report_url=self.risk_report['url'], risk_discrepancies=[],
                       reviewer_attribution=review.reviewer_profile()['attribution'])
         return json.dumps(report)
@@ -296,6 +355,98 @@ class FixtureTests(unittest.TestCase):
         saved = review.load(self.bundle / 'report.json')
         self.assertEqual(saved['risk'], self.risk_report['rating'])
         self.assertEqual(saved['risk_discrepancies'], report['risk_discrepancies'])
+
+    def test_structured_report_is_used_despite_human_prose(self):
+        self.run_with_result(self.valid_report())
+        self.assertEqual(review.load(self.bundle / 'report.json')['correctness'], '')
+        self.assertEqual((self.bundle / 'report.txt').read_text(), 'Human prose around the report.')
+        self.assertTrue(review.load(self.bundle / 'metrics.json')['transcript_persisted'])
+
+    def test_persistence_failure_blocks_before_model_launch(self):
+        self.prepare()
+        args = SimpleNamespace(bundle=str(self.bundle), finish_by=None, timeout=60,
+                               resume=False, max_turns=80, prompt_file=None)
+        with patch.object(review, 'persistence_preflight', side_effect=ValueError('Not writable')), \
+                patch.object(review, 'run_process') as launch, self.assertRaises(ValueError):
+            review.run(args)
+        launch.assert_not_called()
+
+    def test_missing_transcript_is_recorded_and_blind_resume_is_blocked(self):
+        self.run_with_result(self.valid_report(), persist=False)
+        self.assertFalse(review.load(self.bundle / 'metrics.json')['transcript_persisted'])
+        focused = self.root / 'focused.txt'
+        focused.write_text('Inspect the remaining interface.')
+        with self.assertRaisesRegex(ValueError, 'Persisted Claude session is missing'):
+            self.run_with_result(self.valid_report(), resume=True, prompt_file=str(focused))
+        self.assertFalse((self.bundle / 'launch-continuation-1.json').exists())
+
+    def test_resume_uses_verified_transcript_without_new_session(self):
+        self.run_with_result(self.valid_report())
+        session = review.load(self.bundle / 'process.json')['session']
+        focused = self.root / 'focused.txt'
+        focused.write_text('Inspect the remaining interface.')
+        self.run_with_result(self.valid_report(), resume=True, prompt_file=str(focused))
+        argv = review.load(self.bundle / 'launch-continuation-1.json')
+        self.assertNotIn('--session-id', argv)
+        self.assertTrue(argv[argv.index('--resume') + 1].endswith(session + '.jsonl'))
+        self.assertEqual(review.load(self.bundle / 'process-continuation-1.json')['session'], session)
+
+    def test_invalid_output_allows_only_one_replacement_with_original_deadline(self):
+        with self.assertRaises(SystemExit):
+            self.run_with_result('Broken output')
+        deadline = review.load(self.bundle / 'assignment.json')['finish_by']
+        initial = review.load(self.bundle / 'launch.json')
+        self.run_with_result(self.valid_report(), replace_failed=True, recovery_reason='invalid-output')
+        replacement = review.load(self.bundle / 'launch-replacement.json')
+        self.assertNotEqual(initial[initial.index('--session-id') + 1],
+                            replacement[replacement.index('--session-id') + 1])
+        for flag in ('--model', '--effort'):
+            self.assertEqual(initial[initial.index(flag) + 1], replacement[replacement.index(flag) + 1])
+        self.assertEqual(review.load(self.bundle / 'assignment.json')['finish_by'], deadline)
+        with self.assertRaisesRegex(ValueError, 'already been used'):
+            self.run_with_result(self.valid_report(), replace_failed=True, recovery_reason='invalid-output')
+
+    def test_missing_session_allows_replacement_even_when_initial_report_was_valid(self):
+        self.run_with_result(self.valid_report(), persist=False)
+        self.run_with_result(self.valid_report(), replace_failed=True, recovery_reason='missing-session')
+        self.assertTrue(review.load(self.bundle / 'metrics-replacement.json')['transcript_persisted'])
+
+    def test_replacement_rejects_unproven_failure_or_unsettled_process(self):
+        self.run_with_result(self.valid_report())
+        with self.assertRaisesRegex(ValueError, 'requires evidence'):
+            self.run_with_result(self.valid_report(), replace_failed=True, recovery_reason='missing-session')
+        state = review.load(self.bundle / 'process.json')
+        state['running'] = True
+        review.dump(self.bundle / 'process.json', state)
+        with self.assertRaisesRegex(ValueError, 'not settled'):
+            self.run_with_result(self.valid_report(), replace_failed=True, recovery_reason='invalid-output')
+
+    def test_relaunch_without_recovery_and_deadline_extension_are_rejected(self):
+        self.run_with_result(self.valid_report())
+        with self.assertRaisesRegex(ValueError, 'already launched'):
+            self.run_with_result(self.valid_report())
+        with self.assertRaisesRegex(ValueError, 'cannot extend'):
+            self.run_with_result(self.valid_report(), finish_by='2100-01-01T00:00:00Z')
+
+    def test_recovery_cannot_change_recorded_execution_profile(self):
+        with self.assertRaises(SystemExit):
+            self.run_with_result('Broken output')
+        manifest = review.load(self.bundle / 'manifest.json')
+        manifest['reviewer']['effort'] = 'high'
+        review.dump(self.bundle / 'manifest.json', manifest)
+        with self.assertRaisesRegex(ValueError, 'execution profile changed'):
+            self.run_with_result(self.valid_report(), replace_failed=True, recovery_reason='invalid-output')
+
+    def test_structured_incomplete_coverage_is_not_execution_signoff(self):
+        report = json.loads(self.valid_report())
+        report['correctness'] = 'Incomplete'
+        report['coverage']['scope_complete'] = False
+        report['gaps'] = ['Retained runtime implementation remains uninspected.']
+        self.run_with_result(json.dumps(report))
+        metrics = review.load(self.bundle / 'metrics.json')
+        self.assertTrue(metrics['report_valid'])
+        self.assertFalse(metrics['coverage_complete_claimed'])
+        self.assertIn('Publisher must verify', metrics['coverage_verification'])
 
     def test_invalid_report_cannot_be_accepted(self):
         with self.assertRaises(SystemExit):

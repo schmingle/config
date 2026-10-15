@@ -7,7 +7,7 @@ If a needed tool, credential, repository path, source, or permission is unavaila
 
 Pin head, actual base and merge-base; inspect the incremental diff, relevant source/callers/tests, linked intent and fully paginated reviews, comments and threads. Assess stack parents and rollout dependencies explicitly. Existing findings must have substantive addressed/rebutted dispositions, including outdated, non-inline and P2/P3 findings; resolved flags alone do not establish correctness. Independently reject unsupported rebuttals.
 
-Full mode covers the diff and surrounding invariants. Revalidate mode starts with accepted prior coverage and changed head/base delta, affected interfaces and new discussion; expand when interactions or missing evidence invalidate coverage. Base movement or an identical diff alone does not justify another full review/LGTM. Disjoint paths alone do not prove safety. Report a gap if needed coverage exceeds the assignment.
+Full mode covers the diff and surrounding invariants. Revalidate mode starts with accepted prior coverage and changed head/base delta, affected interfaces and new discussion; expand when interactions or missing evidence invalidate coverage. Base movement or an identical diff alone does not justify another full review/LGTM. Disjoint paths alone do not prove safety. For deletions or contract changes, inspect relevant retained implementations, callers, and actual deployment boundaries; name searches alone do not establish those contracts. A structured report and claimed completeness do not replace this evidence. Report a gap if needed coverage exceeds the assignment.
 
 ## Required Linear context
 

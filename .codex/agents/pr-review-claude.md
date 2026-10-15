@@ -6,7 +6,7 @@ Agent descriptions define routing; the shared contract defines review standards 
 The reviewer selects relevant instructions and source context, expanding beyond the
 supplied brief as needed under [the context policy](context.md).
 The wrapper prepares, verifies, and performs any authorized publication; one Claude
-session supplies the independent analysis. Neither reviewer delegates further.
+session at a time supplies the independent analysis. Neither reviewer delegates further.
 
 ## Execution settings
 
@@ -35,7 +35,12 @@ normal subscription authentication and inherited Linear access.
 3. Create or verify a fresh, clean detached worktree at the pinned head, with the
    actual base and enough ancestry available. Each simultaneous review gets its own
    directory. Never use an active writer checkout or install dependencies for review.
-4. Use [the helper](scripts/claude_review.py) to prepare and run the bundle; see its
+4. Before spending model tokens, run the helper under permissions that support its
+   authenticated `claude auth status` check and write probe in the actual session
+   directory. Preserve the existing login, configuration directory, and Linear access.
+   If preflight fails inside the sandbox, request authorized command-level escalation;
+   do not copy credentials or disable persistence to bypass it.
+5. Use [the helper](scripts/claude_review.py) to prepare and run the bundle; see its
    [commands and specification](scripts/README.md). It copies evidence unchanged,
    rejects visible API errors/incomplete pagination, selects `AGENTS.override.md`
    before `AGENTS.md`, and includes applicable global/ancestor/testing guidance.
@@ -59,10 +64,32 @@ continuing independent source inspection. The shared contract owns context judgm
 
 ## Run and settle
 
-Start one fresh session for the assignment. Use a focused `--resume` only when a
-substantive coverage gap or new evidence requires continuation of that same review;
-never use an unrelated prior session. Resume preserves the original launch profile
-and saves separate artifacts. Old bundle formats must be prepared again.
+Start one fresh session for the assignment, with only one active reviewer process.
+Use a focused `--resume` for a substantive coverage gap or new evidence, after the
+helper verifies the actual persisted transcript. Never blindly resume a missing
+session or use an unrelated session. Resume preserves the original launch profile
+and saves separate artifacts. The helper checks authenticated session storage before
+launch and records whether the transcript exists afterward. Missing persistence is
+an infrastructure gap to surface, even when the analysis otherwise completed.
+
+Allow at most one replacement session for a confirmed missing transcript, invalid
+structured output, or CLI execution failure, after diagnosing/correcting its cause
+and verifying all owned processes are settled. Use the helper's `--replace-failed`
+and matching `--recovery-reason`; it enforces the limit and original deadline. Keep
+the pinned evidence, reviewer settings, and publication rules. A replacement must
+establish full coverage; never treat partial prior analysis as sign-off. Do not
+replace a reviewer just to obtain a better verdict, reset the deadline, or reprepare
+a bundle to evade the recovery limit. If recovery fails, return Incomplete with the
+concrete blocker. Old bundle formats require fresh preparation; explicit retries of
+historical failed runs still count toward the assignment's single replacement.
+
+Use the helper's `--json-schema` result in `structured_output`. Human prose in
+`result` is diagnostic, not the machine report. Output shape, process success, and a
+saved transcript are distinct from coverage: inspect actual source/tool evidence,
+including relevant retained implementations, interfaces, and deployment boundaries.
+A name search alone does not prove surviving contracts. Request a focused same-session
+continuation for material missing coverage, or the bounded replacement if that
+session is unavailable. Withhold sign-off until coverage is established.
 
 Reserve publication/cleanup time before the analysis deadline. The helper terminates
 and waits for its owned process on timeout, interruption, and unexpected errors;
