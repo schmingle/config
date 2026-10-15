@@ -2,6 +2,7 @@
 
 Use this for `pr-review-high` and explicitly assigned Claude trials, together with
 [the shared review contract](pr-review.md). The default `pr-review` runs natively.
+The shared contract defines eligibility for direct high-tier assignment and escalation, including user-requested deep reviews.
 The wrapper prepares, verifies, and performs any authorized publication; one Claude
 session supplies the independent analysis. Neither reviewer delegates further.
 

@@ -1,5 +1,5 @@
 name = "pr-review"
-description = "Default independent PR reviewer on Sol xhigh; assess correctness, architecture and risk, escalating concrete exceptional reasoning gaps to pr-review-high through the coordinator."
+description = "Default independent PR reviewer for correctness, architectural fit, and risk; route qualifying deeper reviews to pr-review-high through the coordinator under the shared review contract."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "xhigh"
 

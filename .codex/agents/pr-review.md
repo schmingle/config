@@ -25,11 +25,17 @@ The caller supplies the repository/PR, pinned head, actual base and merge-base, 
 
 Use the assigned default or escalated reviewer under the same review standards. The caller selects the reviewer and supplies its verified attribution.
 
-Escalate only when a concrete, consequential reasoning gap remains after focused source/history inspection: for example, competing interpretations of a concurrency, authorization or data-integrity invariant with materially different outcomes. PR size, an auth-related path, risk rating, routine repair complexity, slow CI or a desire for reassurance alone do not justify escalation. Missing access, tests, requirements or user approval requires the actual evidence/decision, not a different reviewer.
+Use `pr-review-high` when any of these applies:
 
-The reviewer does not independently delegate or transfer review work. Return the escalation request to the coordinator with the pinned PR/head/base, exact unresolved question, consequence, evidence inspected and source links, completed coverage, and why further same-tier review is unlikely to resolve it. Mark unresolved coverage Incomplete. Do not publish an LGTM or a placeholder review before handing off.
+- **Sensitive or high-impact changes:** authentication, authorization, shared components with high fanout, or other areas where mistakes have substantial security, data-integrity, or operational consequences.
+- **High complexity:** the PR exhibits or requires substantial reasoning about concurrency, state transitions, algorithms, cross-layer interactions, or other complex behavior. A concrete, consequential reasoning gap found during a default review also qualifies.
+- **User-requested depth:** the user asks for a deep, in-depth, or thorough review, or explicitly requests this reviewer.
 
-The coordinator normally dispatches the default reviewer first. It may assign the escalated reviewer directly when the user explicitly requests it or when a documented exceptional reasoning gap is already established. Never run both reviewers routinely or in parallel on the same snapshot. Start the escalated reviewer without inherited writer/coordinator conversation; provide a compact factual handoff and verified prior review coverage. Accepted coverage must be evidenced, not assumed from a reviewer's summary.
+A prior default-tier review or demonstrated failure of that tier is not required. Record the qualifying area, complexity, or user request and the intended review scope. PR size or slow CI alone does not establish high complexity. Missing access, tests, requirements, or user approval still requires the actual evidence or decision; a different reviewer does not remove that blocker.
+
+The reviewer does not independently delegate or transfer review work. Return the escalation request to the coordinator with the pinned PR/head/base, qualifying reason, scope and any specific unresolved question, consequence, evidence inspected and source links, completed coverage, and remaining work. Mark unresolved coverage Incomplete. Do not publish an LGTM or a placeholder review before handing off.
+
+The coordinator uses the default reviewer for ordinary PRs and may assign `pr-review-high` directly whenever a criterion above applies, or escalate when a criterion becomes apparent during review. Never run both reviewers routinely or in parallel on the same snapshot. Start the escalated reviewer without inherited writer/coordinator conversation; provide a compact factual handoff and any verified prior review coverage. Accepted coverage must be evidenced, not assumed from a reviewer's summary.
 
 For targeted escalation, distinguish a question-specific conclusion from whole-PR sign-off. A final LGTM requires complete applicable coverage of current code and integration, either independently established or explicitly revalidated with accepted prior coverage. Publish/reuse one applicable final review under the rules below; do not duplicate a valid review solely to change the reviewer attribution.
 
