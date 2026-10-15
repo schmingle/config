@@ -22,7 +22,7 @@ def native_attribution(settings):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('agent', choices=['pr-review'])
+    parser.add_argument('agent', choices=['pr-review', 'pr-risk'])
     args = parser.parse_args()
     settings = tomllib.loads((AGENTS / (args.agent + '.toml')).read_text())
     print(native_attribution(settings))

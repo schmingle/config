@@ -17,7 +17,7 @@ import uuid
 AGENTS = Path(__file__).resolve().parents[1]
 PROFILE = Path(__file__).with_name('claude-review.toml')
 REPORT_FIELDS = {'correctness', 'approach', 'risk', 'summary', 'findings', 'coverage',
-                 'gaps', 'validation', 'reviewer_attribution'}
+                 'gaps', 'validation', 'reviewer_attribution', 'risk_report_url', 'risk_discrepancies'}
 
 
 def load(path):
@@ -107,11 +107,21 @@ def collect_guides(checkout, changed_paths, additional=(), codex_home=None):
     return list(dict.fromkeys(path.resolve() for path in guides if path is not None))
 
 
+def validate_risk_report(report):
+    """Require the posted assessment without demanding a new snapshot or rerating it."""
+    fields = ('body', 'url', 'head', 'base', 'merge_base')
+    if (not isinstance(report, dict)
+            or report.get('rating') not in ('Low', 'Medium low', 'Medium', 'Medium high', 'High')
+            or any(not isinstance(report.get(field), str) or not report[field].strip() for field in fields)):
+        raise ValueError('A complete posted risk_report with rating, body, URL, and assessed commits is required')
+
+
 def prepare(args):
     spec = load(args.spec)
     for field in ('repo', 'number', 'head', 'base', 'merge_base', 'base_ref'):
         if not spec.get(field):
             raise ValueError('Missing review specification field: ' + field)
+    validate_risk_report(spec.get('risk_report'))
     if not spec.get('evidence'):
         raise ValueError('Full saved GitHub evidence is required')
     checkout = Path(args.checkout).resolve()
@@ -146,7 +156,7 @@ def prepare(args):
         ['git', '-C', str(checkout), 'diff', spec['merge_base'], spec['head'], '--']))
     (output / 'guidance.md').write_text('\n\n'.join('## ' + str(path) + '\n\n' + path.read_text() for path in guides))
     spec.pop('evidence')
-    spec.update({'bundle_format': 2, 'checkout': str(checkout), 'changed_paths': paths,
+    spec.update({'bundle_format': 3, 'checkout': str(checkout), 'changed_paths': paths,
                  'guidance': [str(path) for path in guides], 'raw_evidence': inventory,
                  'guidance_sha256': digest(output / 'guidance.md'), 'reviewer': reviewer_profile()})
     dump(output / 'manifest.json', spec)
@@ -227,8 +237,9 @@ def run_process(argv, checkout, prompt, timeout, artifact, session):
 def run(args):
     bundle = Path(args.bundle).resolve()
     manifest = load(bundle / 'manifest.json')
-    if manifest.get('bundle_format') != 2:
+    if manifest.get('bundle_format') != 3:
         raise ValueError('Reprepare this bundle with the current helper before running it')
+    validate_risk_report(manifest.get('risk_report'))
     finish_by = args.finish_by or manifest.get('finish_by')
     bounded_timeout(args.timeout, finish_by)
     if args.max_turns <= 0:
@@ -271,6 +282,11 @@ def run(args):
               + 'First verify live Linear access with ToolSearch: read linked issues and relevant comment pages, '
               + 'or verify get_user(me) when unlinked without reading unrelated tickets. '
               + 'Missing required access remains Incomplete.\n'
+              + 'Use manifest.risk_report unchanged: it is the posted risk assessment, not a request to reassess. '
+              + 'Return risk as its exact rating and risk_report_url as its exact URL. '
+              + 'Reuse it even when its assessed commits differ from this review. '
+              + 'Return concrete contradictions as a risk_discrepancies list (empty if none); '
+              + 'a material unresolved contradiction prevents whole-PR sign-off. Do not silently rerate.\n'
               + 'Use the shared review standards. Return one JSON object with these fields: '
               + ', '.join(sorted(REPORT_FIELDS)) + ', prior_findings, open_questions. '
               + 'Findings include priority, path, line, side, scenario, consequence, evidence, and correction. '
@@ -304,6 +320,9 @@ def run(args):
         pass
     report_valid = (isinstance(report, dict) and REPORT_FIELDS <= report.keys()
                     and isinstance(report.get('findings'), list)
+                    and report.get('risk') == manifest['risk_report']['rating']
+                    and report.get('risk_report_url') == manifest['risk_report']['url']
+                    and isinstance(report.get('risk_discrepancies'), list)
                     and report.get('reviewer_attribution') == profile['attribution'])
     checkout_matches = (git(checkout, 'rev-parse', 'HEAD') == manifest['head']
                         and not git(checkout, 'status', '--porcelain'))

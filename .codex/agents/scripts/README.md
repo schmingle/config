@@ -4,7 +4,8 @@ The helper runs the Claude-backed `pr-review-high`; the default reviewer runs
 natively. Review definitions and the posted template remain in
 [the shared contract](../pr-review.md). [The execution profile](claude-review.toml)
 is the single source for Claude's model, effort, display name, and allowed tools.
-Native review signoffs come from `reviewer_attribution.py pr-review`, which reads
+Native signoffs come from `reviewer_attribution.py pr-review` or
+`reviewer_attribution.py pr-risk`, which reads
 the native agent's `model` and `model_reasoning_effort` fields.
 
 ## Prepare and run
@@ -12,7 +13,12 @@ the native agent's `model` and `model_reasoning_effort` fields.
 Create a fresh detached checkout at the pinned PR head. Save complete paginated
 GitHub responses and write a JSON specification containing `repo`, `number`, `head`,
 `base` (commit), `base_ref` (branch), `merge_base`, and `evidence` (plain output filename
-to source path). Include title/body, linked issues, mode/scope, and an ISO 8601
+to source path), plus `risk_report`. This object contains the posted report's exact
+`rating`, `body`, `url`, and assessed commit fields `head`, `base`, and `merge_base`.
+The caller verifies its publication and provenance. Its assessed commits may predate
+the current review: reuse the posted report on subsequent reviews without rerunning
+risk assessment. Missing/incomplete reports block preparation. Include title/body,
+linked issues, mode/scope, and an ISO 8601
 `finish_by` with timezone. Additional `guidance` paths and `benchmark: true` are
 optional. Never include baseline reports or private coordinator conclusions in a
 blind benchmark.
@@ -40,8 +46,8 @@ The reviewer chooses applicable instructions and source context, using the bundl
 a starting point and gathering more evidence when needed. Required review coverage
 still applies. The caller owns live eligibility, required Linear reads, review-coverage verification,
 publication/readback, and worktree cleanup. The helper checks initial and final HEAD
-and cleanliness, validates the report envelope, and settles its owned process on
-normal completion, timeout, interruption, or error. After a hard kill or crash,
+and cleanliness, validates the report envelope and unchanged risk rating/report URL,
+and settles its owned process on normal completion, timeout, interruption, or error. After a hard kill or crash,
 inspect the saved process identity and reconcile it manually.
 
 ## Continue a review
@@ -54,6 +60,10 @@ Use a continuation only for a substantive gap or new evidence. Restore the same 
 pinned checkout if necessary. Original launch settings are retained; new deadline
 information is sent with the focused request. Each attempt has separate process,
 events, report, and metrics files. Execution/report success is never coverage sign-off.
+The result includes `risk` (the supplied rating), `risk_report_url` (the supplied
+URL), and `risk_discrepancies` (a list of concrete contradictions, empty when none).
+The publisher must surface discrepancies and withhold sign-off for unresolved material
+contradictions; a structurally valid report is not sign-off.
 Use the final cumulative cost once per session; do not sum it across continuations.
 
 ## Verification

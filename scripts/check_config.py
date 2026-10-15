@@ -100,9 +100,9 @@ def validate():
                     continue  # Placeholder, fragment, or external reference.
                 destination = (path.parent / target.split('#')[0]).resolve()
                 check(destination.exists(), name + ': broken local link: ' + target)
-    reviewer = agents['pr-review']
-    check('reviewer_attribution.py' in reviewer['developer_instructions'],
-          'Default reviewer must derive its signoff from execution fields')
+    for name in ('pr-review', 'pr-risk'):
+        check('reviewer_attribution.py' in agents[name]['developer_instructions'],
+              name + ': derive signoff from execution fields')
     profile_path = ROOT / '.codex/agents/scripts/claude-review.toml'
     profile = tomllib.loads(profile_path.read_text())
     check('-'.join(profile['label'].lower().split()).replace('.', '-') == profile['model'],

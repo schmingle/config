@@ -112,9 +112,14 @@ class FixtureTests(unittest.TestCase):
         ], indent=2) + '\n')
         self.bundle = self.root / 'bundle'
         self.spec = self.root / 'spec.json'
+        self.risk_report = {'rating': 'Medium high',
+                            'body': '## PR risk assessment\n**Medium high** — Shared behavior with coordinated rollout.\n',
+                            'url': 'https://example.invalid/pull/1#pullrequestreview-1',
+                            'head': self.head, 'base': self.base, 'merge_base': self.base}
         review.dump(self.spec, {'repo': 'example/config', 'number': 1, 'head': self.head,
                                'base': self.base, 'base_ref': 'main', 'merge_base': self.base,
-                               'evidence': {'threads.json': str(self.evidence)}})
+                               'evidence': {'threads.json': str(self.evidence)},
+                               'risk_report': self.risk_report})
 
     def git(self, *args):
         return subprocess.check_output(['git', '-c', 'core.hooksPath=/dev/null', '-c',
@@ -236,7 +241,8 @@ class FixtureTests(unittest.TestCase):
 
     def valid_report(self):
         report = dict.fromkeys(review.REPORT_FIELDS, '')
-        report.update(findings=[], coverage={}, gaps=[],
+        report.update(findings=[], coverage={}, gaps=[], risk=self.risk_report['rating'],
+                      risk_report_url=self.risk_report['url'], risk_discrepancies=[],
                       reviewer_attribution=review.reviewer_profile()['attribution'])
         return json.dumps(report)
 
@@ -246,6 +252,50 @@ class FixtureTests(unittest.TestCase):
         self.assertTrue(metrics['execution_complete'])
         self.assertTrue(metrics['report_valid'])
         self.assertTrue(metrics['checkout_matches'])
+
+    def test_missing_risk_report_blocks_preparation(self):
+        spec = review.load(self.spec)
+        del spec['risk_report']
+        review.dump(self.spec, spec)
+        with self.assertRaisesRegex(ValueError, 'posted risk_report'):
+            self.prepare()
+        self.assertFalse(self.bundle.exists())
+
+    def test_existing_risk_report_survives_new_head_and_base_unchanged(self):
+        (self.checkout / 'source.txt').write_text('later revision\n')
+        self.commit('Later revision')
+        spec = review.load(self.spec)
+        spec.update(head=self.git('rev-parse', 'HEAD'), base=self.head, merge_base=self.head)
+        review.dump(self.spec, spec)
+        self.run_with_result(self.valid_report())
+        saved = review.load(self.bundle / 'manifest.json')
+        self.assertEqual(saved['risk_report'], self.risk_report)
+        self.assertNotEqual(saved['head'], saved['risk_report']['head'])
+        self.assertNotEqual(saved['base'], saved['risk_report']['base'])
+        self.assertTrue(review.load(self.bundle / 'metrics.json')['report_valid'])
+
+    def test_silent_risk_rerating_is_rejected(self):
+        report = json.loads(self.valid_report())
+        report['risk'] = 'Low'
+        with self.assertRaises(SystemExit):
+            self.run_with_result(json.dumps(report))
+        self.assertFalse(review.load(self.bundle / 'metrics.json')['report_valid'])
+
+    def test_substituted_risk_report_link_is_rejected(self):
+        report = json.loads(self.valid_report())
+        report['risk_report_url'] = 'https://example.invalid/other-report'
+        with self.assertRaises(SystemExit):
+            self.run_with_result(json.dumps(report))
+        self.assertFalse(review.load(self.bundle / 'metrics.json')['report_valid'])
+
+    def test_contradiction_is_preserved_without_changing_rating(self):
+        report = json.loads(self.valid_report())
+        report['correctness'] = 'Incomplete'
+        report['risk_discrepancies'] = ['New persistent write conflicts with claimed easy reversal.']
+        self.run_with_result(json.dumps(report))
+        saved = review.load(self.bundle / 'report.json')
+        self.assertEqual(saved['risk'], self.risk_report['rating'])
+        self.assertEqual(saved['risk_discrepancies'], report['risk_discrepancies'])
 
     def test_invalid_report_cannot_be_accepted(self):
         with self.assertRaises(SystemExit):

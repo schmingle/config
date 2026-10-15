@@ -25,6 +25,7 @@ normal subscription authentication and inherited Linear access.
 
 1. Start the wrapper with `fork_turns="none"`. Supply repository/PR, pinned head,
    actual base and merge-base, mode/scope, absolute finish-by, publication permissions,
+   the exact posted risk report body, URL, rating, and assessed snapshot/provenance,
    and evidenced prior coverage or an escalation question when applicable. Keep
    writer-private conversation and coordinator conclusions out of the assignment.
 2. Verify repository identity and live PR state. Collect full paginated GitHub
@@ -73,12 +74,14 @@ Never claim an unaccounted reviewer stopped.
 ## Verify and publish
 
 - Verify the actual model/effort, valid report, pinned final HEAD, clean checkout,
-  source/test/caller coverage, full discussion, actual Linear reads, and grounded
+  source/test/caller coverage, full discussion, actual Linear reads, unchanged supplied
+  risk rating/report link, any risk contradictions, and grounded
   findings with valid anchors. Process success or a JSON report is not sign-off.
 - Refresh live PR head/base/discussion before any authorized publication. Follow the
   shared contract's review template, assessments, revalidation, inline findings,
   COMMENT publication, attribution, and readback rules without substituting a wrapper
-  LGTM. Incomplete coverage remains Incomplete.
+  LGTM. Do not perform a second risk assessment. Missing reports or unresolved material
+  contradictions return to the coordinator; incomplete coverage remains Incomplete.
 - Keep raw evidence, session/process IDs, launch arguments, report, and diagnostics
   outside the worktree. Once the owned process is settled, remove only that review's
   clean checkout, or return it to the coordinator if the coordinator owns cleanup.

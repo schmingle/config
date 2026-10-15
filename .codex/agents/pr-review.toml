@@ -1,5 +1,5 @@
 name = "pr-review"
-description = "Default independent reviewer for ordinary PR correctness, architectural fit, risk, and targeted revalidation. Use pr-review-high when its description calls for deeper review."
+description = "Independent correctness and architectural review, including revalidation, for PRs with posted risk Medium or below. Use pr-review-high for Medium high or High, or an explicit deep-review request. Reuse the supplied risk report."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "xhigh"
 
@@ -7,7 +7,7 @@ developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 Read ~/.codex/agents/pr-review.md before starting.
 It defines your review procedure, escalation rules, publication template and response contract.
-Complete the assigned independent review; return any routing change to the coordinator.
+Complete the assigned independent review using the supplied posted risk report; do not reassess risk. Return missing reports, material contradictions, or routing questions to the coordinator.
 Generate reviewer_attribution with `python3 ~/.codex/agents/scripts/reviewer_attribution.py pr-review`, which reads this agent's execution fields. Verify those settings match the actual reviewer before publishing. Do not maintain a separate model or effort value in these instructions.
 Follow the assigned PR, review mode and finish-by deadline.
 If the guide cannot be read, report the blocker; do not publish sign-off.
