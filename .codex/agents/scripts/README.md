@@ -1,36 +1,64 @@
 # Claude review preparation and launch
 
-This helper performs no publication and no source edits. It standardizes the Claude-backed `pr-review-high` execution while the default `pr-review` runs natively on Sol xhigh. Reviewer definitions, priorities, assessments, and the posted template stay in [../pr-review.md](../pr-review.md).
+The helper runs the Claude-backed `pr-review-high`; the default reviewer runs
+natively. Review definitions and the posted template remain in
+[the shared contract](../pr-review.md). [The execution profile](claude-review.toml)
+is the single source for Claude's model, effort, display name, and allowed tools.
 
-1. Prepare a fresh, clean detached worktree at the verified PR head. Collect complete paginated GitHub evidence and identify applicable guidance. Do not include private author/coordinator conclusions or a baseline review report in a blind benchmark.
-2. Write a specification with `repo`, `number`, `head`, `base`, `merge_base`, `base_ref`, `title`, `body`, `linked_issues`, `finish_by` (ISO 8601 with timezone), `evidence` (output filename to raw source path), and optional `guidance` paths. Set `benchmark: true` only for authorized historical snapshot tests. In normal reviews the caller remains responsible for live eligibility, snapshot/discussion refresh, authorized publication/readback, and worktree cleanup.
-3. Run:
+## Prepare and run
+
+Create a fresh detached checkout at the pinned PR head. Save complete paginated
+GitHub responses and write a JSON specification containing `repo`, `number`, `head`,
+`base` (commit), `base_ref` (branch), `merge_base`, and `evidence` (plain output filename
+to source path). Include title/body, linked issues, mode/scope, and an ISO 8601
+`finish_by` with timezone. Additional `guidance` paths and `benchmark: true` are
+optional. Never include baseline reports or private coordinator conclusions in a
+blind benchmark.
 
 ```sh
 python3 ~/.codex/agents/scripts/claude_review.py prepare --spec /absolute/spec.json --checkout /absolute/checkout --output /new/bundle
-python3 ~/.codex/agents/scripts/claude_review.py run --bundle /new/bundle --timeout 900 --finish-by 2026-10-15T20:00:00Z
+python3 ~/.codex/agents/scripts/claude_review.py run --bundle /new/bundle --timeout 900
 ```
 
-The bundle retains raw data and exact hashes, projects CI transport metadata, preserves discussion bodies and thread/disposition context with deduplicated copies, and includes exact ancestor guidance. Preparation rejects a dirty/wrong checkout, a wrong merge-base, and visibly incomplete pagination. This validation cannot prove that the caller fetched every REST page; the caller must establish completeness.
+The deadline comes from the specification; `--finish-by` can override it. Reserve
+publication/cleanup time before that deadline. Output belongs outside the checkout
+and public configuration repository because it can include private source material.
 
-The launcher uses Opus 5.5 medium, a stable shared contract/checklist prefix, dynamic-section exclusion, deferred tool discovery, subscription authentication, Linear-only MCP filtering, and explicitly allowed read tools/commands. Guidance is embedded exactly once in the initial user assignment. Original source/history and raw evidence remain inspectable. An unavailable required integration is a blocker; a claimed connection is insufficient without actual reads.
+The bundle preserves full evidence byte-for-byte. It validates visible API errors
+and final pagination markers without compacting or reconstructing discussion.
+The caller must still prove every REST page was fetched. Guidance includes the
+selected global and repository ancestor instruction files (`AGENTS.override.md`
+then `AGENTS.md`), root testing guidance, and explicit additional topical guides.
+Saved evidence/guidance hashes are checked before launch. Legacy bundles must be
+prepared again; they are never silently migrated.
 
-Use simple read commands from the already pinned working directory. Do not prepend `cd`, combine commands, broaden permissions, or silently substitute another model. The helper bounds the timeout by `--finish-by` or the manifest deadline, rejects expired/ambiguous deadlines, and stops its owned process group. The caller must reserve publication/cleanup time before that analysis deadline. On external cancellation the caller must still verify owned process termination.
+Claude has trusted local shell/file access. Review instructions still prohibit
+source edits, tests/installs, delegation, publication, and external mutations.
+The caller owns live eligibility, required Linear reads, review-coverage verification,
+publication/readback, and worktree cleanup. The helper checks initial and final HEAD
+and cleanliness, validates the report envelope, and settles its owned process on
+normal completion, timeout, interruption, or error. After a hard kill or crash,
+inspect the saved process identity and reconcile it manually.
 
-If a substantive gap or changed snapshot requires continuation:
+## Continue a review
 
 ```sh
 python3 ~/.codex/agents/scripts/claude_review.py run --bundle /new/bundle --resume --prompt-file /absolute/focused-request.txt --timeout 600
 ```
 
-Restore the same clean pinned checkout path first if it was removed. Continuation preserves the initial recorded system prompt and launch/tool settings; it does not silently apply later changes to the helper/checklist. Provide new instructions in the focused request. Each continuation gets separate events, metrics, and report files. Formatting/preferences alone do not justify another reasoning pass.
+Use a continuation only for a substantive gap or new evidence. Restore the same clean
+pinned checkout if necessary. Original launch settings are retained; new deadline
+information is sent with the focused request. Each attempt has separate process,
+events, report, and metrics files. Execution/report success is never coverage sign-off.
+Use the final cumulative cost once per session; do not sum it across continuations.
 
-`execution_complete` is not review sign-off. Verify source/test/caller coverage and supported claims, actual Linear reads, exact guidance delivery, model/effort, and finding anchors. Require Incomplete for unresolved material gaps. Count every necessary continuation in the comparison, and report failed/incomplete attempts separately rather than treating their low token count as a quality-preserving saving.
+## Verification
 
-Usage totals are per invocation. Resumed `total_cost_usd` and `modelUsage` costs are cumulative session estimates: take the final value per session, never sum it across continuations. API-equivalent list prices do not establish subscription quota consumption. Historical tests fix code and archived GitHub context; live Linear may have changed and must be disclosed.
-
-Verification:
+Run `python3 scripts/check_config.py` from the config repository, then:
 
 ```sh
-PYTHONDONTWRITEBYTECODE=1 python3 ~/.codex/agents/scripts/test_claude_review.py
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .codex/agents/scripts -p 'test_*.py'
 ```
+
+Tests use local fixtures and subprocesses. They do not invoke Claude or connected
+services. CI installs the small validation dependency from `requirements-dev.txt`.

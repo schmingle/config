@@ -43,7 +43,7 @@ The time-frame and reconciliation rules below apply to both modes. The general s
 
 ## Source collection
 
-Use the available connectors, APIs, or read-only local history. Attempt relevant sources, following existing access restrictions and user exclusions:
+Use the available connectors, APIs, or read-only local history. Start with sources most relevant to the requested outcome, then fill material evidence gaps. Reuse unchanged evidence within the invocation and stop when the requested coverage is complete or the caller's deadline is reached; do not impose an arbitrary call limit on general collection. Report unavailable or unreviewed sources honestly. Follow existing access restrictions and user exclusions:
 
 - GitHub: authored commits, PR creation and updates, reviews, merges, checks, and deployment evidence.
 - Linear: issue progress, comments, decisions, and linked work.

@@ -1,0 +1,7 @@
+# Execution settings for pr-review-high and explicitly assigned Claude trials.
+model = "claude-opus-5-5"
+label = "Claude Opus 5.5"
+effort = "medium"
+
+# Claude is trusted locally. Task instructions still govern permitted actions.
+allowed_tools = ["Bash", "Read", "Glob", "Grep", "Edit", "Write", "ToolSearch", "WebFetch", "WebSearch", "mcp__claude_ai_Linear__get_issue", "mcp__claude_ai_Linear__list_comments", "mcp__claude_ai_Linear__get_user", "mcp__claude_ai_Linear__list_teams", "mcp__claude_ai_Linear__get_document", "mcp__claude_ai_Linear__get_project"]

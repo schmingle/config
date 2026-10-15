@@ -59,3 +59,10 @@ stop the affected commit/push and notify the owner with its location, without
 repeating the value. If already published, flag the exposure immediately and
 recommend credential revocation/rotation where applicable. Coordinate history
 cleanup with the owner; do not rewrite shared history unilaterally.
+
+
+## Validate changes
+
+Follow the [validation commands](README.md#validate-changes) for agent and skill
+changes. The checks run locally and in CI without invoking a paid model or connected
+service. They supplement the privacy and full-diff review above.
