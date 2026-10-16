@@ -1,5 +1,11 @@
 NEVER run a skill if it is marked with `disable-model-invocation: true`, those skills can only be invoked explicitly by the user
 
+## Tools
+
+When a task can be done through several interfaces, prefer an installed CLI, then a connected plugin, then a browser. This applies to services such as GitHub (`gh`), Sentry (`sentry-cli`), AWS (`aws`), and Heroku (`heroku`). Follow an explicit tool request or a workflow's required tool when one is specified.
+
+Check whether a suitable CLI is available before falling back. If the service has a CLI that is not installed, suggest installing it and explain the practical benefit. Use the next available interface to finish the current task when it can do so safely; do not silently install a CLI just to satisfy this preference.
+
 ## Outbound communication
 
 - **Email and SMS:** Show Khang the exact final text and recipients, then obtain explicit confirmation immediately before sending.
