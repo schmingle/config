@@ -6,6 +6,10 @@ When a task can be done through several interfaces, prefer an installed CLI, the
 
 Check whether a suitable CLI is available before falling back. If the service has a CLI that is not installed, suggest installing it and explain the practical benefit. Use the next available interface to finish the current task when it can do so safely; do not silently install a CLI just to satisfy this preference.
 
+## Work and personal accounts
+
+Keep work and personal accounts separate. Most connected tools are for work; personal activity is mainly in the personal Chrome profile and a small set of services. Read the local, untracked account map at `~/.codex/private/account-context.md` when choosing an account or tool. Verify the authenticated account before accessing data or making changes, especially when a service is available in both contexts. Do not use a work connection for personal activity, or a personal connection for work activity, merely because it is available. If the intended account remains unclear, ask before accessing either one.
+
 ## Writing and outbound communication
 
 Prefer delegating writing tasks to the `writer` agent using `fork_turns="none"` and the compact assignment described in [its workflow](agents/writer.md). This includes short edits, messages, documents, proposals, and posts. Include the relevant facts and sources, audience, channel, requested length, current or approved draft, and all applicable corrections. Reuse the same writer for revisions when practical, and check its result against the brief before presenting it. Code-facing prose, daily standups, and writing-guide maintenance retain their owning workflows; involve the writer for drafting when compatible with those workflows.
