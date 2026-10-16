@@ -26,15 +26,13 @@ For email, SMS, and Slack, show Khang the exact final message and recipients or 
 
 For smaller writing tasks, or if the writer is unavailable or delegation is disallowed, follow [the writing workflow](agents/writer.md) and the private canonical guide at `~/.codex/writing/style-guide.md` directly. Briefly disclose a fallback when the writer would otherwise have been used. Do not duplicate style preferences in this routing rule.
 
-## Subagent context
+## Delegation
 
-When delegation is authorized, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless Khang explicitly requests full-context inheritance. This rule does not itself authorize delegation.
+Prefer delegating substantial tasks to a suitable predefined agent unless Khang specifies otherwise, such as "don't delegate" or "do it yourself." Substantial work includes tasks that may take more than 30 seconds or involve more than 10 steps. Examples include creating PRs, running GitHub workflows or deployment skills, and performing bulk repeated actions; these are examples, not an exhaustive list or automatic delegation requirements. Handle short, straightforward tasks directly unless Khang requests delegation or the owning workflow requires it.
 
-## Delegation preference
+This preference authorizes delegation within the task's existing scope and approval boundaries. Choose only agents whose defined roles fit the work. If none is suitable, do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
 
-Prefer delegating substantial tasks to a suitable predefined agent unless Khang specifies otherwise, such as "don't delegate." Substantial work includes tasks that may take more than 30 seconds or involve more than 10 steps. Examples include creating PRs, running GitHub workflows or deployment skills, and performing bulk repeated actions; these are examples, not an exhaustive list or automatic delegation requirements. Handle short, straightforward tasks directly unless Khang requests delegation or the owning workflow requires it.
-
-This preference authorizes delegation within the task's existing scope and approval boundaries; follow the Subagent context requirements above. Choose only agents whose defined roles fit the work. If none is suitable, do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
+When delegation is authorized, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless Khang explicitly requests full-context inheritance. This context rule does not itself authorize delegation.
 
 ## PR independence and dependency stacking
 
