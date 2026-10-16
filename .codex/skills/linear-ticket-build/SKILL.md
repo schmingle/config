@@ -111,27 +111,31 @@ remains a blocker; do not guess to force implementation or promotion.
 
 ## Questions and plan
 
-Read only the [shared questions and defaults contract](../linear-ticket-triage/SKILL.md#questions-and-defaults)
+Read only the shared [comment style](../linear-ticket-triage/SKILL.md#comment-style),
+[questions and defaults](../linear-ticket-triage/SKILL.md#questions-and-defaults), and
+[private checkpoint/quiet-run contracts](../linear-ticket-triage/SKILL.md#private-checkpoint-and-quiet-runs)
 as reference material; this is not an invocation of triage and does not load its
-execution steps. Use one initial set of at most three meaningful questions for
-the bounded ticket across both skills. Recover legacy question comments, thread
-IDs, answers, timestamps, and defaults before posting. A separate invocation is
-not a new question budget. If no initial set exists, build may ask within that budget while
-implementing safe defaults immediately.
+execution steps. Keep all machine bookkeeping private under that contract.
+Use one initial set of at most three meaningful questions for the bounded ticket
+across both skills. Recover legacy question comments, thread IDs, answers,
+timestamps, and defaults before posting. A separate invocation is
+not a new question budget. If no initial set exists, build may ask within that
+budget while implementing safe defaults immediately.
 
 Infer ordinary ambiguity from available context. After a reply, the original
 48-hour deadline, or exhaustion of the question budget, stop ordinary questioning;
 record assumptions in the plan and PR instead. Only a truly new material risk
 that cannot safely proceed without authorization or required data permits one
-precise blocking ask under the canonical contract. Record its fingerprint and
-quietly skip unchanged later invocations; timeout never supplies that permission.
+precise blocking ask under the canonical contract. Keep its fingerprint and source
+references in the private checkpoint, and quietly skip unchanged later invocations;
+timeout never supplies that permission.
 A new ownership or risk ask consumes this run's one-ticket budget; end the run
 without asking across other candidates.
 
-Write Linear comments naturally as the current user, following applicable writing
-guidance. Explain the approach, what is already addressed, what remains, the
-sequence, acceptance criteria, defaults being implemented, and any questions.
-Do not repeat the ticket or use a fixed heading template.
+Follow the shared comment limits: lead with user impact and next action, and
+include only a material decision/default, question, or blocker. Put technical
+rationale and validation detail in the repository-required PR description, linked
+from the ticket. Never repeat the ticket or append a workflow/metadata inventory.
 
 Reuse a triage plan or existing question set; otherwise post one concise initial
 plan and any questions, then implement immediately.
@@ -181,9 +185,9 @@ proportional to risk and fix failures caused by the work before publishing.
 
 After a push, re-fetch the issue, PR, and comments. Incorporate newer in-scope
 answers before declaring completion. Record processed reply IDs and `updatedAt`
-values, including edited comments, only after their implementation or documented
-no-code disposition is complete. Compare replies with build's applied state,
-not triage's assessed/seen state: a triage assessment does not mean the requested
+values privately, including edited comments, only after their implementation or
+documented no-code disposition is complete. Compare replies with build's applied
+state, not triage's assessed/seen state: a triage assessment does not mean the requested
 change has been applied. Reuse legacy processed-reply records only when prior
 implementation/disposition evidence supports that meaning. Leave unapplied work
 pending so queued feedback cannot be silently skipped.
@@ -197,13 +201,12 @@ the repository's dependency rules.
 
 Title the PR `<issue identifier>: <concise title>`. Follow the repository's description
 requirements, including the issue, solution, acceptance criteria, and test plan
-and results. Include the documented defaults, question-comment link, original
-question timestamp, 48-hour deadline, and unresolved questions when applicable.
-Keep a minimal workflow record in Linear and the PR: bounded scope, defaults,
-original question/thread IDs and `createdAt`/deadline when recoverable, processed
-reply IDs/`updatedAt` separately from triage-assessed IDs/`updatedAt`, terminal
-clarification state, ownership decision links, and plan/delivery comment links.
-Reuse legacy records; do not create repository tracking files or a second question round to normalize their format.
+and results. Include material defaults and unresolved questions when relevant;
+link the original question comment instead of repeating it. A useful readiness
+deadline may be a readable date/time with timezone. Keep original timestamps,
+reply watermarks, provenance, holds, and other machine state in the private
+checkpoint, never in human-facing PR text or hidden HTML/JSON blocks. Do not
+create repository tracking files or a new question round to normalize old records.
 
 Both Draft and ready-for-review PRs are open on GitHub; use `isDraft` to distinguish
 them. Choose or update readiness after implementation and verification:
@@ -259,17 +262,18 @@ When new work or a meaningful update is complete and the PR matches current
 answers or recorded defaults:
 
 1. Move the issue to In Review, including when the PR remains Draft for questions.
-2. Post one delivery comment linking the PR, summarizing the result and checks,
-   and stating whether it is Draft awaiting answers or ready using confirmed
-   choices/defaults. Invite optional feedback without requiring acknowledgement.
+2. Post one delivery comment within the shared 100-word maximum: link the PR,
+   state the user-visible result, one useful verification summary, and whether it
+   is Draft awaiting answers or ready using confirmed choices/defaults. Invite
+   optional feedback without requiring acknowledgement.
    Mention only the requester; GitHub handles reviewer requests. Reuse an existing
    delivery comment instead of posting it again on a later unchanged run.
-3. Keep the workflow record current. Combine substantive answer, implementation,
-   readiness, or blocker changes into one update comment; do not post per-push
-   updates, reminders, or unchanged blocker pings.
+3. Keep the private checkpoint current without publishing it. Combine substantive
+   answer, implementation, readiness, or blocker changes into one short update;
+   do not post per-push updates, reminders, or unchanged blocker pings.
 
-Report the issue and requester, plan/question comment links, branch and commits,
-changed behavior, verification, PR and Draft/ready state, reviewers, final Linear
-status, assumptions, unanswered questions/deadline, blockers, and human next steps.
+Report the issue/PR links, user-visible outcome, verification summary, Draft/ready
+state, and any material blocker or next action concisely. Include a readable
+question deadline only when useful; omit raw bookkeeping and routine field lists.
 State that another invocation is needed for future replies or promotion;
 do not claim that a follow-up was scheduled.

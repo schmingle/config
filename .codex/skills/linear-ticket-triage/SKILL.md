@@ -61,11 +61,12 @@ gates under applicable `AGENTS.md` guidance.
 
 Before selecting new work, inspect the current user's previously managed leaves
 in the configured team in Todo, In Progress, or In Review and their linked PRs.
-Require a traceable Linear/PR workflow record with bounded scope, verified
-ownership, and estimate; assignment or status alone is not eligibility. Re-fetch
-replies, edits, blockers, and observed PR state. Prefer a new actionable answer,
-scope change, or newly due 48-hour follow-up. Record the substantive assessment
-and pending implementation/readiness work in the Linear handoff, then stop.
+Require an existing plan and source evidence establishing this workflow's bounded
+scope, verified ownership, and estimate; assignment or status alone is not
+eligibility. Re-fetch replies, edits, blockers, and observed PR state. Prefer a new
+actionable answer, scope change, or newly due 48-hour follow-up. Record only the material decision
+and next action in a concise Linear handoff; keep assessment bookkeeping in the
+private checkpoint below, then stop.
 Do not change the code, PR, readiness, review requests, or existing issue status
 for this continuation. This consumes the same one-ticket budget as a new selection.
 
@@ -144,9 +145,9 @@ before posting a new ownership question. A pending question remains a hold
 even when the question itself is recent activity. This is an ownership permission
 check, separate from the three product questions: silence, safe defaults, skill
 invocation, and the product questions' 48-hour deadline never authorize claiming,
-assigning, or moving to Todo. Once confirmed, retain the question
-and affirmative reply links in the Linear handoff so later invocations can verify
-that ownership was cleared.
+assigning, or moving to Todo. Once confirmed, retain the question and affirmative
+reply references in the private checkpoint; re-read those sources on later runs
+to verify that ownership was cleared. Link them in a human handoff only when useful.
 
 ## Assess
 
@@ -176,6 +177,45 @@ default remains a blocker. Do not force such work into Todo or treat silence as
 authorization. If more than three unresolved decisions prevent a coherent bounded
 implementation, narrow the scope or leave it in triage with the blocker explained.
 
+## Comment style
+
+This is the shared output contract for both skills. Write naturally as the current
+user and follow applicable writing guidance. Lead with user impact and the next
+action. Use a few short sentences or at most three top-level items; number any
+questions with compact choices. Include only a material decision/default, question,
+or blocker. Targets are guides, not minimums: write less when it is sufficient,
+and never pad to a word target. Do not repeat the ticket description, narrate the
+workflow, or append redundant acceptance criteria, implementation steps, or test
+inventories.
+
+- Initial plan/triage: aim for **60–100 words**, with a **150-word total maximum**.
+  Only an initial comment with necessary product questions may use up to **180
+  words total**, including all questions and choices; the lifetime limit is three.
+- Delivery or substantive follow-up: aim for **40–80 words**, with a **100-word
+  total maximum**. A simple confirmation or blocker can be shorter.
+- Put technical rationale, implementation detail, and validation evidence in the
+  repository-required PR description; link the PR from the ticket. Use native
+  assignee, estimate, status, and PR links instead of restating fields in prose.
+
+Never put raw UUIDs, timestamp dumps, workflow provenance, processed-reply
+watermarks, serialized state/JSON, or HTML comment blocks in Linear comments,
+human-facing PR descriptions/comments, or routine user reports. HTML comments may
+render visibly in Linear; they are not private storage. Do not move a metadata
+wall into the PR or disguise it as hidden text. A useful deadline may appear as a
+readable date/time with timezone; retain exact source timestamps privately.
+
+Example triage plan (no questions):
+
+> I propose showing the specific validation error while keeping the user's entries
+> intact, so they can correct the form without starting over. The change should
+> cover both single-field errors and several invalid fields submitted together.
+
+Example build delivery (replace `URL` with the actual PR URL):
+
+> The [PR](URL) now shows specific validation errors without clearing the form.
+> Users can correct the affected fields and retry the save. Focused regression
+> checks pass for single-field and combined errors. It is ready for review.
+
 ## Questions and defaults
 
 This is the shared clarification contract for triage and build for the lifetime
@@ -192,9 +232,9 @@ avoid compound questions and low-level implementation choices. If questions were
 already asked, reuse their decisions, answers, defaults, and original timestamp
 without posting another question set or filling unused slots later.
 
-Write as the current user: friendly, direct, concise, and human. Follow applicable
-writing guidance. Never identify the comment as agent-generated or use a templated
-heading. Number questions with mutually exclusive lettered choices; A is the safe
+Follow the shared comment limits above, including the total word cap for questions.
+Never identify the comment as agent-generated or use a templated heading.
+Number questions with mutually exclusive lettered choices; A is the safe
 default and the only option labeled `[Recommended]`. Invite a compact reply such
 as `1A, 2C`; add `Other — please specify` only when useful.
 
@@ -233,74 +273,83 @@ Missing timestamp evidence alone is not proof that a PR can leave Draft.
 
 Only **new evidence of a material risk** that is unsafe without authorization,
 required data, or permission, or an explicit user reopening of that risk, can
-justify one precise blocking ask. Persist a stable fingerprint of the risk,
-bounded scope, and latest supporting source IDs alongside the ask ID and
-resolution. On later invocations, an unresolved identical blocker is a quiet skip,
-not another ask. Routine edits, ambiguous replies, and the skill's own comment
-`updatedAt` are not new evidence. Reassess genuinely new scope or risk without
+justify one precise blocking ask. Keep its stable risk fingerprint, bounded scope,
+source references, ask reference, and resolution in the private checkpoint;
+the comment itself states only the blocker and needed decision. On later
+invocations, an unresolved identical blocker is a quiet skip, not another ask.
+Routine edits, ambiguous replies, and the skill's own comment `updatedAt` are not new evidence. Reassess genuinely new scope or risk without
 automatically opening another product-question round.
 
-## Durable handoff and quiet runs
+## Private checkpoint and quiet runs
 
-Keep a minimal durable handoff in Linear, never repository tracking files. Triage
-may read an existing implementation PR record; only build maintains that PR.
-Reuse an existing record and change it only for substantive new information.
-Include:
+This is the shared bookkeeping contract; build reads it as reference material,
+without invoking triage. The human handoff is the short plan/defaults/next action,
+existing issue fields, and useful source/PR links. Do not publish a separate
+workflow record in Linear or the PR, and do not create repository tracking files.
 
-- Workflow provenance, verified owner/estimate, bounded scope, acceptance criteria,
-  answers/defaulted assumptions, and the original question-comment ID/link,
-  `createdAt`, and deadline (`createdAt` + 48 elapsed hours), when known. Omit
-  question metadata when none were asked; mark missing evidence explicitly.
-- Triage-assessed source IDs and `updatedAt`, pending implementation/readiness
-  work, and any due follow-up already recorded. Keep these separate from build's
-  applied reply IDs and `updatedAt`; never advance or overwrite build's watermark.
-- Clarification state: `open`, `settled` (answered/defaulted), or `blocked`.
-  Preserve it across runs; settled product choices do not mean code was applied.
-- Ownership-ask IDs/links and their resolution; any exceptional blocking-ask
-  fingerprint, source IDs, ask ID, and resolution.
+When durable idempotency needs a checkpoint, use
+`~/.codex/private/linear-ticket-workflow-state/<issue-uuid>.json`, keyed by the
+issue UUID verified from the authenticated workspace/team. Keep it outside all
+repositories, with directory mode `0700` and file mode `0600`. Store only necessary
+source IDs/links and timestamps, bounded decisions/defaults, the original question
+reference/`createdAt` and deadline, ownership/risk holds and their source references,
+and separate `triageSeen` and `buildApplied` reply IDs/`updatedAt`. No copied
+threads, ticket dumps, credentials, or secrets. Update only the current skill's
+assessment/applied state and necessary shared decisions; preserve the other state.
+Settled product choices do not mean code was applied. Triage never advances
+`buildApplied`; build advances it only after applying or resolving the feedback.
 
-On every invocation, re-fetch and read replies, comparing their IDs and `updatedAt`
-with triage's assessment record, without marking them applied by build. For
-previously recorded tickets, if there are no new requirements or actionable state
-changes, take no action and continue the eligible queue. A fresh eligible candidate can still receive its initial plan/handoff
-without a recent requirements change. Do not
-post acknowledgements, reminders, unchanged plans, repeated questions, or edit
-notifications. A pending ownership or material-risk ask follows this same quiet
-gate. The skill's own comment update alone must never trigger another question.
+Always re-fetch source issues, questions/replies, ownership decisions, blockers,
+and PRs. A checkpoint is a cache, never authorization or evidence that a hold
+cleared. If absent, stale, or unavailable, reconstruct from live source comments,
+server timestamps, native fields, and implementation/disposition evidence.
+Legacy machine blocks may be read for reconstruction but must not be recreated
+or copied into new comments or PR text. Do not reset the original question clock,
+reopen the lifetime question budget, repeat an ownership ask, or treat silence as
+ownership permission. Never invent a timestamp or applied result. If evidence
+cannot establish a needed gate, keep that gate closed and report only the concise
+blocker; missing cache data alone does not justify a new product question.
 
-Post only the initial combined plan/questions as a routine triage update. Later
-updates require a substantive decision, newly due follow-up, or blocker change;
-combine related assessments into one Linear handoff update. Do not post delivery
-comments, claim implementation or readiness changes, or acknowledge unchanged
-feedback. Only build records its implementation and PR-delivery results.
+On each invocation compare current source IDs/`updatedAt` with the appropriate
+private assessment/applied state, or reconstruct the prior disposition from source
+evidence. Triage-seen replies remain pending for build until applied or resolved.
+For previously assessed tickets without a new requirement or actionable change,
+take no action and continue the eligible queue. An unchanged pending hold or
+previously recorded due follow-up is a quiet skip. A fresh eligible candidate can
+receive its initial short plan without a recent requirements change.
+
+Post only the initial combined plan/questions as a routine triage comment. Later
+comments require a material decision, newly due follow-up, or blocker change;
+combine related changes within the follow-up word cap. No acknowledgements,
+reminders, unchanged plans, repeated questions, edit notifications, or metadata-only
+updates. The skill's own comment update never triggers another question. Only
+build posts implementation/delivery results, and unchanged runs post nothing.
 
 ## Finish triage and stop
 
 For a suitable leaf whose ownership gate is clear, without waiting for product
 answers:
 
-1. Re-fetch every blocker before any handoff fields, comments, or deadline are
-   recorded. Continue only when all are Done; otherwise skip without preparing
-   the ticket. Recheck duplicate, obsolete, and bounded-scope eligibility too.
+1. Re-fetch every blocker before preparing the handoff or posting a comment.
+   Continue only when all are Done; otherwise skip without preparing the ticket.
+   Recheck duplicate, obsolete, and bounded-scope eligibility too.
 2. Set or confirm its Medium-or-smaller estimate, and assign it to the current
    user if unassigned.
 3. Reuse the existing plan/questions and answers, or post the single initial
-   combined approach/questions comment when needed. Record the bounded scope,
-   acceptance criteria, and durable handoff above without redundant updates.
-4. Move it to Todo last and stop. Persist its issue ID, verified ownership,
-   estimate/blockers, plan/defaults, question metadata, and any existing PR in the
-   handoff. Implementation and existing-PR updates await a separate explicit
-   user or authorized automation invocation of build.
+   short plan/questions comment when needed. Link useful existing criteria rather
+   than repeating them; retain necessary bookkeeping only in the private checkpoint.
+4. Move it to Todo last and stop. The short plan and native issue fields form the
+   handoff; include an existing PR link when useful. Implementation and existing-PR
+   updates await a separate explicit user or authorized automation build invocation.
 
 Never change priority. Never move oversized, unsuitable, duplicate, obsolete,
 parent, blocked, or ownership-held tickets to Todo. Defaults and elapsed time do
 not override those limits. Do not invoke build or modify its code/PR state.
 
-Report the issue, estimate evidence, actual comment action/link, assumptions,
-triage readiness, resulting assignee/status, and persisted handoff. An existing
-PR's observed state may be reported as read-only context, never as a verified
-implementation outcome of triage. Include ownership skips/pending confirmation
-with activity/comment links and newer oversized candidates assessed. For open
-questions, give the known original deadline without promising automatic promotion.
-State that implementation requires a separate build invocation. In explicit
-read-only mode, label actions as proposed and do not prepare or mutate the handoff.
+Report the issue link, actual triage action, resulting status, material assumption
+or blocker, and next action concisely. Link evidence only where it explains a
+skip or decision; do not dump timestamps or internal state. An existing PR's
+observed state is read-only context, never a verified implementation outcome of
+triage. Mention a readable question deadline only when useful, and make clear
+that implementation needs a separate build invocation. In read-only mode, label
+actions as proposed and do not mutate the handoff or checkpoint.
