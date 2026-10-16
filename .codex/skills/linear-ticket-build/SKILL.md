@@ -2,9 +2,10 @@
 name: linear-ticket-build
 description: >-
     Implement an eligible Linear ticket in the configured work queue immediately
-    using explicit defaults, publish a Draft PR while initial answers are pending or a ready PR otherwise,
-    and process answers or a 48-hour timeout on later invocations. Normal
-    invocation authorizes the bounded implementation and its Linear/GitHub workflow.
+    using explicit defaults, publish a Draft PR while initial answers are pending
+    or a ready PR otherwise, and process answers or a 48-hour timeout on later
+    invocations. Requires its own explicit user or authorized automation invocation;
+    never invokes triage.
 disable-model-invocation: true
 ---
 
@@ -15,11 +16,13 @@ user's behalf. Build immediately using documented defaults instead of waiting fo
 clarifying answers.
 Never merge its PR unless explicitly asked.
 
-Run when explicitly invoked by the user or through the user-authorized triage
-handoff in the same invocation. A separate scheduler may invoke this workflow;
-do not create an automation, sleep until the deadline, or promise a background
-follow-up. Recheck answers and deadlines during this run. Time passing alone does
-not change a PR between invocations.
+Run only when independently invoked explicitly by the user or by an existing
+user-authorized automation. A triage invocation or persisted handoff is context,
+not authorization to run build. Never invoke triage as part of this workflow.
+Implement or substantively update at most one ticket per invocation.
+Do not create or edit automations, sleep until the deadline, or promise a
+background follow-up. Recheck answers and deadlines during this run. Time passing
+alone does not change a PR between invocations.
 
 ## Private workflow settings
 
@@ -81,15 +84,20 @@ On a general queue invocation, if a PR has no actionable new feedback and its
 deadline has not arrived, continue to the next candidate after checking it.
 An explicitly selected ticket may simply report that no action is due yet.
 
-Honor a verified triage handoff for its selected leaf, including triage's child
-creator exception: verify the recorded parent selection and ownership decision
-rather than rescanning or promoting another candidate. Triage may first hand off
-one existing workflow record in Todo, In Progress, or In Review with actionable
-new feedback/edits or a due deadline, outside its new-ticket status filter. That
-follow-up consumes the same one-ticket budget; do not also select new work.
-Resume In Progress work only through its known owning workflow record. Check
-linked PRs before starting; reuse an open owning PR and never duplicate an
-implementation. These exceptions do not authorize an unbounded review queue.
+On this independent invocation, honor an explicitly selected issue or persisted
+workflow handoff before scanning for new work. A handoff may come from an earlier
+run; re-fetch and validate its issue, ownership, estimate, blockers, discussion,
+and linked PR rather than requiring a same-invocation transfer. Preserve the
+queue filters above, including the recorded parent-selection/child-creator
+exception: verify that selection and ownership decision rather than selecting a
+different candidate. A verified existing workflow record may resume Todo,
+In Progress, or In Review work with actionable new feedback/edits or a due deadline.
+This consumes the same one-ticket budget; do not also select new work. Resume
+In Progress work only through its known owning workflow record. Check linked PRs
+before starting; reuse an open owning PR and never duplicate an implementation.
+These exceptions do not authorize an unbounded review queue. A handoff never
+bypasses current eligibility, ownership holds, or this skill's separate invocation
+requirement.
 
 Ownership must be clear. Honor recorded ownership holds and takeover decisions.
 Do not reapply triage's other-engineer active-discussion gate to review feedback
@@ -103,11 +111,12 @@ remains a blocker; do not guess to force implementation or promotion.
 
 ## Questions and plan
 
-Use [triage's questions and defaults contract](../linear-ticket-triage/SKILL.md#questions-and-defaults):
-one initial set of at most three meaningful questions for the bounded ticket
-across both skills. Recover legacy question comments, thread IDs, answers,
-timestamps, and defaults before posting. A separate invocation is not a new
-question budget. If no initial set exists, build may ask within that budget while
+Read only the [shared questions and defaults contract](../linear-ticket-triage/SKILL.md#questions-and-defaults)
+as reference material; this is not an invocation of triage and does not load its
+execution steps. Use one initial set of at most three meaningful questions for
+the bounded ticket across both skills. Recover legacy question comments, thread
+IDs, answers, timestamps, and defaults before posting. A separate invocation is
+not a new question budget. If no initial set exists, build may ask within that budget while
 implementing safe defaults immediately.
 
 Infer ordinary ambiguity from available context. After a reply, the original
@@ -172,7 +181,12 @@ proportional to risk and fix failures caused by the work before publishing.
 
 After a push, re-fetch the issue, PR, and comments. Incorporate newer in-scope
 answers before declaring completion. Record processed reply IDs and `updatedAt`
-values, including edited comments, so unchanged feedback causes no repeated work.
+values, including edited comments, only after their implementation or documented
+no-code disposition is complete. Compare replies with build's applied state,
+not triage's assessed/seen state: a triage assessment does not mean the requested
+change has been applied. Reuse legacy processed-reply records only when prior
+implementation/disposition evidence supports that meaning. Leave unapplied work
+pending so queued feedback cannot be silently skipped.
 
 ## Branch and PR
 
@@ -187,9 +201,9 @@ and results. Include the documented defaults, question-comment link, original
 question timestamp, 48-hour deadline, and unresolved questions when applicable.
 Keep a minimal workflow record in Linear and the PR: bounded scope, defaults,
 original question/thread IDs and `createdAt`/deadline when recoverable, processed
-reply IDs/`updatedAt`, terminal clarification state, ownership decision links,
-and plan/delivery comment links. Reuse legacy records; do not create repository
-tracking files or a second question round to normalize their format.
+reply IDs/`updatedAt` separately from triage-assessed IDs/`updatedAt`, terminal
+clarification state, ownership decision links, and plan/delivery comment links.
+Reuse legacy records; do not create repository tracking files or a second question round to normalize their format.
 
 Both Draft and ready-for-review PRs are open on GitHub; use `isDraft` to distinguish
 them. Choose or update readiness after implementation and verification:
