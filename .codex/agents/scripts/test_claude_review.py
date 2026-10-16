@@ -152,7 +152,6 @@ class FixtureTests(unittest.TestCase):
         self.spec = self.root / 'spec.json'
         self.risk_report = {'rating': 'Medium high',
                             'body': '## PR risk assessment\n**Medium high** — Shared behavior with coordinated rollout.\n',
-                            'url': 'https://example.invalid/pull/1#pullrequestreview-1',
                             'head': self.head, 'base': self.base, 'merge_base': self.base}
         review.dump(self.spec, {'repo': 'example/config', 'number': 1, 'head': self.head,
                                'base': self.base, 'base_ref': 'main', 'merge_base': self.base,
@@ -301,7 +300,7 @@ class FixtureTests(unittest.TestCase):
                       'deployment': ['runtime boundary inspected'], 'discussion': 'All pages read',
                       'linear': 'Live issue/comments read'}, gaps=[], prior_findings=[], open_questions=[],
                       risk=self.risk_report['rating'],
-                      risk_report_url=self.risk_report['url'], risk_discrepancies=[],
+                      risk_discrepancies=[],
                       reviewer_attribution=review.reviewer_profile()['attribution'])
         return json.dumps(report)
 
@@ -316,7 +315,7 @@ class FixtureTests(unittest.TestCase):
         spec = review.load(self.spec)
         del spec['risk_report']
         review.dump(self.spec, spec)
-        with self.assertRaisesRegex(ValueError, 'posted risk_report'):
+        with self.assertRaisesRegex(ValueError, 'complete risk_report'):
             self.prepare()
         self.assertFalse(self.bundle.exists())
 
@@ -340,12 +339,14 @@ class FixtureTests(unittest.TestCase):
             self.run_with_result(json.dumps(report))
         self.assertFalse(review.load(self.bundle / 'metrics.json')['report_valid'])
 
-    def test_substituted_risk_report_link_is_rejected(self):
-        report = json.loads(self.valid_report())
-        report['risk_report_url'] = 'https://example.invalid/other-report'
-        with self.assertRaises(SystemExit):
-            self.run_with_result(json.dumps(report))
-        self.assertFalse(review.load(self.bundle / 'metrics.json')['report_valid'])
+    def test_legacy_published_risk_report_remains_accepted(self):
+        spec = review.load(self.spec)
+        spec['risk_report']['url'] = 'https://example.invalid/pull/1#pullrequestreview-1'
+        review.dump(self.spec, spec)
+        self.run_with_result(self.valid_report())
+        self.assertEqual(review.load(self.bundle / 'manifest.json')['risk_report']['url'],
+                         spec['risk_report']['url'])
+        self.assertTrue(review.load(self.bundle / 'metrics.json')['report_valid'])
 
     def test_contradiction_is_preserved_without_changing_rating(self):
         report = json.loads(self.valid_report())

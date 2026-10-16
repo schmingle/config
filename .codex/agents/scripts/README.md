@@ -13,11 +13,13 @@ the native agent's `model` and `model_reasoning_effort` fields.
 Create a fresh detached checkout at the pinned PR head. Save complete paginated
 GitHub responses and write a JSON specification containing `repo`, `number`, `head`,
 `base` (commit), `base_ref` (branch), `merge_base`, and `evidence` (plain output filename
-to source path), plus `risk_report`. This object contains the posted report's exact
-`rating`, `body`, `url`, and assessed commit fields `head`, `base`, and `merge_base`.
-The caller verifies its publication and provenance. Its assessed commits may predate
-the current review: reuse the posted report on subsequent reviews without rerunning
-risk assessment. Missing/incomplete reports block preparation. Include title/body,
+to source path), plus `risk_report`. This object contains the coordinator-supplied
+assessment's exact `rating`, `body`, and assessed commit fields `head`, `base`, and
+`merge_base`. Include `url` only when reusing an already published assessment.
+The caller verifies its provenance. Its assessed commits may predate the current
+review: reuse a complete final review's Risk section or a legacy separate report
+on subsequent reviews without rerunning risk assessment. Missing/incomplete reports
+block preparation. Include title/body,
 linked issues, mode/scope, and an ISO 8601
 `finish_by` with timezone. Additional `guidance` paths and `benchmark: true` are
 optional. Never include baseline reports or private coordinator conclusions in a
@@ -53,7 +55,7 @@ sandbox cannot support those operations. It records preflight and final transcri
 status separately; an absent transcript cannot be blindly resumed. The helper uses
 `--json-schema` and reads `structured_output`, preserving human `result` text only
 for diagnostics. It checks initial and final HEAD
-and cleanliness, validates the report envelope and unchanged risk rating/report URL,
+and cleanliness, validates the report envelope and unchanged risk rating,
 and settles its owned process on normal completion, timeout, interruption, or error. After a hard kill or crash,
 inspect the saved process identity and reconcile it manually.
 
@@ -68,8 +70,9 @@ persisted transcript. The helper passes its absolute path to `--resume`. Restore
 pinned checkout if necessary. Original launch settings are retained; new deadline
 information is sent with the focused request. Each attempt has separate process,
 events, report, and metrics files. Execution/report success is never coverage sign-off.
-The result includes `risk` (the supplied rating), `risk_report_url` (the supplied
-URL), and `risk_discrepancies` (a list of concrete contradictions, empty when none).
+The result includes `risk` (the supplied rating) and `risk_discrepancies` (a list
+of concrete contradictions, empty when none). A source URL exists only for an
+assessment already published before this review.
 The publisher must surface discrepancies and withhold sign-off for unresolved material
 contradictions; a structurally valid report is not sign-off.
 For a diagnosed infrastructure failure with all owned processes settled, use one

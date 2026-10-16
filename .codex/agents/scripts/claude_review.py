@@ -18,7 +18,7 @@ import uuid
 AGENTS = Path(__file__).resolve().parents[1]
 PROFILE = Path(__file__).with_name('claude-review.toml')
 REPORT_FIELDS = {'correctness', 'approach', 'risk', 'summary', 'findings', 'coverage',
-                 'gaps', 'validation', 'reviewer_attribution', 'risk_report_url', 'risk_discrepancies', 'prior_findings', 'open_questions'}
+                 'gaps', 'validation', 'reviewer_attribution', 'risk_discrepancies', 'prior_findings', 'open_questions'}
 
 
 def load(path):
@@ -109,12 +109,13 @@ def collect_guides(checkout, changed_paths, additional=(), codex_home=None):
 
 
 def validate_risk_report(report):
-    """Require the posted assessment without demanding a new snapshot or rerating it."""
-    fields = ('body', 'url', 'head', 'base', 'merge_base')
+    """Require a complete assessment without demanding publication or rerating it."""
+    fields = ('body', 'head', 'base', 'merge_base')
     if (not isinstance(report, dict)
             or report.get('rating') not in ('Low', 'Medium low', 'Medium', 'Medium high', 'High')
-            or any(not isinstance(report.get(field), str) or not report[field].strip() for field in fields)):
-        raise ValueError('A complete posted risk_report with rating, body, URL, and assessed commits is required')
+            or any(not isinstance(report.get(field), str) or not report[field].strip() for field in fields)
+            or ('url' in report and (not isinstance(report['url'], str) or not report['url'].strip()))):
+        raise ValueError('A complete risk_report with rating, body, and assessed commits is required')
 
 
 def prepare(args):
@@ -177,7 +178,7 @@ def report_schema():
     coverage = {'scope_complete': {'type': 'boolean'}, 'inspected_sources': strings,
                 'interfaces': strings, 'deployment': strings, 'discussion': text, 'linear': text}
     properties = {key: text for key in ('correctness', 'approach', 'risk', 'summary',
-                                       'validation', 'reviewer_attribution', 'risk_report_url')}
+                                       'validation', 'reviewer_attribution')}
     properties.update(findings={'type': 'array', 'items': finding},
                       coverage={'type': 'object', 'properties': coverage, 'required': list(coverage)},
                       gaps=strings, risk_discrepancies=strings, prior_findings=strings, open_questions=strings)
@@ -399,8 +400,9 @@ def run(args):
               + 'First verify live Linear access with ToolSearch: read linked issues and relevant comment pages, '
               + 'or verify get_user(me) when unlinked without reading unrelated tickets. '
               + 'Missing required access remains Incomplete.\n'
-              + 'Use manifest.risk_report unchanged: it is the posted risk assessment, not a request to reassess. '
-              + 'Return risk as its exact rating and risk_report_url as its exact URL. '
+              + 'Use manifest.risk_report unchanged: it is the coordinator-supplied risk assessment, '
+              + 'not a request to reassess or publish it separately. '
+              + 'Return risk as its exact rating. Cite a source URL only when one already exists. '
               + 'Reuse it even when its assessed commits differ from this review. '
               + 'Return concrete contradictions as a risk_discrepancies list (empty if none); '
               + 'a material unresolved contradiction prevents whole-PR sign-off. Do not silently rerate.\n'
@@ -451,7 +453,6 @@ def run(args):
                     and isinstance(report['coverage'].get('scope_complete'), bool)
                     and all(key in report['coverage'] for key in schema['properties']['coverage']['required'])
                     and report.get('risk') == manifest['risk_report']['rating']
-                    and report.get('risk_report_url') == manifest['risk_report']['url']
                     and report.get('reviewer_attribution') == profile['attribution'])
     transcript = saved_transcript(storage, session)
     storage.update(session=session, transcript=transcript, transcript_persisted=bool(transcript))
