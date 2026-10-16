@@ -44,4 +44,4 @@ Stack only when the child requires a concrete API, schema or behavior absent fro
 
 Reassess dependencies when splitting or extracting a PR; default to main, not the source branch. Use the smallest prerequisite and keep independent consumers as siblings.
 
-Before exceeding three open PRs in a chain, check for unnecessary edges or separable shared foundations. Depth alone does not require approval. An explicitly requested linear stack applies only to its requested scope.
+Before exceeding three open PRs in a chain, check for unnecessary edges or separable shared foundations. When a stack is deeper than five open PRs, suggest an audit to see whether it can be split or flattened. Depth alone does not require approval. An explicitly requested linear stack applies only to its requested scope.
