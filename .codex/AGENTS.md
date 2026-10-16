@@ -20,11 +20,11 @@ The GitHub account `schmingle` is used for both work and personal repositories. 
 
 ## Writing and outbound communication
 
-Prefer delegating writing tasks to the `writer` agent using `fork_turns="none"` and the compact assignment described in [its workflow](agents/writer.md). This includes short edits, messages, documents, proposals, and posts. Include the relevant facts and sources, audience, channel, requested length, current or approved draft, and all applicable corrections. Reuse the same writer for revisions when practical, and check its result against the brief before presenting it. Code-facing prose, daily standups, and writing-guide maintenance retain their owning workflows; involve the writer for drafting when compatible with those workflows.
+For substantial writing tasks, prefer delegating to the `writer` agent using `fork_turns="none"` and the compact assignment described in [its workflow](agents/writer.md). This can include messages, documents, proposals, and posts. Include the relevant facts and sources, audience, channel, requested length, current or approved draft, and all applicable corrections. Reuse the same writer for revisions when practical, and check its result against the brief before presenting it. Code-facing prose, daily standups, and writing-guide maintenance retain their owning workflows; involve the writer for drafting when compatible with those workflows.
 
 For email, SMS, and Slack, show Khang the exact final message and recipients or destination, then obtain explicit confirmation immediately before sending or posting. If the message or destination changes afterward, show the revised preview and confirm again. This gate applies across conversations and delegated agents. For other channels, follow the authorization and publication rules of the task and its owning workflow; this section does not impose a separate preview-and-confirmation gate.
 
-If the writer is unavailable or delegation is disallowed, follow [the writing workflow](agents/writer.md) and the private canonical guide at `~/.codex/writing/style-guide.md` directly, and briefly disclose the fallback. Do not duplicate style preferences in this routing rule.
+For smaller writing tasks, or if the writer is unavailable or delegation is disallowed, follow [the writing workflow](agents/writer.md) and the private canonical guide at `~/.codex/writing/style-guide.md` directly. Briefly disclose a fallback when the writer would otherwise have been used. Do not duplicate style preferences in this routing rule.
 
 ## Subagent context
 
@@ -32,7 +32,9 @@ When delegation is authorized, always spawn subagents with `fork_turns="none"`. 
 
 ## Delegation preference
 
-Prefer delegating work to a suitable predefined agent unless Khang specifies otherwise, such as "don't delegate." This preference authorizes delegation within the task's existing scope and approval boundaries; follow the Subagent context requirements above. Choose only agents whose defined roles fit the work. If none is suitable, do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
+Prefer delegating substantial tasks to a suitable predefined agent unless Khang specifies otherwise, such as "don't delegate." Substantial work includes tasks that may take more than 30 seconds or involve more than 10 steps. Examples include creating PRs, running GitHub workflows or deployment skills, and performing bulk repeated actions; these are examples, not an exhaustive list or automatic delegation requirements. Handle short, straightforward tasks directly unless Khang requests delegation or the owning workflow requires it.
+
+This preference authorizes delegation within the task's existing scope and approval boundaries; follow the Subagent context requirements above. Choose only agents whose defined roles fit the work. If none is suitable, do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
 
 ## PR independence and dependency stacking
 
