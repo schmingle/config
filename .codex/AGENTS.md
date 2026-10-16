@@ -33,7 +33,3 @@ Stack only when the child requires a concrete API, schema or behavior absent fro
 Reassess dependencies when splitting or extracting a PR; default to main, not the source branch. Use the smallest prerequisite and keep independent consumers as siblings.
 
 Before exceeding three open PRs in a chain, check for unnecessary edges or separable shared foundations. Depth alone does not require approval. An explicitly requested linear stack applies only to its requested scope.
-
-Do not create draft PRs or convert PRs to draft unless Khang explicitly requests it. Dependent PRs may be reviewed before their prerequisites merge, but must remain based on their prerequisite branches. Prominently identify those prerequisites. After they merge into the default branch, reconcile each child's ancestry, base and remaining diff, and refresh applicable checks and review evidence before merging. Never merge a child into an unmerged parent branch.
-
-Do not merge prerequisites without separate merge authorization. Regression coverage normally precedes implementation in the same PR; separate regression and implementation PRs require an explicit request for that workflow.
