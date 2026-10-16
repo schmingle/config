@@ -63,7 +63,8 @@ its actual issue/comment read tools at runtime. For linked PRs, use the verified
 issue ID and GitHub link evidence from the handoff to read that issue and its
 relevant comment pages. Follow linked material only when the shared contract
 requires it; do not make a broad ticket-search probe or ask for separate user
-approval. For unlinked PRs, verify a minimal identity read instead.
+approval. For unlinked PRs, verify a minimal identity read instead; its success
+satisfies the Linear requirement without an unrelated issue/comment probe.
 Do not launch with an empty strict MCP configuration, export credentials, or install
 another integration to bypass authentication. Respect a tool or automatic approval
 denial rather than retrying the rejected read. Missing required access means
