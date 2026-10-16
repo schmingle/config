@@ -1,5 +1,9 @@
 NEVER run a skill if it is marked with `disable-model-invocation: true`, those skills can only be invoked explicitly by the user
 
+## Response presentation
+
+When presenting choices, always use a numbered list ordered from most to least recommended, and clearly label the recommended option. Prefer numbered lists for other multi-item answers so Khang can refer to specific points. Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
+
 ## Tools
 
 When a task can be done through several interfaces, prefer an installed CLI, then a connected plugin, then a browser. This applies to services such as GitHub (`gh`), Sentry (`sentry-cli`), AWS (`aws`), and Heroku (`heroku`). Follow an explicit tool request or a workflow's required tool when one is specified.
