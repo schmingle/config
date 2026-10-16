@@ -1,26 +1,17 @@
----
-name: linear-ticket-triage
-description: >-
-    Prepare one eligible Linear ticket in the configured work queue: assess scope
-    and estimate, resolve ownership, record a plan and necessary questions, assign
-    it, and move a suitable leaf to Todo. Stop without invoking implementation.
-disable-model-invocation: true
----
+# Linear Ticket Triage Pass
 
-# Linear Ticket Triage
-
-Prepare one Medium-or-smaller ticket on the current user's behalf, then stop.
 Inspect repository code and linked PRs read-only. Never implement code, change a
-PR, request reviews, or invoke build. Implementation requires a separate
-explicit user or authorized automation invocation of the build workflow; preparing
-a handoff does not authorize or trigger it.
+PR, or request reviews during triage. The combined skill's build pass follows
+after triage and selects independently from the verified candidate list.
 
-Prepare or substantively update at most one eligible leaf per invocation.
-Posting a new ownership or exceptional blocking question consumes that budget and
-ends the run; never fan out new questions across the backlog. Existing pending
-asks are quiet skips and do not consume it. This skill may be invoked manually
-or by an existing user-authorized periodic run. Do not create or edit automations,
-promise implementation now, or promise a background follow-up.
+Fully screen at most 10 candidate issues in this invocation, then prepare or
+substantively update only screened tickets. Oversized, held, blocked,
+unsuitable, and quiet outcomes still count among the 10; each issue counts once
+even if preparation changes several fields. Post at most one new ownership or
+exceptional blocking ask in the combined invocation. After it, continue with
+other screened eligible tickets without another such ask. Do not create or edit
+automations, promise implementation
+of a particular ticket now, or promise a background follow-up.
 
 ## Private workflow settings
 
@@ -44,9 +35,9 @@ ID for assignee, creator, and estimate-history comparisons. Never infer identity
 from the OS account, Git, repository history, or an unrelated conversation.
 Ask for identity only when it cannot be resolved unambiguously.
 
-Invoking this skill authorizes its normal Linear comments, assignment, estimate,
-and status changes within this scope. It does not authorize implementation or PR
-mutations. No separate approval or `auto` keyword is required for triage actions.
+The combined invocation authorizes normal Linear comments, assignment, estimate,
+and status changes in this triage pass. Only the build pass may implement or
+mutate a PR. No separate approval or `auto` keyword is required for triage actions.
 Honor an explicit read-only or dry-run request: inspect and report proposed actions
 without mutations.
 
@@ -59,55 +50,67 @@ gates under applicable `AGENTS.md` guidance.
 
 ## Resume prior workflow work
 
-Before selecting new work, inspect the current user's previously managed leaves
-in the configured team in Todo, In Progress, or In Review and their linked PRs.
-Require an existing plan and source evidence establishing this workflow's bounded
-scope, verified ownership, and estimate; assignment or status alone is not
-eligibility. Re-fetch replies, edits, blockers, and observed PR state. Prefer a new
-actionable answer, scope change, or newly due 48-hour follow-up. Record only the material decision
-and next action in a concise Linear handoff; keep assessment bookkeeping in the
-private checkpoint below, then stop.
+While choosing up to 10 issues to screen, consider the current user's previously
+managed leaves in the configured team in Todo, In Progress, or In Review.
+Inspect linked PRs only for screened issues. Apply the configured creator
+allowlist or verified parent-selected direct child exception below. Require an
+existing plan and source evidence establishing
+this workflow's bounded scope, verified ownership, and estimate; assignment or
+status alone is not eligibility. Re-fetch replies, edits, blockers, and observed
+PR state. Prefer a new actionable answer, scope change, newly due 48-hour
+follow-up, or verified interrupted In Progress build. When an update
+is needed, record only the material decision and next action in a concise Linear
+handoff; keep assessment bookkeeping in the private checkpoint below.
 Do not change the code, PR, readiness, review requests, or existing issue status
-for this continuation. This consumes the same one-ticket budget as a new selection.
+for this continuation. A substantive update counts as one of the 10 triage tickets.
 
 Preserve unresolved ownership holds and check for actual reassignment or newer
 conflicting ownership. Do not reapply the new-work seven-day participation veto
 to ordinary reviews on the current user's recorded implementation PR. An unchanged
 record is a quiet skip, including a previously recorded due follow-up; continue
 the queue so waiting work does not starve new candidates. This continuation path
-does not broaden the creator filter for new work below. Triage records what it
+does not broaden the creator filter. Triage records what it
 assessed separately from what build has applied; reading feedback never marks it
 implemented or consumes build's applied-reply watermark.
 
 ## Candidates
 
-Process newest `updatedAt` first. Paginate until a candidate is selected or the
-eligible set is exhausted; do not report no work from one page. Paginate relevant
-comments and relations before deciding suitability or whether feedback is new:
+Use listing metadata and checkpoint hints to rank likely actionable or due
+prior workflow work first, newest `updatedAt` first within that tier; then rank
+new candidates by newest `updatedAt`. Paginate listing pages until 10 candidate
+issues have been fully screened or the eligible listing set is exhausted. Do
+not read full issue/comment/PR detail for more than 10 candidates. Paginate
+comments and relations for each screened issue before deciding suitability or
+whether feedback is new. A parent whose detailed discussion is read to gate a
+child counts as one of the 10 distinct screened issues:
 
 ```text
 team = settings.team
 status in (Triage, Backlog)
 assignee in (none, current user)
-creator in settings.triageCreatorEmails
+creator in settings.triageCreatorEmails and creator != current user
+  (except a verified parent-selected direct child)
 estimate = unset or Medium-or-smaller (at most settings.maxEstimate)
 ```
 
-Resolve the configured creators by exact email and compare user IDs. Skip tickets
-already estimated above Medium. Read existing questions and answers; do not repost
-questions or skip an otherwise suitable ticket merely because answers are pending.
-Only after the ownership gate is clear, if a linked PR already exists, record
-its identity in the handoff for a later independent build invocation. Do not
-create or update an implementation PR.
+Resolve the configured creators by exact email and compare user IDs. The only
+creator exception is a direct child selected from an allowlisted parent under
+this workflow; verify the parent's selection and ownership decision, then apply
+the child's own ownership and eligibility gates. Skip tickets already estimated
+above Medium. Read existing questions and answers; do not repost questions or
+skip an otherwise suitable ticket merely because answers are pending. After the
+ownership gate is clear, include any linked PR in the candidate evidence. Do
+not create or update an implementation PR during triage.
 
 ## Ownership gate
 
 Target up-for-grabs work and confirm stale-work takeover. For new selections,
 apply this gate before any ticket field change (including an oversized estimate),
 normal triage comment, or implementation handoff record. Recorded prior-work
-continuations use the ownership checks in Resume prior workflow work above. Check a parent
-before selecting its direct child, then check the child's own discussion and linked PRs too; a child cannot bypass an
-unresolved parent ownership gate. The assignee filter above always applies:
+continuations use the ownership checks in Resume prior workflow work above.
+Check a parent before selecting its direct child, then check the child's own
+discussion and linked PRs too; a child cannot bypass an unresolved parent
+ownership gate. The assignee filter above always applies:
 assignment to another engineer excludes the issue even when stale or a takeover
 is offered.
 
@@ -127,11 +130,15 @@ are not engineers; engineer participation and activity recency are separate chec
 - **No other engineer involved:** continue normal triage.
 - **Another engineer involved and active:** skip without comments, field changes,
   or handoff preparation; report the engineer and latest activity as the reason.
-- **Another engineer involved and stale:** post one top-level Linear comment:
+- **Another engineer involved and stale:** mark a prospective ownership ask for
+  ranking. If selected for disposition, post one top-level Linear comment:
   “Do we still want to address this? If so, shall I take this?” Mention the involved
   engineer and requester when useful.
   Hold all field changes and handoff preparation pending an explicit affirmative
   confirmation that the work is still wanted and the current user may take it.
+
+If this invocation already posted one new ownership or exceptional blocking ask,
+do not post another; keep any newly found held ticket out of the buildable list.
 
 An explicit affirmative takeover/handoff from the involved engineer or requester
 can clear this gate even though that reply itself makes the issue active. Re-read
@@ -161,8 +168,9 @@ For each candidate:
    estimate from product impact, implementation complexity, and risk using the
    configured team’s estimate scale. If estimate authorship is unavailable, assess
    it rather than claiming it was verified.
-4. If larger than Medium, set the estimate (propose it in read-only mode), make
-   no other ticket change, and continue.
+4. If larger than Medium, mark an oversized estimate disposition for the ranked
+   mutation pass. Make no other change to that ticket and keep it out of the
+   buildable list.
 5. For Medium-or-smaller parents with eligible direct sub-issues, triage the
    newest eligible child whose ownership gate is also clear. Consider relevant
    parent discussion as well as the child's own activity and ownership. The creator
@@ -176,10 +184,25 @@ required data, an unfinished prerequisite, or a decision with no safe bounded
 default remains a blocker. Do not force such work into Todo or treat silence as
 authorization. If more than three unresolved decisions prevent a coherent bounded
 implementation, narrow the scope or leave it in triage with the blocker explained.
+Only verified prior workflow work and newly prepared Todo leaves that pass every
+implementation gate enter the buildable candidate list. Oversized, blocked,
+held, unsuitable, duplicate, obsolete, parent, and no-safe-default tickets stay
+out even if triage changed a field or posted a question. A read-only assessment
+of a new Triage/Backlog ticket does not make it buildable.
+
+After screening at most 10 issues, rank needed dispositions as described in the
+entrypoint. Apply them only to screened tickets, re-fetching each affected issue
+and its sources before mutation. An oversized estimate change,
+new ownership/exceptional blocking ask, substantive continuation handoff, or
+new leaf preparation each counts as a disposition of that screened issue. If a
+candidate becomes ineligible, skip it and use the next ranked screened issue;
+do not pull in an eleventh issue. An unchanged pending ask or quiet skip counts
+among the 10 screened issues but requires no mutation. Keep the one-new-ask
+limit across both passes even if other screened tickets remain.
 
 ## Comment style
 
-This is the shared output contract for both skills. Write naturally as the current
+This is the shared output contract for both passes. Write naturally as the current
 user and follow applicable writing guidance. Lead with user impact and the next
 action. Use a few short sentences or at most three top-level items; number any
 questions with compact choices. Include only a material decision/default, question,
@@ -223,10 +246,11 @@ of the same bounded ticket. Read all historical comments and replies, including
 legacy questions in any format, before asking anything. Reuse relevant answered
 context from related tickets too; a different issue does not justify asking a
 known decision again. Count prior product questions toward the shared budget;
-invocation, edits, partial answers, missing metadata, and a move between skills never reset it.
+invocation, edits, partial answers, missing metadata, and a move between passes
+never reset it.
 
 Post **one initial product-question comment at most**, containing no more than
-**three meaningful questions in total across both skills**. Ask fewer or none.
+**three meaningful questions in total across both passes**. Ask fewer or none.
 Ask only when the answer changes observable behavior and is not already known;
 avoid compound questions and low-level implementation choices. If questions were
 already asked, reuse their decisions, answers, defaults, and original timestamp
@@ -244,15 +268,14 @@ as `1A, 2C`; add `Other — please specify` only when useful.
    B. <alternative>
 ```
 
-During triage, state that these defaults are recorded for a separate build
-invocation; do not promise implementation now. During an independently authorized
-build invocation, implementation proceeds immediately using those defaults. An
+During triage, state that these defaults are recorded for build; do not promise
+that this ticket will be the one built in the current invocation. When build
+selects it, implementation proceeds immediately using those defaults. An
 initial unanswered question set keeps any implementation PR Draft until a reply
 settles the assumptions or 48 elapsed hours after the original question `createdAt`.
-Only build may update a verified PR's readiness during its own invocation; time
+Only build may update a verified PR's readiness during its own pass; time
 alone never substitutes for verification or authorizes triage to change a PR.
-Neither skill's invocation authorizes invoking the other. Do not imply an
-automatic wake-up or merge.
+Do not imply an automatic wake-up or merge.
 
 Honor clear parts of any reply and infer reasonable intent for partial or
 ambiguous parts. Record the best-supported assumptions in the implementation
@@ -282,8 +305,8 @@ automatically opening another product-question round.
 
 ## Private checkpoint and quiet runs
 
-This is the shared bookkeeping contract; build reads it as reference material,
-without invoking triage. The human handoff is the short plan/defaults/next action,
+This is the shared bookkeeping contract for both passes. The human handoff is
+the short plan/defaults/next action,
 existing issue fields, and useful source/PR links. Do not publish a separate
 workflow record in Linear or the PR, and do not create repository tracking files.
 
@@ -294,7 +317,7 @@ repositories, with directory mode `0700` and file mode `0600`. Store only necess
 source IDs/links and timestamps, bounded decisions/defaults, the original question
 reference/`createdAt` and deadline, ownership/risk holds and their source references,
 and separate `triageSeen` and `buildApplied` reply IDs/`updatedAt`. No copied
-threads, ticket dumps, credentials, or secrets. Update only the current skill's
+threads, ticket dumps, credentials, or secrets. Update only the current pass's
 assessment/applied state and necessary shared decisions; preserve the other state.
 Settled product choices do not mean code was applied. Triage never advances
 `buildApplied`; build advances it only after applying or resolving the feedback.
@@ -325,7 +348,7 @@ reminders, unchanged plans, repeated questions, edit notifications, or metadata-
 updates. The skill's own comment update never triggers another question. Only
 build posts implementation/delivery results, and unchanged runs post nothing.
 
-## Finish triage and stop
+## Finish triage and pass candidates to build
 
 For a suitable leaf whose ownership gate is clear, without waiting for product
 answers:
@@ -338,18 +361,18 @@ answers:
 3. Reuse the existing plan/questions and answers, or post the single initial
    short plan/questions comment when needed. Link useful existing criteria rather
    than repeating them; retain necessary bookkeeping only in the private checkpoint.
-4. Move it to Todo last and stop. The short plan and native issue fields form the
-   handoff; include an existing PR link when useful. Implementation and existing-PR
-   updates await a separate explicit user or authorized automation build invocation.
+4. Move it to Todo last. The short plan and native issue fields form the
+   handoff; include an existing PR link when useful. Add it to the buildable
+   list only after verifying completed preparation and current gates.
 
 Never change priority. Never move oversized, unsuitable, duplicate, obsolete,
 parent, blocked, or ownership-held tickets to Todo. Defaults and elapsed time do
-not override those limits. Do not invoke build or modify its code/PR state.
+not override those limits. Triage does not modify code or PR state.
 
-Report the issue link, actual triage action, resulting status, material assumption
-or blocker, and next action concisely. Link evidence only where it explains a
-skip or decision; do not dump timestamps or internal state. An existing PR's
-observed state is read-only context, never a verified implementation outcome of
-triage. Mention a readable question deadline only when useful, and make clear
-that implementation needs a separate build invocation. In read-only mode, label
+Carry the verified buildable list into the build pass in this invocation. Report
+the ticket links, actual triage dispositions, resulting statuses, and material
+assumptions or blockers concisely. Link evidence only where it explains a skip
+or decision; do not dump timestamps or internal state. An existing PR's observed
+state is read-only context, never a verified implementation outcome of triage.
+Mention a readable question deadline only when useful. In read-only mode, label
 actions as proposed and do not mutate the handoff or checkpoint.

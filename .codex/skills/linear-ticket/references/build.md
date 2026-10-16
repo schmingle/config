@@ -1,52 +1,27 @@
----
-name: linear-ticket-build
-description: >-
-    Implement an eligible Linear ticket in the configured work queue immediately
-    using explicit defaults, publish a Draft PR while initial answers are pending
-    or a ready PR otherwise, and process answers or a 48-hour timeout on later
-    invocations. Requires its own explicit user or authorized automation invocation;
-    never invokes triage.
-disable-model-invocation: true
----
-
-# Linear Ticket Build
+# Linear Ticket Build Pass
 
 Implement one Medium-or-smaller issue in the configured work queue on the current
 user's behalf. Build immediately using documented defaults instead of waiting for
 clarifying answers.
 Never merge its PR unless explicitly asked.
 
-Run only when independently invoked explicitly by the user or by an existing
-user-authorized automation. A triage invocation or persisted handoff is context,
-not authorization to run build. Never invoke triage as part of this workflow.
-Implement or substantively update at most one ticket per invocation.
+Run after the triage pass in the explicitly invoked combined workflow. Select
+only from that pass's verified buildable candidate list. Implement or
+substantively update at most one ticket in this pass.
 Do not create or edit automations, sleep until the deadline, or promise a
 background follow-up. Recheck answers and deadlines during this run. Time passing
 alone does not change a PR between invocations.
 
-## Private workflow settings
+## Shared settings and identity
 
-Before accessing the queue, read `~/.codex/private/linear-ticket-workflows.json`.
-It must supply `team` (the exact Linear team key), `repository` (the GitHub
-`owner/repository`), `triageCreatorEmails` (the nonempty exact creator allowlist),
-`maxEstimate` (the numeric upper bound), and `mediumEstimateLabel` (the scale label
-used as Medium below). Resolve these values from that private file only; never
-copy them into this skill or public configuration. Verify the intended authenticated
-Linear workspace, team/estimate scale, and repository against those settings.
-If the file or any required value is missing, invalid, or cannot be verified,
-stop before ticket mutations and report the configuration blocker. Never guess
-settings, substitute the current repository/team, or broaden queue filters.
+Use the [private workflow settings](triage.md#private-workflow-settings) and
+[identity rules](triage.md#identity-and-authorization) established in triage.
+Recheck the intended workspace, team, repository, and current user before build
+mutations; do not infer identity from the OS account or Git.
 
-## Identity and authorization
+## Build authorization
 
-Resolve the current user through the authenticated Linear connector's current-user
-lookup (`get_user` with `query: "me"`, or the equivalent available tool). Alternatively, resolve an explicit Linear identity or reuse an identity
-already explicitly confirmed in this conversation. Use the resulting Linear user
-ID for assignee and creator comparisons. Never infer identity from the OS account,
-Git, repository history, or an unrelated conversation. Ask only when identity
-cannot be resolved unambiguously.
-
-Normal invocation authorizes one eligible bounded ticket's implementation,
+The combined invocation authorizes one eligible bounded ticket's implementation,
 Linear plan/comments, estimate, assignment, and status changes, branch, commits,
 pushes, PR creation or updates, Draft/ready transitions, and reviewer requests.
 Start with known context and safe defaults; do not stop for routine approval or
@@ -61,43 +36,64 @@ Slack messages. Draft status and elapsed time never bypass these gates.
 
 ## Candidates
 
-Process newest `updatedAt` first. Paginate until a candidate is selected or the
-eligible set is exhausted; do not report no work from one page. Paginate relevant
-comments, relations, and PR feedback before deciding readiness or whether feedback
-is new:
+Use only the triage-produced buildable list; do not independently scan assigned
+issues. Prefer actionable new feedback/edits, a due deadline, or a verified
+interrupted In Progress build, newest `updatedAt` first within that tier. Then
+prefer the newest
+eligible prepared Todo ticket. Re-fetch the selected candidate and paginate its
+comments, relations, and PR feedback before deciding readiness or whether
+feedback is new. Recheck these underlying filters:
 
 ```text
 team = settings.team
-status in (Todo, In Review)
+status in (Todo, In Review), or verified interrupted In Progress
 assignee = current user
-creator != current user
+creator in settings.triageCreatorEmails and creator != current user,
+  except a verified parent-selected direct child
 estimate is set and Medium-or-smaller (at most settings.maxEstimate on the configured team scale)
 leaf issue
 ```
 
+The same creator allowlist and self-created-ticket exclusion govern both passes. For the child exception, verify
+the allowlisted parent's workflow selection and ownership decision, then the
+child's own ownership and eligibility. Confirm the issue was triaged by this
+workflow from this run's completed preparation or prior live plan, native field
+history, discussion, and linked PR evidence, with the private checkpoint as an
+optional aid. For prior work, verify the current user's plan/defaults against
+native estimate, assignment, and Todo history or corroborating linked PR evidence
+to establish the bounded handoff. A generic issue description, assignment,
+status, or checkpoint alone is insufficient. Keep unprepared, oversized,
+blocked, held, unsuitable, duplicate, or no-safe-default tickets out of the
+buildable list.
+
 Read the issue, comments, attachments, relations, sub-issues, and linked PRs.
-If any blocker is not Done, move the issue to Backlog, make no other
-change, and continue. Skip duplicate, obsolete, unsuitable, or already-complete
-work. An existing Draft PR with unanswered questions is eligible for checking
-answers or its deadline; do not skip it merely because no new reply exists.
+If any blocker is not Done, use the build pass's one-ticket budget and stop.
+With no open owning PR, move the issue to Backlog and make no other change. With an open
+owning PR, preserve the issue's status and PR; keep an already-Draft PR Draft,
+or convert a ready PR to Draft because the prerequisite prevents completion.
+Record a newly material blocker in the existing PR description and issue
+discussion; unchanged reruns remain quiet. Do not create a replacement PR or
+claim the work is ready. Skip duplicate, obsolete, unsuitable, or
+already-complete work. An existing Draft PR with unanswered questions is
+eligible for checking answers or its deadline; do not skip it merely because no
+new reply exists.
 On a general queue invocation, if a PR has no actionable new feedback and its
 deadline has not arrived, continue to the next candidate after checking it.
 An explicitly selected ticket may simply report that no action is due yet.
 
-On this independent invocation, honor an explicitly selected issue or persisted
-workflow handoff before scanning for new work. A handoff may come from an earlier
-run; re-fetch and validate its issue, ownership, estimate, blockers, discussion,
-and linked PR rather than requiring a same-invocation transfer. Preserve the
-queue filters above, including the recorded parent-selection/child-creator
-exception: verify that selection and ownership decision rather than selecting a
-different candidate. A verified existing workflow record may resume Todo,
-In Progress, or In Review work with actionable new feedback/edits or a due deadline.
-This consumes the same one-ticket budget; do not also select new work. Resume
-In Progress work only through its known owning workflow record. Check linked PRs
-before starting; reuse an open owning PR and never duplicate an implementation.
-These exceptions do not authorize an unbounded review queue. A handoff never
-bypasses current eligibility, ownership holds, or this skill's separate invocation
-requirement.
+An explicitly build-scoped issue may be selected only if triage verified it for
+the buildable list. A prior handoff is source context, not automatic eligibility
+or priority. A verified prior workflow issue may resume Todo, In Progress, or
+In Review work with actionable new feedback/edits, a due deadline, or verified
+unfinished implementation. Recover an
+interrupted In Progress build without a private checkpoint when live source
+evidence establishes the current user's bounded plan and ownership, plus the
+user's In Progress transition if no branch/PR exists, or the owning branch and
+commits tied to the issue or owning PR with its issue link when one exists.
+Triage may include such a verified issue in its list; build never starts a
+broad In Progress scan. Check linked PRs before
+starting; reuse an open owning PR and never duplicate an implementation. Current
+eligibility, ownership holds, and the one-ticket build cap still apply.
 
 Ownership must be clear. Honor recorded ownership holds and takeover decisions.
 Do not reapply triage's other-engineer active-discussion gate to review feedback
@@ -111,13 +107,12 @@ remains a blocker; do not guess to force implementation or promotion.
 
 ## Questions and plan
 
-Read only the shared [comment style](../linear-ticket-triage/SKILL.md#comment-style),
-[questions and defaults](../linear-ticket-triage/SKILL.md#questions-and-defaults), and
-[private checkpoint/quiet-run contracts](../linear-ticket-triage/SKILL.md#private-checkpoint-and-quiet-runs)
-as reference material; this is not an invocation of triage and does not load its
-execution steps. Keep all machine bookkeeping private under that contract.
+Follow the shared [comment style](triage.md#comment-style),
+[questions and defaults](triage.md#questions-and-defaults), and
+[private checkpoint/quiet-run contracts](triage.md#private-checkpoint-and-quiet-runs).
+Keep all machine bookkeeping private under that contract.
 Use one initial set of at most three meaningful questions for the bounded ticket
-across both skills. Recover legacy question comments, thread IDs, answers,
+across both passes. Recover legacy question comments, thread IDs, answers,
 timestamps, and defaults before posting. A separate invocation is
 not a new question budget. If no initial set exists, build may ask within that
 budget while implementing safe defaults immediately.
@@ -129,8 +124,10 @@ that cannot safely proceed without authorization or required data permits one
 precise blocking ask under the canonical contract. Keep its fingerprint and source
 references in the private checkpoint, and quietly skip unchanged later invocations;
 timeout never supplies that permission.
-A new ownership or risk ask consumes this run's one-ticket budget; end the run
-without asking across other candidates.
+A new ownership or risk ask consumes the build pass's one-ticket budget; stop
+without asking across other candidates. If triage already posted the combined
+invocation's one allowed new ownership or exceptional blocking ask, do not post
+another; report the blocker and stop this pass.
 
 Follow the shared comment limits: lead with user impact and next action, and
 include only a material decision/default, question, or blocker. Put technical
