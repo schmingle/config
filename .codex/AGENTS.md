@@ -2,7 +2,7 @@ NEVER run a skill if it is marked with `disable-model-invocation: true`, those s
 
 ## Response presentation
 
-Use a list for a collection of distinct items, such as choices, steps, findings, or actions; do not turn a single point or a connected explanation into a list. When presenting choices, always use a numbered list ordered from most to least recommended, and clearly label the recommended option. For other collections, prefer numbered lists when referring to items by number would help. Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
+When presenting a collection or set--such as choices, steps, findings, or actions--use a list for easy reading. For choices, always use a numbered list ordered starting with most recommended, and clearly label the recommended option. Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
 
 ## Tools
 
