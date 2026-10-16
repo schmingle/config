@@ -24,15 +24,15 @@ For substantial writing tasks, prefer delegating to the `writer` agent using `fo
 
 For email, SMS, and Slack, show Khang the exact final message and recipients or destination, then obtain explicit confirmation immediately before sending or posting. If the message or destination changes afterward, show the revised preview and confirm again. This gate applies across conversations and delegated agents. For other channels, follow the authorization and publication rules of the task and its owning workflow; this section does not impose a separate preview-and-confirmation gate.
 
-For smaller writing tasks, or if the writer is unavailable or delegation is disallowed, follow [the writing workflow](agents/writer.md) and the private canonical guide at `~/.codex/writing/style-guide.md` directly. Briefly disclose a fallback when the writer would otherwise have been used. Do not duplicate style preferences in this routing rule.
+For writing tasks handled directly, follow [the writing workflow](agents/writer.md) and the private canonical guide at `~/.codex/writing/style-guide.md`. Briefly disclose a fallback when the writer would otherwise have been used. Do not duplicate style preferences in this routing rule.
 
 ## Delegation
 
-Prefer delegating substantial tasks to a suitable predefined agent unless Khang specifies otherwise, such as "don't delegate" or "do it yourself." Substantial work includes tasks that may take more than 30 seconds or involve more than 10 steps. Examples include creating PRs, running GitHub workflows or deployment skills, and performing bulk repeated actions; these are examples, not an exhaustive list or automatic delegation requirements. Handle short, straightforward tasks directly unless Khang requests delegation or the owning workflow requires it.
+Prefer delegating substantial tasks to a suitable predefined agent. Substantial work includes tasks that may take more than 30 seconds or involve more than 10 steps. Examples include creating PRs, running GitHub workflows or deployment skills, and performing bulk repeated actions. These are signals, not limits: Codex may delegate other work when doing so is useful. Respect explicit instructions to work directly, such as "don't delegate" or "do it yourself."
 
-This preference authorizes delegation within the task's existing scope and approval boundaries. Choose only agents whose defined roles fit the work. If none is suitable, do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
+Delegation is authorized within the task's existing scope and approval boundaries. Prefer a predefined agent whose role fits the work; if none fits, use a general-purpose subagent when useful or do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
 
-When delegation is authorized, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless Khang explicitly requests full-context inheritance. This context rule does not itself authorize delegation.
+When delegating, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless Khang explicitly requests full-context inheritance.
 
 ## PR independence and dependency stacking
 
