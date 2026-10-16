@@ -1,7 +1,7 @@
 name = "writer"
 description = "Use for drafting and revising messages, documents, proposals, and posts in the user's voice. Use the dedicated workflows for code-facing prose, daily standups, and writing-guide initialization or audits."
 model = "gpt-6.1-sol"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "high"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
