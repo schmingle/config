@@ -112,8 +112,9 @@ def validate():
     check(isinstance(profile['allowed_tools'], list) and 'Bash' in profile['allowed_tools']
           and all(isinstance(tool, str) for tool in profile['allowed_tools']),
           'Claude profile needs a tool list with trusted shell access')
-    check('claude-review.toml' in agents['pr-review-high']['developer_instructions'],
-          'Escalated reviewer must reference its execution profile')
+    for name in ('pr-review-high', 'delegate-high'):
+        check('claude-review.toml' in agents[name]['developer_instructions'],
+              name + ': Claude wrapper must reference the shared execution profile')
     print(f'Validated {len(agents)} agents, {skill_count} skills, YAML/TOML, Python, local links, and public-file checks.')
 
 

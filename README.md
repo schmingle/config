@@ -4,7 +4,7 @@ Reusable development settings, agent definitions, and skills. This repository is
 public; follow [AGENTS.md](AGENTS.md) before adding or publishing content.
 
 - [Global instructions](.codex/AGENTS.md): personal working agreements for every Codex task.
-- [Agents](.codex/agents/): role definitions, shared instructions, and review helpers.
+- [Agents](.codex/agents/): role definitions, shared instructions, and Claude execution helpers.
 - [Skills](.codex/skills/): custom skills and supporting files.
 
 The `.codex/` directory mirrors the corresponding directories in `~/.codex/`.

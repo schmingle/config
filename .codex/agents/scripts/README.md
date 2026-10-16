@@ -1,6 +1,18 @@
-# Claude review preparation and launch
+# Claude execution helpers
 
-The helper runs the Claude-backed `pr-review-high`; the default reviewer runs
+[The shared execution layer](claude_runner.py) supplies launch arguments,
+authentication, session persistence, deadlines, and process settlement to both role
+runners. [The common handoff](../claude.md) defines their execution contract.
+
+- General tasks: [claude_delegate.py](claude_delegate.py), following
+  [the task handoff](../delegate-claude.md). It permits assigned source changes and
+  verification in the existing checkout, saves initial/final state, and has no
+  PR/risk/Linear requirement.
+- PR reviews: [claude_review.py](claude_review.py), following
+  [the review handoff](../pr-review-claude.md). It retains clean pinned snapshots,
+  risk reports, required Linear reads, review output, and bounded recovery.
+
+The review helper runs the Claude-backed `pr-review-high`; the default reviewer runs
 natively. Review definitions and the posted template remain in
 [the shared contract](../pr-review.md). [The execution profile](claude-review.toml)
 is the single source for Claude's model, effort, display name, and allowed tools.

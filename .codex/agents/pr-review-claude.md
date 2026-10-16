@@ -1,7 +1,7 @@
 # Claude PR review handoff
 
 Use this for `pr-review-high` and explicitly assigned Claude trials, together with
-[the shared review contract](pr-review.md). The default `pr-review` runs natively.
+[the shared review contract](pr-review.md) and [shared Claude execution contract](claude.md). The default `pr-review` runs natively.
 Agent descriptions define routing; the shared contract defines review standards and handoff requirements.
 The reviewer selects relevant instructions and source context, expanding beyond the
 supplied brief as needed under [the context policy](context.md).

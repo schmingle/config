@@ -13,6 +13,8 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import MagicMock, call, patch
 
+import claude_runner as runner
+
 MODULE = Path(__file__).with_name('claude_review.py')
 spec = importlib.util.spec_from_file_location('review', MODULE)
 review = importlib.util.module_from_spec(spec)
@@ -107,7 +109,7 @@ class PersistenceTests(unittest.TestCase):
                     returncode=1, stdout='{"loggedIn": false}')), self.assertRaisesRegex(ValueError, 'login/config'):
                 review.persistence_preflight('fake-cli', checkout)
             with patch.object(review.subprocess, 'run', return_value=status), \
-                    patch.object(review.tempfile, 'TemporaryFile', side_effect=PermissionError()), \
+                    patch.object(runner.tempfile, 'TemporaryFile', side_effect=PermissionError()), \
                     self.assertRaisesRegex(ValueError, 'not writable'):
                 review.persistence_preflight('fake-cli', checkout)
 
