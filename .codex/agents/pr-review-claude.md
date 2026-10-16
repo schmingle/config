@@ -26,7 +26,8 @@ normal subscription authentication and inherited Linear access.
 1. Start the wrapper with `fork_turns="none"`. Supply repository/PR, pinned head,
    actual base and merge-base, mode/scope, absolute finish-by, publication permissions,
    the exact coordinator-supplied risk report body, rating, assessed snapshot/provenance,
-   any existing source URL, and evidenced prior coverage or an escalation question
+   any existing source URL, the exact linked Linear issue ID and GitHub evidence for
+   that link when one exists, and evidenced prior coverage or an escalation question
    when applicable. Keep
    writer-private conversation and coordinator conclusions out of the assignment.
 2. Verify repository identity and live PR state. Collect full paginated GitHub
@@ -39,8 +40,10 @@ normal subscription authentication and inherited Linear access.
 4. Before spending model tokens, run the helper under permissions that support its
    authenticated `claude auth status` check and write probe in the actual session
    directory. Preserve the existing login, configuration directory, and Linear access.
-   If preflight fails inside the sandbox, request authorized command-level escalation;
-   do not copy credentials or disable persistence to bypass it.
+   If this local authentication or session-storage preflight fails inside the sandbox,
+   request authorized command-level escalation; do not copy credentials or disable
+   persistence to bypass it. This escalation instruction does not apply to ordinary
+   read-only lookup of a PR-linked Linear issue.
 5. Use [the helper](scripts/claude_review.py) to prepare and run the bundle; see its
    [commands and specification](scripts/README.md). It copies evidence unchanged,
    rejects visible API errors/incomplete pagination, selects `AGENTS.override.md`
@@ -56,10 +59,14 @@ CLI. Keep `ToolSearch` available for deferred tools; a connected status or an em
 initial tool list does not establish usable or missing access.
 
 The current connector is `claude.ai Linear` at `https://mcp.linear.app/mcp`. Discover
-its actual issue/comment read tools at runtime. For linked PRs, read the issue and
-relevant comment pages; for unlinked PRs, verify a minimal identity read instead.
+its actual issue/comment read tools at runtime. For linked PRs, use the verified
+issue ID and GitHub link evidence from the handoff to read that issue and its
+relevant comment pages. Follow linked material only when the shared contract
+requires it; do not make a broad ticket-search probe or ask for separate user
+approval. For unlinked PRs, verify a minimal identity read instead.
 Do not launch with an empty strict MCP configuration, export credentials, or install
-another integration to bypass authentication. Missing required access means
+another integration to bypass authentication. Respect a tool or automatic approval
+denial rather than retrying the rejected read. Missing required access means
 Incomplete without sign-off; surface the exact blocker and unblock action while
 continuing independent source inspection. The shared contract owns context judgments.
 
