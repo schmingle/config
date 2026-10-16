@@ -28,6 +28,10 @@ If the writer is unavailable or delegation is disallowed, follow [the writing wo
 
 When delegation is authorized, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless Khang explicitly requests full-context inheritance. This rule does not itself authorize delegation.
 
+## Delegation preference
+
+Prefer delegating work to a suitable predefined agent unless Khang specifies otherwise, such as "don't delegate." This preference authorizes delegation within the task's existing scope and approval boundaries; follow the Subagent context requirements above. Choose only agents whose defined roles fit the work. If none is suitable, do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
+
 ## PR independence and dependency stacking
 
 Avoid stacking by default. Create independent PRs from the repository's current default branch (`main` where applicable).
