@@ -3,13 +3,15 @@
 Reusable development settings, agent definitions, and skills. This repository is
 public; follow [AGENTS.md](AGENTS.md) before adding or publishing content.
 
+- [Global instructions](.codex/AGENTS.md): personal working agreements for every Codex task.
 - [Agents](.codex/agents/): role definitions, shared instructions, and review helpers.
 - [Skills](.codex/skills/): custom skills and supporting files.
 
 The `.codex/` directory mirrors the corresponding directories in `~/.codex/`.
 Instruction references use that default installation path; adapt them if your Codex
-home differs. Symlink the installed `agents` and `skills` folders to these directories
-to edit the same files from either location. Back up existing folders before linking.
+home differs. Symlink the installed `AGENTS.md` file and the `agents` and `skills`
+folders to these tracked paths to edit the same files from either location. Back up
+existing files and folders before linking.
 Other local Codex settings are not included.
 
 Codex-managed `.system` skills are excluded by `skills/.gitignore`; runtime state is
