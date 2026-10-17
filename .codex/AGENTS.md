@@ -18,7 +18,7 @@ For 1Password (`op`), prefer the CLI for approved work. Check `op whoami` in the
 
 ## Work and personal accounts
 
-Keep work and personal accounts separate. Most connected tools are for work; personal activity is mainly in the personal Chrome profile and a small set of services. Read the local, untracked account map at `~/.codex/private/account-context.md` when choosing an account or tool. Verify the authenticated account before accessing data or making changes, especially when a service is available in both contexts. Do not use a work connection for personal activity, or a personal connection for work activity, merely because it is available. If the intended account remains unclear, ask before accessing either one.
+Keep work and personal accounts separate. Most connected tools are for work; personal activity is mainly in the personal Chrome profile and a small set of services. Read the local, untracked private settings at `~/.codex/AGENTS-PRIVATE.md` for the account map and other applicable private preferences. Never copy its contents into tracked files or public artifacts. Verify the authenticated account before accessing data or making changes, especially when a service is available in both contexts. Do not use a work connection for personal activity, or a personal connection for work activity, merely because it is available. If the intended account remains unclear, ask before accessing either one.
 
 The GitHub account `schmingle` is used for both work and personal repositories. Classify GitHub activity by the repository owner or organization, remote URL, and task context; the authenticated identity alone does not determine whether a task is work or personal. Verify the target repository before reading or writing repository data.
 

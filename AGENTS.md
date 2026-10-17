@@ -59,6 +59,11 @@ Keep local overrides and sensitive source material outside the repository, with
 appropriate ignore rules for any local-only files. Ignoring a file does not protect
 it if it is already tracked.
 
+The explicit local-only exception is `.codex/AGENTS-PRIVATE.md`, which holds private
+settings and account context. Keep it gitignored and untracked; never force-add it,
+copy its contents into tracked files, or include it in public artifacts. Its installed
+path is `~/.codex/AGENTS-PRIVATE.md`, symlinked to the ignored file.
+
 ## Before staging, committing, or pushing
 
 1. Inspect the exact files and complete diff, including new, hidden, generated,

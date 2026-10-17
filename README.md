@@ -14,6 +14,11 @@ folders to these tracked paths to edit the same files from either location. Back
 existing files and folders before linking.
 Other local Codex settings are not included.
 
+Private preferences and account context live in a local `.codex/AGENTS-PRIVATE.md`.
+This file is gitignored and must never be committed. Create it locally and symlink
+`~/.codex/AGENTS-PRIVATE.md` to it, alongside the tracked global instructions.
+The global instructions explicitly direct agents to read the private settings.
+
 Codex-managed `.system` skills are excluded by `skills/.gitignore`; runtime state is
 also excluded. The writer references
 a private `~/.codex/writing/style-guide.md`; supply your own guide outside this repo.
