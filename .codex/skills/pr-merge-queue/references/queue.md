@@ -68,7 +68,7 @@ Never merge into an unmerged parent. Stack only verified prerequisites, with act
 
 ## Reporting
 
-This full report applies only after the entrypoint finds candidates. Successful empty/excluded-only discovery uses the entrypoint's quiet exit instead.
+Every manual or scheduled run must end with a user-visible final reply, including errors or interruptions with the outcome and blockers known so far. Commentary and automation memory updates do not replace it. Successful empty/excluded-only discovery uses the entrypoint's concise final reply. After candidates are found, use the full report below even when no PRs merge.
 
 Progress updates show PR, action, outcome/blocker and remaining time. Report decisions here, not in automatic decision-request PR comments; risk above the ceiling alone is not a request for an exception.
 
