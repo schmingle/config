@@ -4,6 +4,10 @@ NEVER run a skill if it is marked with `disable-model-invocation: true`, those s
 
 When presenting a collection or set--such as choices, steps, findings, or actions--use a list for easy reading. For choices, always use a numbered list ordered starting with most recommended, and clearly label the recommended option. Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
 
+## Private customization
+
+At the start of each task, read `~/.codex/AGENTS-PRIVATE.md` if present and apply its relevant preferences, account map, and local context. This local, untracked file is the canonical location for identifying details and personal customization; the reusable defaults here also work without it. Never copy private settings into tracked files or public artifacts.
+
 ## Tools
 
 When a task can be done through several interfaces, prefer an installed CLI, then a connected plugin, then a browser. This applies to services such as GitHub (`gh`), Sentry (`sentry-cli`), AWS (`aws`), and Heroku (`heroku`). Follow an explicit tool request or a workflow's required tool when one is specified.
@@ -18,26 +22,26 @@ For 1Password (`op`), prefer the CLI for approved work. Check `op whoami` in the
 
 ## Work and personal accounts
 
-Keep work and personal accounts separate. Most connected tools are for work; personal activity is mainly in the personal Chrome profile and a small set of services. Read the local, untracked private settings at `~/.codex/AGENTS-PRIVATE.md` for the account map and other applicable private preferences. Never copy its contents into tracked files or public artifacts. Verify the authenticated account before accessing data or making changes, especially when a service is available in both contexts. Do not use a work connection for personal activity, or a personal connection for work activity, merely because it is available. If the intended account remains unclear, ask before accessing either one.
+Keep work and personal accounts separate. Use the private account map to select the intended service account and browser profile. Verify the authenticated account before accessing data or making changes, especially when a service is available in both contexts. Do not use a work connection for personal activity, or a personal connection for work activity, merely because it is available. If the intended account remains unclear, ask before accessing either one.
 
-The GitHub account `schmingle` is used for both work and personal repositories. Classify GitHub activity by the repository owner or organization, remote URL, and task context; the authenticated identity alone does not determine whether a task is work or personal. Verify the target repository before reading or writing repository data.
+When the private account map identifies a GitHub account used for both work and personal repositories, classify activity by the repository owner or organization, remote URL, and task context; the authenticated identity alone does not determine whether a task is work or personal. Verify the target repository before reading or writing repository data.
 
 ## Writing and outbound communication
 
 For substantial writing tasks, prefer delegating to the `writer` agent using `fork_turns="none"` and the compact assignment described in [its workflow](agents/writer.md). This can include messages, documents, proposals, and posts. Include the relevant facts and sources, audience, channel, requested length, current or approved draft, and all applicable corrections. Reuse the same writer for revisions when practical, and check its result against the brief before presenting it. Code-facing prose, daily standups, and writing-guide maintenance retain their owning workflows; involve the writer for drafting when compatible with those workflows.
 
-For email, SMS, and Slack, show Khang the exact final message and recipients or destination, then obtain explicit confirmation immediately before sending or posting. If the message or destination changes afterward, show the revised preview and confirm again. This gate applies across conversations and delegated agents. For other channels, follow the authorization and publication rules of the task and its owning workflow; this section does not impose a separate preview-and-confirmation gate.
+For email, SMS, and Slack, show the user the exact final message and recipients or destination, then obtain explicit confirmation immediately before sending or posting. If the message or destination changes afterward, show the revised preview and confirm again. This gate applies across conversations and delegated agents. For other channels, follow the authorization and publication rules of the task and its owning workflow; this section does not impose a separate preview-and-confirmation gate.
 
 For writing tasks handled directly, follow [the writing workflow](agents/writer.md) and the private canonical guide at `~/.codex/writing/style-guide.md`. Briefly disclose a fallback when the writer would otherwise have been used. Do not duplicate style preferences in this routing rule.
 
 ## Work management
 
-Use Linear as the durable home for work so Khang can switch priorities and resume without reconstructing Codex conversations.
+Use Linear as the durable home for work so the user can switch priorities and resume without reconstructing Codex conversations.
 
 1. **Projects track big rocks.** Propose creating or reusing a project when work involves roughly 10 tickets or at least one week of elapsed delivery time, including coordination, rollout, and acceptance. These are signals, not hard cutoffs; smaller efforts may qualify when they have a distinct outcome or significant coordination. Obtain approval before creating a project or reorganizing existing work.
 2. **Keep projects finite.** Each project needs a clear outcome, scope boundary, and completion criteria. Chunk larger programs into bounded versions or phases, such as v0, v1, and v2. Avoid continually expanding a project to absorb every related improvement; capture follow-ups separately.
 3. **Labels track ongoing workstreams.** Use labels such as Foundation, Recruiting, Security, and Ops for continuing categories of work. Tickets can carry these labels without belonging to a project. Use a project when a finite initiative emerges within a workstream.
-4. **Pins reflect current focus.** Khang generally focuses on one or two big rocks at a time. Keep roughly two or three major priorities pinned in Codex; use Linear to track the rest. Do not change pins without a request.
+4. **Pins reflect current focus.** The user generally focuses on one or two big rocks at a time. Keep roughly two or three major priorities pinned in Codex; use Linear to track the rest. Do not change pins without a request.
 5. **Make switching easy.** Keep each project's current state, next action, blockers, consequential decisions, and important links easy to find. A fresh Codex chat should be able to resume from Linear without recovering previous conversations.
 6. **Maintain approved tracking automatically.** Keep descriptions, milestones, links, and statuses current based on verified progress. Distinguish implementation, deployment, and operational acceptance. Reuse existing records, preserve ownership and relationships, and ask before materially changing scope or ownership.
 
@@ -45,7 +49,7 @@ Keep project management in Linear and maintained technical documentation beside 
 
 ### Project descriptions
 
-Use this structure when creating or materially updating a Linear project. The description is the project's current contract: clear enough for Khang to assess the direction and for Codex to execute without reconstructing prior conversations.
+Use this structure when creating or materially updating a Linear project. The description is the project's current contract: clear enough for the user to assess the direction and for Codex to execute without reconstructing prior conversations.
 
 ```markdown
 ## Summary
@@ -81,7 +85,7 @@ Apply these directions:
 2. **Always include Key Decisions.** State explicitly if none have been identified. Treat decided choices as constraints and propose changes before departing from them. Keep assumptions and open decisions visibly distinct from commitments.
 3. **Separate results from proof.** KRs describe what must become true. Completion validation explains how to demonstrate it. Use user stories for capabilities and appropriate operational, recovery, reconciliation, or performance checks for other outcomes.
 4. **Make phases govern execution.** Preserve each phase's core intention and exit condition so its tickets can be checked for alignment. Identify meaningful dependencies and parallel work.
-5. **Maintain one current contract.** Refresh the description when approved goals, decisions, or approach change. Use native milestones and tickets for detailed tracking. Keep current progress, next actions, blockers, and requests for Khang in the latest project update, with historical evidence in linked records.
+5. **Maintain one current contract.** Refresh the description when approved goals, decisions, or approach change. Use native milestones and tickets for detailed tracking. Keep current progress, next actions, blockers, and requests for the user in the latest project update, with historical evidence in linked records.
 
 ## Delegation
 
@@ -89,7 +93,7 @@ Prefer delegating substantial tasks to a suitable predefined agent. Substantial 
 
 Delegation is authorized within the task's existing scope and approval boundaries. Prefer a predefined agent whose role fits the work; if none fits, use a general-purpose subagent when useful or do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
 
-When delegating, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless Khang explicitly requests full-context inheritance.
+When delegating, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless the user explicitly requests full-context inheritance.
 
 ## PR independence and dependency stacking
 

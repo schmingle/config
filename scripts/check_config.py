@@ -8,14 +8,12 @@ import tomllib
 
 import yaml
 
+from check_privacy import inspect_blob
+
 ROOT = Path(__file__).resolve().parents[1]
 EFFORTS = {'none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'}
-SECRET = re.compile(r'(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|'
-                    r'sk-(?:proj-|ant-)?[A-Za-z0-9_-]{30,}|AKIA[A-Z0-9]{16}|'
-                    r'xox[baprs]-[A-Za-z0-9-]{20,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----)')
 EXECUTION_PROSE = re.compile(r'(?i)\b(?:gpt-\d[\w.-]*|claude-(?:opus|sonnet|haiku)[\w.-]*|Sol|Astra|Luna|Terra|Opus|Sonnet|Haiku)\b|\b(?:low|medium|high|xhigh|max|ultra)\s+effort\b')
-PRIVATE_ROOTS = {'auth.json', 'config.toml', 'writing', 'sessions', 'memories', 'automations',
-                 'worktrees', 'history.jsonl', 'cache', 'backups', 'logs'}
+
 
 
 def check(condition, message):
@@ -40,19 +38,12 @@ def validate():
     skill_count = 0
     for name in sorted(set(paths) - {''}):
         path = ROOT / name
+        check(not path.is_symlink(), name + ': inspect symlinks before publishing')
         if not path.exists():
             continue  # A tracked file scheduled for deletion.
-        check(not path.is_symlink(), name + ': inspect symlinks before publishing')
-        parts = Path(name).parts
-        if parts[0] == '.codex' and len(parts) > 1:
-            check(parts[1] not in PRIVATE_ROOTS, name + ': private/local-only Codex content')
-            check('.system' not in parts, name + ': bundled skills must remain untracked')
-        try:
-            text = path.read_text()
-        except UnicodeError:
-            raise ValueError(name + ': binary content needs explicit review') from None
-        check(not SECRET.search(text), name + ': possible credential; value omitted')
-        check(not re.search(r'/' r'Users' r'/[^/\s]+/', text), name + ': replace personal absolute paths')
+        payload = path.read_bytes()
+        inspect_blob(name, '100644', payload)
+        text = payload.decode('utf-8')
         check(all(line.rstrip() == line for line in text.splitlines()), name + ': trailing whitespace')
         if path.suffix == '.py':
             ast.parse(text, filename=name)

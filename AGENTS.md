@@ -26,12 +26,17 @@ to supply everything. Required guidance and role-specific coverage still apply.
 ## What belongs here
 
 Track reusable development configuration, agent definitions, skills, scripts, and
-instructions. Development preferences, public developer identities, and public
-technical references are allowed when relevant. Include only information necessary
-to explain or use the configuration.
+instructions. Development preferences and public technical references are allowed
+when relevant. Include only information necessary to explain or use the
+configuration.
 
 Development relevance alone does not make information safe to publish. Company,
 customer, and third-party confidential information must remain outside this repo.
+This includes proprietary business rules, internal architecture, schemas, and
+documentation, whether copied, paraphrased, summarized, or reconstructed from
+private sources. A generic request to edit, improve, or commit configuration does
+not authorize publishing private material. Publication requires explicit
+authorization for the specific material and public destination.
 
 ## Never include
 
@@ -60,11 +65,21 @@ appropriate ignore rules for any local-only files. Ignoring a file does not prot
 it if it is already tracked.
 
 The explicit local-only exception is `.codex/AGENTS-PRIVATE.md`, which holds private
-settings and account context. Keep it gitignored and untracked; never force-add it,
-copy its contents into tracked files, or include it in public artifacts. Its installed
-path is `~/.codex/AGENTS-PRIVATE.md`, symlinked to the ignored file.
+preferences, identifying details, and account context. Keep it gitignored and
+untracked; never force-add it, copy its contents into tracked files, or include it
+in public artifacts. Its installed path is `~/.codex/AGENTS-PRIVATE.md`, symlinked to the ignored file.
 
 ## Before staging, committing, or pushing
+
+The local privacy gate is mandatory for every change, including Markdown-only
+edits. Install the [versioned hooks](README.md#validate-changes), scan the exact
+staged index before committing, and scan every outgoing commit before pushing.
+Run the [validation commands](README.md#validate-changes) as applicable. Checks
+must fail closed when a required dependency or scan cannot run; fix the blocker
+before committing or pushing. CI runs after publication and cannot replace these
+local checks. Do not bypass hooks with `--no-verify`, override `core.hooksPath`, or
+otherwise disable a safeguard without explicit user authorization for that
+specific bypass and reason.
 
 1. Inspect the exact files and complete diff, including new, hidden, generated,
    and binary files. Review staged content again before committing. Do not use

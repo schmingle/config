@@ -1,0 +1,7 @@
+#!/bin/sh
+# Git supplies the prepared commit-message path as the first argument.
+set -eu
+root=$(git rev-parse --show-toplevel) || exit 1
+cd "$root"
+export PYTHONDONTWRITEBYTECODE=1
+exec python3 scripts/check_privacy.py --commit-message "$1"
