@@ -1,0 +1,21 @@
+# Standalone worker protocol
+
+Read this when creating or assigning the project's paired worker. Resolve this installed reference to an absolute path, include it in the worker's task prompt, and require the worker to read it. If the worker cannot access it, include the protocol requirements in the assignment instead; otherwise pass project-specific facts without duplicating the protocol. The worker is a standalone native task, not a supervisor child agent, and has no heartbeat or other automation.
+
+## Assignment
+
+Supply a compact, complete brief containing:
+
+1. The live Linear project contract source, applicable decisions and boundaries, phase/ticket work with actual IDs, desired outcome, and required validation.
+2. The verified target repository, checkout/branch ownership, existing PRs, relevant guidance, and other agents' ownership. Preserve others' changes and use existing work rather than recreating it.
+3. Existing approvals and prohibited actions, the stable project and supervisor task IDs, and a retrievable task/message reference to the human invocation (no copied transcript) authorizing this pair and scoped messages in both directions. That authorization covers questions, progress requiring intervention, and final reports to this supervisor; it grants no unrelated messaging or additional approval.
+4. Absolute batch start and deadline with timezone, normally 50 minutes apart. Include existing outstanding corrections and their proof requirements. A steering message to an active batch does not reset these times. A correction for an idle/settled worker belongs in a full new assignment with fresh times after prior work is confirmed settled.
+
+## Execution and reporting
+
+1. Check the current time against the supplied deadline before starting work. Work continuously on useful authorized steps within this batch, reserving time for cleanup and reporting. Use native agent delegation where appropriate, with bounded ownership and the same deadline/settlement requirements. Respect phase exits before dependent work and continue independent authorized preparation when useful.
+2. Do not treat one completed step as the whole batch when useful authorized work remains. Native Goals are optional only if the user authorized their use. A prompt or goal does not guarantee autonomous continuation; the pilot must validate what the host actually does. This is a cooperative deadline, not a hard watchdog.
+3. Send material questions immediately to the named supervisor via `send_message_to_thread`, with the decision needed, relevant evidence, and useful unaffected work you can continue. Send the final report immediately through the same channel. Use the human authorization reference supplied in the assignment so replies are not justified solely by a supervisor message.
+4. Stop early when no useful authorized work remains. Report whether waiting, blocked, or finished, with actual outcomes, evidence/PR links, remaining corrections, next action, and settlement of owned agents, commands, and writes. A report is a claim for the supervisor to verify, not acceptance evidence by itself.
+5. On deadline or an explicit stop, start no new work, stop or settle owned agents and commands using supported controls, and verify their states. If a child or command cannot be stopped or inspected, report it as unresolved. Do not claim all work stopped when its status is unknown, and do not begin another batch until the supervisor verifies settlement. Elapsed time is not proof of cancellation.
+6. Diagnose missing capabilities and repeated failures rather than retrying an identical action blindly. Escalate the actual blocker and continue safe independent work; there is no arbitrary failure-count rule requiring a human. Approval boundaries remain in force even if the worker believes a change is necessary.
