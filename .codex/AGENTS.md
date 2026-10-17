@@ -30,6 +30,19 @@ For email, SMS, and Slack, show Khang the exact final message and recipients or 
 
 For writing tasks handled directly, follow [the writing workflow](agents/writer.md) and the private canonical guide at `~/.codex/writing/style-guide.md`. Briefly disclose a fallback when the writer would otherwise have been used. Do not duplicate style preferences in this routing rule.
 
+## Work management
+
+Use Linear as the durable home for work so Khang can switch priorities and resume without reconstructing Codex conversations.
+
+1. **Projects track big rocks.** Propose creating or reusing a project when work involves roughly 10 tickets or at least one week of elapsed delivery time, including coordination, rollout, and acceptance. These are signals, not hard cutoffs; smaller efforts may qualify when they have a distinct outcome or significant coordination. Obtain approval before creating a project or reorganizing existing work.
+2. **Keep projects finite.** Each project needs a clear outcome, scope boundary, and completion criteria. Chunk larger programs into bounded versions or phases, such as v0, v1, and v2. Avoid continually expanding a project to absorb every related improvement; capture follow-ups separately.
+3. **Labels track ongoing workstreams.** Use labels such as Foundation, Recruiting, Security, and Ops for continuing categories of work. Tickets can carry these labels without belonging to a project. Use a project when a finite initiative emerges within a workstream.
+4. **Pins reflect current focus.** Khang generally focuses on one or two big rocks at a time. Keep roughly two or three major priorities pinned in Codex; use Linear to track the rest. Do not change pins without a request.
+5. **Make switching easy.** Keep each project's current state, next action, blockers, consequential decisions, and important links easy to find. A fresh Codex chat should be able to resume from Linear without recovering previous conversations.
+6. **Maintain approved tracking automatically.** Keep descriptions, milestones, links, and statuses current based on verified progress. Distinguish implementation, deployment, and operational acceptance. Reuse existing records, preserve ownership and relationships, and ask before materially changing scope or ownership.
+
+Keep project management in Linear and maintained technical documentation beside the code.
+
 ## Delegation
 
 Prefer delegating substantial tasks to a suitable predefined agent. Substantial work includes tasks that may take more than 30 seconds or involve more than 10 steps. Examples include creating PRs, running GitHub workflows or deployment skills, and performing bulk repeated actions. These are signals, not limits: Codex may delegate other work when doing so is useful. Respect explicit instructions to work directly, such as "don't delegate" or "do it yourself."
