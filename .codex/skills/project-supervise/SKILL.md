@@ -1,10 +1,10 @@
 ---
-name: project-supervisor
+name: project-supervise
 description: Supervise one finite Linear project through a dedicated supervisor task, one standalone worker task, and a recurring verification cycle. Run only when explicitly invoked; configuration work does not start supervision.
 disable-model-invocation: true
 ---
 
-# Project supervisor
+# Project supervision
 
 Use one dedicated supervisor task per finite Linear project and one corresponding standalone worker task. The supervisor owns coordination and acceptance; the worker executes authorized work. Use native Linear, task, agent, and automation capabilities. Keep runtime state only in Linear and native task/automation records: no local markers, memory, registry, or custom scheduler.
 
@@ -20,7 +20,7 @@ Use one dedicated supervisor task per finite Linear project and one correspondin
 1. Resolve a unique project identity before creating, messaging, or writing; clarify ambiguity. Read the live project contract, recent project updates, relevant tickets/comments, and current human instructions. The summary, Key Decisions, KRs, completion validation, phase intentions/exits, and boundaries govern intent. Inspect code, PRs, CI, and operator evidence for actual state; a worker report or Done ticket is not proof. If consequential outcomes, acceptance criteria, or phase boundaries are missing, gather available evidence, escalate the missing decision, and hold dependent work while continuing safe authorized independent preparation with the heartbeat active. Missing template headings alone are not blockers.
 2. Recover the supervisor, worker, heartbeat, active batch, and outstanding corrections from the latest Linear update, task context, and native task/automation inspection. Verify identities and live status rather than trusting old IDs. Use Linear's native project status-update read/write tools when available. Use a project-based worker title and include stable project and supervisor task IDs in its initial creation prompt. For ambiguous or lost creation results, discover candidates through native records and verify that binding on readback before any retry; do not create replacements while the outcome is unknown.
 3. Reuse the existing pair and heartbeat. Do not take over another active supervisor or create a competing pair. Resolve an ambiguous owner/handoff before dispatch. Check stopped/completed control state and later human instructions before writes: a queued heartbeat cannot resume a stopped project or reactivate its automation. Only a later explicit human instruction can resume stopped work: reactivate the existing paused heartbeat, read back its active state, and record the resume in Linear. Otherwise retain the stop and perform only needed settlement checks. An unchanged, already verified complete project exits without a new worker or heartbeat.
-4. For a new authorized supervisor, create its thread heartbeat with the automation tool before dispatch, or reuse the matching existing heartbeat. Its entire future prompt is `$project-supervisor`; project context stays in Linear and this task. Apply the resolved interval and verify the returned record. Immediately execute the cycle below in this turn; do not depend on a separate “run now” API. Subsequent manual invocations execute this same cycle without duplicating tasks or schedules. Before repository-backed `create_thread`, use the native task host's `list_projects` to select the verified repository project; default to the local environment and omit unrequested worktree options.
+4. For a new authorized supervisor, create its thread heartbeat with the automation tool before dispatch, or reuse the matching existing heartbeat. Its entire future prompt is `$project-supervise`; project context stays in Linear and this task. Apply the resolved interval and verify the returned record. Immediately execute the cycle below in this turn; do not depend on a separate “run now” API. Subsequent manual invocations execute this same cycle without duplicating tasks or schedules. Before repository-backed `create_thread`, use the native task host's `list_projects` to select the verified repository project; default to the local environment and omit unrequested worktree options.
 
 ## Supervisor cycle
 
