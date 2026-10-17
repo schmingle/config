@@ -3,8 +3,9 @@ name: linear-ticket
 description: >-
     Triage bugs and one-off work in the configured Linear queue, recommend project
     framing when needed, then implement or update one best eligible bounded
-    ticket in up to two focused PRs. Requires explicit user or
-    authorized automation invocation; never merges or deploys.
+    ticket, preferring a one-to-one mapping between implementation tickets and
+    focused PRs. Requires explicit user or authorized automation invocation;
+    never merges or deploys.
 disable-model-invocation: true
 ---
 

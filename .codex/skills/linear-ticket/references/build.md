@@ -199,11 +199,18 @@ pending so queued feedback cannot be silently skipped.
 
 ## Branches and PRs
 
-Prefer one focused PR. A second is permitted only when necessary to deliver the
-same complete bounded ticket in reviewable parts; two is not a quota. Keep each
-PR’s scope, validation, and contribution to the ticket’s acceptance criteria clear,
-link both from the issue, and verify their combined result. The ticket counts once
-toward the build budget. Do not call the ticket complete after only one part.
+Prefer a one-to-one mapping between implementation tickets and focused PRs. If a
+bounded outcome needs two PRs, follow triage’s
+[split rules](triage.md#work-routing) to split tickets/sub-issues where already
+authorized or propose the split. Do not
+build multiple children under one selected ticket’s budget or bypass screening.
+
+Preserve existing multi-PR work. A necessary exception may still use two PRs for
+the same complete bounded ticket; state the scope rationale and why the one-to-one
+preference cannot reasonably be applied. Keep each PR’s contribution to the
+acceptance criteria clear, link both from the issue, and verify their combined
+result. The ticket counts once toward the build budget. Do not call it complete
+after only one part; two PRs are not a quota.
 
 Follow the repository’s branch, commit, push, and PR workflow. Use the Linear ID
 in new Todo branches when practical; reuse owning branches and PRs for revisions.
@@ -297,8 +304,8 @@ For partial delivery, preserve the issue’s In Progress status and report the
 remaining acceptance criteria without claiming completion. On later revisions to
 work already In Review, use the existing status-routing rules.
 
-Report the issue and all owning PR links, complete or partial user-visible outcome,
-combined verification summary, each PR’s Draft/ready/landed state, and any material
+Report the actual issue ID and all owning PR links, complete or partial
+user-visible outcome, combined verification summary, each PR’s Draft/ready/landed state, and any material
 blocker or next action concisely. Include a readable question deadline only when
 useful; omit raw bookkeeping and routine field lists.
 State that another invocation is needed for future replies or promotion;

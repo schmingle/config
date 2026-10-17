@@ -216,10 +216,12 @@ membership alone does not exclude a bounded fix; honor an active owner or
 supervisor’s assignment and do not create competing execution.
 
 1. **Bounded bug or one-off:** The complete cohesive outcome has known acceptance
-   criteria and a credible validation path, and fits one or, when necessary, two
-   focused PRs. PR count is a sizing signal, not permission to stuff a large change
-   into two PRs or defer essential work. Ordinary unanswered details may use the
-   existing safe-default contract; no full project plan is needed for a clear fix.
+   criteria and a credible validation path. Prefer a one-to-one mapping between
+   implementation tickets and focused PRs; a justified exception may use two PRs
+   for the same bounded outcome.
+   PR count is a sizing signal, not permission to stuff a large change into two
+   PRs or defer essential work. Ordinary unanswered details may use the existing
+   safe-default contract; no full project plan is needed for a clear fix.
 2. **Project framing needed:** Consequential unresolved decisions or coordinated
    phases, dependencies, rollout, or acceptance need a project-level contract.
    Exclude it from the buildable list and propose the finite outcome, known scope
@@ -232,6 +234,15 @@ supervisor’s assignment and do not create competing execution.
 3. **Material uncertainty:** Investigate read-only within the existing screening
    cap. If the route remains unclear, exclude it from build and state the specific
    evidence or decision missing instead of guessing or forcing a project plan.
+
+For a bounded outcome needing two PRs, prefer appropriately scoped tickets or
+sub-issues where creation/splitting is already authorized; otherwise propose the
+split. This workflow alone does not authorize ticket creation or splitting. Each
+child must independently pass screening, triage, and build selection under the
+existing ownership, estimate, and creator rules, including the child exception.
+Preserve the 10-screened/10-mutated caps and one-ticket build cap; a selected parent never authorizes building multiple
+children. Preserve existing multi-PR work rather than retroactively splitting it;
+use the build pass’s documented exception when necessary.
 
 Apply routing proposals only in the ranked disposition pass, within the same
 10-screened/10-mutated ticket limits and comment caps. Reuse the existing plan or
@@ -253,22 +264,22 @@ recommendation remains quiet.
 ## Comment style
 
 This is the shared output contract for both passes. Write naturally as the current
-user and follow applicable writing guidance. Lead with user impact and the next
-action. Use a few short sentences or at most three top-level items; number any
-questions with compact choices. Include only a material decision/default, question,
-or blocker, including a material routing proposal. Targets are guides, not minimums:
-write less when sufficient, and never pad to a word target. Do not repeat the
-ticket description, narrate the workflow, or append redundant acceptance criteria,
-implementation steps, or test inventories.
+user and follow applicable writing guidance. Post ticket comments directly in
+Linear. Lead with the outcome, decision or blocker, and next action. Make the main
+point clear in a five-second scan and the full update readable within 30 seconds.
+Use a few short sentences or at most three top-level items; number questions with
+compact choices. Mention issues by their actual ticket IDs so Linear can autolink
+them; never substitute titles, vague references, or invented IDs.
 
-- Initial plan/triage: aim for **60–100 words**, with a **150-word total maximum**.
-  Only an initial comment with necessary product questions may use up to **180
-  words total**, including all questions and choices; the lifetime limit is three.
-- Delivery or substantive follow-up: aim for **40–80 words**, with a **100-word
-  total maximum**. A simple confirmation or blocker can be shorter.
-- Put technical rationale, implementation detail, and validation evidence in the
-  repository-required PR description; link the PR from the ticket. Use native
-  assignee, estimate, status, and PR links instead of restating fields in prose.
+- All Linear comments and status updates, including initial questions and
+  choices, have a **100-word total maximum**; aim much shorter. Keep the lifetime
+  three-question budget and existing ask limits. Do not pad to a word target or force a template.
+- Include only a material outcome, decision/default, question, blocker, routing
+  proposal, or next action. Do not repeat the ticket description or workflow.
+- The update cap does not shorten durable specifications. Keep adequate scope
+  and acceptance detail in the ticket, with technical rationale, implementation
+  detail, and validation evidence in the required PR description. Link the PR from the ticket. Use native assignee, estimate, status,
+  and PR links instead of restating fields in prose.
 
 Never put raw UUIDs, timestamp dumps, workflow provenance, processed-reply
 watermarks, serialized state/JSON, or HTML comment blocks in Linear comments,
