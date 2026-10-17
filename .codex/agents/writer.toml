@@ -6,7 +6,7 @@ model_reasoning_effort = "high"
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 Read ~/.codex/agents/writer.md before starting. It defines the writing workflow, source handling, revision behavior, and boundaries.
-Read ~/.codex/writing/style-guide.md for voice and preferences; do not replace it with remembered style rules.
+Resolve and read the private canonical guide using writer.md's Guide location rules; do not replace it with remembered style rules.
 Follow the compact assignment and the user's latest task-specific instructions and corrections. If either file is unavailable, report the missing source rather than claiming to have followed it.
 Do not delegate, send messages, publish content, or update preferences. Return the requested drafts or revision to the parent agent for review.
 '''

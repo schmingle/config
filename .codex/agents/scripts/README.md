@@ -14,11 +14,16 @@ runners. [The common handoff](../claude.md) defines their execution contract.
 
 The review helper runs the Claude-backed `pr-review-high`; the default reviewer runs
 natively. Review definitions and the posted template remain in
-[the shared contract](../pr-review.md). [The execution profile](claude-review.toml)
-is the single source for Claude's model, effort, display name, and allowed tools.
+[the shared review contract](../pr-review.md). Profile selection, authentication,
+session persistence, process settlement, and execution verification are defined
+once in [the shared Claude contract](../claude.md).
 Native signoffs come from `reviewer_attribution.py pr-review` or
 `reviewer_attribution.py pr-risk`, which reads
 the native agent's `model` and `model_reasoning_effort` fields.
+
+Claude runners require POSIX `waitid`/`WNOWAIT` support and `ps` (available on macOS
+and Linux) to verify process-group settlement; they stop if ownership or settlement
+cannot be verified.
 
 ## Prepare and run
 
@@ -59,17 +64,12 @@ Claude has trusted local shell/file access. Review instructions still prohibit
 source edits, tests/installs, delegation, publication, and external mutations.
 The reviewer chooses applicable instructions and source context, using the bundle as
 a starting point and gathering more evidence when needed. Required review coverage
-still applies. The caller owns live eligibility, required Linear reads, review-coverage verification,
-publication/readback, and worktree cleanup. The helper checks authenticated `claude auth status` and probes write access to the
-actual session directory before model execution, without changing the login or
-configuration environment. Run under authorized command-level escalation when the
-sandbox cannot support those operations. It records preflight and final transcript
-status separately; an absent transcript cannot be blindly resumed. The helper uses
+still applies. The caller owns live eligibility, required Linear reads, review-coverage
+verification, publication/readback, and worktree cleanup. The helper records preflight
+and final transcript status separately. It uses
 `--json-schema` and reads `structured_output`, preserving human `result` text only
 for diagnostics. It checks initial and final HEAD
-and cleanliness, validates the report envelope and unchanged risk rating,
-and settles its owned process on normal completion, timeout, interruption, or error. After a hard kill or crash,
-inspect the saved process identity and reconcile it manually.
+and cleanliness, and validates the report envelope and unchanged risk rating.
 
 ## Continue a review
 

@@ -109,10 +109,11 @@ def prepare(args):
     validate_risk_report(spec.get('risk_report'))
     if not spec.get('evidence'):
         raise ValueError('Full saved GitHub evidence is required')
-    checkout = Path(args.checkout).resolve()
-    output = Path(args.output).resolve()
-    if output == checkout or checkout in output.parents:
-        raise ValueError('Evidence bundle must be outside the review checkout')
+    checkout = Path(args.checkout).expanduser().resolve()
+    output = Path(args.output).expanduser().resolve()
+    config_repo = Path(__file__).resolve().parents[3]
+    if any(output == root or root in output.parents for root in (checkout, config_repo)):
+        raise ValueError('Evidence bundle must be outside the review checkout and public configuration repository')
     verify_checkout(checkout, spec['head'])
     if git(checkout, 'merge-base', spec['base'], spec['head']) != spec['merge_base']:
         raise ValueError('Pinned merge-base does not match repository ancestry')

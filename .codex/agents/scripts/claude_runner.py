@@ -105,36 +105,82 @@ def bounded_timeout(requested, finish_by):
     return min(requested, remaining)
 
 
+def wait_for_exit(proc, timeout):
+    """Observe exit without reaping: the owned leader pins its process-group ID."""
+    deadline = time.monotonic() + timeout
+    while True:
+        if os.waitid(os.P_PID, proc.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is not None:
+            return
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise subprocess.TimeoutExpired(proc.args, timeout)
+        time.sleep(min(0.05, remaining))
+
+
+def live_group_members(proc):
+    """Inspect the pinned group, counting zombies as terminated, not live work."""
+    # A successful waitid proves this is still our unreaped child. Never signal a
+    # group by a stale PID after Popen.poll()/wait() has released that identity.
+    os.waitid(os.P_PID, proc.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT)
+    snapshot = subprocess.check_output(['ps', '-axo', 'pid=,pgid=,stat='],
+                                       text=True, timeout=3)
+    members = {}
+    for line in snapshot.splitlines():
+        pid, group, status = line.split()
+        if int(group) == proc.pid:
+            members[int(pid)] = status
+    if proc.pid not in members:
+        raise RuntimeError('Cannot verify the owned process group')
+    return [pid for pid, status in members.items() if not status.startswith('Z')]
+
+
 def stop_process(proc):
-    if proc.poll() is not None:
-        return
+    """Settle the entire pinned group, then reap its leader; fail closed on doubt."""
     try:
-        os.killpg(proc.pid, signal.SIGTERM)
-    except ProcessLookupError:
-        pass
-    try:
+        for action in (signal.SIGTERM, signal.SIGKILL):
+            if not live_group_members(proc):
+                break
+            os.killpg(proc.pid, action)
+            deadline = time.monotonic() + 3
+            while live_group_members(proc):
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    break
+                time.sleep(min(0.05, remaining))
+            else:
+                break
+        if live_group_members(proc):
+            raise RuntimeError('Owned process group did not settle after SIGKILL')
         proc.wait(timeout=3)
-    except subprocess.TimeoutExpired:
-        try:
-            os.killpg(proc.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
-        proc.wait(timeout=3)
+        return True
+    finally:
+        # Reap an exited leader even when inspection failed, without mistaking
+        # that exit for proof that the rest of the group has stopped.
+        if proc.returncode is None:
+            exited = os.waitid(os.P_PID, proc.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT)
+            if exited is not None:
+                proc.wait(timeout=3)
 
 
 def run_process(argv, checkout, prompt, timeout, artifact, session, cleanup=None):
-    """Always settle the owned process, including input failures and interruption."""
+    """Always settle the owned process group, including failures and interruption."""
+    if not all(hasattr(os, name) for name in ('waitid', 'WNOWAIT', 'WEXITED', 'WNOHANG')):
+        raise RuntimeError('Safe process-group settlement requires waitid/WNOWAIT')
     proc = None
     state = {'session': session, 'running': False, 'timed_out': False, 'interrupted': False}
-    with artifact('events.jsonl').open('w') as stdout, artifact('stderr.log').open('w') as stderr:
+    with tempfile.TemporaryFile() as stdin, artifact('events.jsonl').open('w') as stdout, artifact('stderr.log').open('w') as stderr:
+        # File input cannot block on a child that never reads its pipe. Keep the
+        # private prompt anonymous and do not let communicate() reap the leader.
+        stdin.write(prompt.encode())
+        stdin.seek(0)
         try:
             env = os.environ.copy()
             env['ENABLE_TOOL_SEARCH'] = 'true'
-            proc = subprocess.Popen(argv, cwd=checkout, env=env, stdin=subprocess.PIPE,
+            proc = subprocess.Popen(argv, cwd=checkout, env=env, stdin=stdin,
                                     stdout=stdout, stderr=stderr, start_new_session=True)
             state.update(pid=proc.pid, running=True)
             dump(artifact('process.json'), state)
-            proc.communicate(input=prompt.encode(), timeout=timeout)
+            wait_for_exit(proc, timeout)
         except subprocess.TimeoutExpired:
             state['timed_out'] = True
         except BaseException:
@@ -143,10 +189,15 @@ def run_process(argv, checkout, prompt, timeout, artifact, session, cleanup=None
         finally:
             try:
                 if proc is not None:
-                    (cleanup or stop_process)(proc)
+                    if (cleanup or stop_process)(proc) is not True:
+                        raise RuntimeError('Owned process-group settlement was not verified')
+                    state['running'] = False
+            except BaseException as error:
+                state['settlement_error'] = str(error)
+                raise
             finally:
                 if proc is not None:
-                    state.update(running=proc.poll() is None, exit_code=proc.poll())
+                    state['exit_code'] = proc.returncode
                 dump(artifact('process.json'), state)
     return state
 

@@ -3,23 +3,15 @@
 Use this for `pr-review-high` and explicitly assigned Claude trials, together with
 [the shared review contract](pr-review.md) and [shared Claude execution contract](claude.md). The default `pr-review` runs natively.
 Agent descriptions define routing; the shared contract defines review standards and handoff requirements.
-The reviewer selects relevant instructions and source context, expanding beyond the
-supplied brief as needed under [the context policy](context.md).
 The wrapper prepares, verifies, and performs any authorized publication; one Claude
-session at a time supplies the independent analysis. Neither reviewer delegates further.
-
-## Execution settings
-
-[The execution profile](scripts/claude-review.toml) owns Claude's model, effort,
-display name, and tool permissions. The helper records that profile and its exact
-reviewer attribution in each bundle. Agent TOMLs own native wrapper settings.
-Do not repeat execution settings in this guide or silently substitute them.
+session at a time supplies the independent analysis. The shared execution contract
+owns profile selection, authentication, privacy, process settlement, and verification.
+Use the helper manifest's exact reviewer attribution after those checks pass.
 
 Claude is trusted on this machine. The runner permits ordinary shell commands and
 file tools rather than maintaining fragile command-prefix rules. Task scope still
 applies: review is analysis-only; tool access does not authorize publication, source
-changes, test runs, installs, external mutations, or additional reviewers. Preserve
-normal subscription authentication and inherited Linear access.
+changes, test runs, installs, external mutations, or additional reviewers.
 
 ## Prepare
 
@@ -37,19 +29,15 @@ normal subscription authentication and inherited Linear access.
 3. Create or verify a fresh, clean detached worktree at the pinned head, with the
    actual base and enough ancestry available. Each simultaneous review gets its own
    directory. Never use an active writer checkout or install dependencies for review.
-4. Before spending model tokens, run the helper under permissions that support its
-   authenticated `claude auth status` check and write probe in the actual session
-   directory. Preserve the existing login, configuration directory, and Linear access.
-   If this local authentication or session-storage preflight fails inside the sandbox,
-   request authorized command-level escalation; do not copy credentials or disable
-   persistence to bypass it. This escalation instruction does not apply to ordinary
-   read-only lookup of a PR-linked Linear issue.
-5. Use [the helper](scripts/claude_review.py) to prepare and run the bundle; see its
+4. Use [the helper](scripts/claude_review.py) under the shared contract's preflight
+   permissions to prepare and run the bundle; see its
    [commands and specification](scripts/README.md). It copies evidence unchanged,
    rejects visible API errors/incomplete pagination, selects `AGENTS.override.md`
    before `AGENTS.md`, and includes applicable global/ancestor/testing guidance.
    Supply additional topical or configured fallback guides explicitly. It does not
    prove that every REST page was fetched; collection completeness remains yours.
+   Authentication/session-storage escalation does not apply to ordinary read-only
+   lookup of a PR-linked Linear issue.
 
 ## Required Linear access
 
@@ -100,17 +88,13 @@ A name search alone does not prove surviving contracts. Request a focused same-s
 continuation for material missing coverage, or the bounded replacement if that
 session is unavailable. Withhold sign-off until coverage is established.
 
-Reserve publication/cleanup time before the analysis deadline. The helper terminates
-and waits for its owned process on timeout, interruption, and unexpected errors;
-SIGTERM enters the same cleanup path. On cancellation, inspect `process.json` and
-verify settlement before releasing the checkout. An abrupt SIGKILL or machine crash
-can prevent cleanup: the caller must reconcile the recorded owned PID/session.
-Never claim an unaccounted reviewer stopped.
+Reserve publication time before the analysis deadline. Apply the shared process
+settlement rules to `process.json` before releasing the checkout or recovering.
 
 ## Verify and publish
 
-- Verify the actual model/effort, valid report, pinned final HEAD, clean checkout,
-  source/test/caller coverage, full discussion, actual Linear reads, unchanged supplied
+- In addition to shared execution verification, check the valid report, pinned final
+  HEAD, clean checkout, source/test/caller coverage, full discussion, actual Linear reads, unchanged supplied
   risk rating/report link, any risk contradictions, and grounded
   findings with valid anchors. Process success or a JSON report is not sign-off.
 - Refresh live PR head/base/discussion before any authorized publication. Follow the

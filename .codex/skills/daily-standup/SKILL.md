@@ -9,7 +9,14 @@ Produce a copy-ready daily standup from the available evidence, not an activity 
 
 ## Reporting window
 
-- From the last Daily Standup I attended until the current time
+- Use an explicit user-supplied window when given. Otherwise report from the start
+  of the most recent concluded Daily Standup the user attended until now, resolving
+  both boundaries once in the user's timezone.
+- Establish attendance from the user's confirmation or reliable attendance evidence,
+  such as a participant record or transcript. An invitation or accepted RSVP alone
+  is insufficient. Reuse a confirmed boundary in the current conversation.
+- If the last attended standup cannot be established, ask for its date/time; continue
+  independent source discovery, but do not guess a cutoff or substitute 24 hours.
 - State the exact window at the top. Do not include work outside it.
 
 ## Gather context

@@ -73,13 +73,21 @@ class EvidenceTests(unittest.TestCase):
     def test_unresponsive_process_is_killed_and_reaped(self):
         proc = MagicMock()
         proc.pid = 12345
-        proc.poll.return_value = None
-        proc.wait.side_effect = [subprocess.TimeoutExpired('fake-cli', 3), -9]
-        with patch.object(review.os, 'killpg') as kill:
-            review.stop_process(proc)
+        proc.returncode = None
+
+        def reap(**kwargs):
+            proc.returncode = -9
+            return proc.returncode
+
+        proc.wait.side_effect = reap
+        with patch.object(runner, 'live_group_members', side_effect=[
+                [proc.pid], [proc.pid], [proc.pid], [], []]), \
+                patch.object(runner.time, 'monotonic', side_effect=[0, 4, 4]), \
+                patch.object(review.os, 'killpg') as kill:
+            self.assertTrue(review.stop_process(proc))
         self.assertEqual(kill.call_args_list, [call(proc.pid, signal.SIGTERM),
                                                call(proc.pid, signal.SIGKILL)])
-        self.assertEqual(proc.wait.call_count, 2)
+        proc.wait.assert_called_once_with(timeout=3)
 
 
 class PersistenceTests(unittest.TestCase):
@@ -181,6 +189,48 @@ class FixtureTests(unittest.TestCase):
         saved = review.load(self.bundle / 'manifest.json')
         self.assertEqual(saved['raw_evidence'][0]['sha256'], review.digest(self.evidence))
 
+    def test_output_inside_checkout_or_public_repo_is_rejected_before_any_write(self):
+        config_repo = self.root / 'public-config'
+        config_repo.mkdir()
+        script = config_repo / '.codex/agents/scripts/claude_review.py'
+        for root in (self.checkout, config_repo):
+            for output in (root, root / 'nested/private-bundle'):
+                self.bundle = output
+                with self.subTest(output=output), patch.object(review, '__file__', str(script)), \
+                        patch.object(review, 'verify_checkout') as verify, \
+                        patch.object(Path, 'mkdir') as mkdir, \
+                        self.assertRaisesRegex(ValueError, 'outside'):
+                    self.prepare()
+                verify.assert_not_called()
+                mkdir.assert_not_called()
+
+    def test_symlink_ancestor_into_checkout_or_public_repo_is_rejected(self):
+        config_repo = self.root / 'public-config'
+        config_repo.mkdir()
+        script = config_repo / '.codex/agents/scripts/claude_review.py'
+        for index, root in enumerate((self.checkout, config_repo)):
+            alias = self.root / ('alias-' + str(index))
+            alias.symlink_to(root, target_is_directory=True)
+            self.bundle = alias / 'not-created/private-bundle'
+            with self.subTest(root=root), patch.object(review, '__file__', str(script)), \
+                    patch.object(review, 'verify_checkout') as verify, \
+                    patch.object(Path, 'mkdir') as mkdir, \
+                    self.assertRaisesRegex(ValueError, 'outside'):
+                self.prepare()
+            verify.assert_not_called()
+            mkdir.assert_not_called()
+            self.assertFalse((root / 'not-created').exists())
+
+    def test_external_output_with_public_repo_name_prefix_is_allowed(self):
+        config_repo = self.root / 'public-config'
+        config_repo.mkdir()
+        script = config_repo / '.codex/agents/scripts/claude_review.py'
+        self.bundle = self.root / 'public-config-private/bundle'
+        with patch.object(review, '__file__', str(script)):
+            self.prepare()
+        self.assertEqual((self.bundle / 'raw/threads.json').read_bytes(), self.evidence.read_bytes())
+        self.assertEqual(review.load(self.bundle / 'manifest.json')['head'], self.head)
+
     def test_error_response_is_rejected_before_bundle_creation(self):
         review.dump(self.evidence, {'data': None, 'errors': [{'message': 'Failure'}]})
         with self.assertRaises(ValueError):
@@ -204,16 +254,16 @@ class FixtureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             review.collect_guides(self.checkout, [], [self.root / 'missing.md'])
 
-    def test_interruption_and_stdin_errors_always_settle_owned_process(self):
+    def test_interruption_and_wait_errors_always_settle_owned_process(self):
         self.bundle.mkdir()
         for error in (KeyboardInterrupt(), BrokenPipeError()):
             proc = MagicMock()
             proc.pid = 12345
-            proc.poll.return_value = -15
-            proc.communicate.side_effect = error
+            proc.returncode = -15
             with self.subTest(error=type(error).__name__), \
                     patch.object(review.subprocess, 'Popen', return_value=proc), \
-                    patch.object(review, 'stop_process') as stop:
+                    patch.object(runner, 'wait_for_exit', side_effect=error), \
+                    patch.object(review, 'stop_process', return_value=True) as stop:
                 with self.assertRaises(type(error)):
                     review.run_process(['fake-cli'], self.checkout, 'prompt', 1,
                                        lambda name: self.bundle / name, 'session')

@@ -32,8 +32,8 @@ source material. Do not copy local credentials into bundles.
 
 ## Authentication and sessions
 
-Before spending model tokens, verify the installed CLI's authentication and writable
-actual session directory under the permissions that will launch it. Preserve normal
+Before spending model tokens, the helper must pass `claude auth status` and a write
+probe in the actual session directory under its launch permissions. Preserve normal
 subscription authentication, configuration directory, and inherited MCP access.
 If sandbox permissions block the check or write probe, request authorized
 command-level escalation. Missing credentials or unavailable tools return a concrete
@@ -42,9 +42,11 @@ unblock action; do not bypass authentication or switch models.
 Use one owned fresh session at a time. Resume or replacement requires the role's
 specific recovery procedure, a verified transcript or diagnosed failure, settled
 processes, and the original deadline. Never blindly relaunch after partial work.
-The shared runner terminates and waits for its process on timeout, interruption,
-and errors. After a hard kill or crash, reconcile the recorded process identity
-before releasing the checkout or starting another session.
+Reserve cleanup time before the deadline. The shared runner settles the owned
+process group on completion, timeout, interruption, and errors; SIGTERM uses the
+same cleanup path. Verify the recorded group is settled before releasing the
+checkout or starting another session. After SIGKILL or a crash, reconcile the saved
+process/session identity manually; never claim an unaccounted process stopped.
 
 ## Verification
 

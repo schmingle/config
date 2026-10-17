@@ -65,6 +65,8 @@ Keep detailed correctness and architectural findings inline: scenario, consequen
 
 Use the complete coordinator-supplied [risk assessment](pr-risk.md), including its exact rating, body, assessed snapshot, and provenance. A new assessment remains internal until the final review is published. Include a source link only when one already exists. Do not perform another risk assessment, rerate it, or invoke an assessor. Re-reviews reuse a complete prior assessment even after head/base movement; disclose its assessed snapshot when it differs from the current review. Missing or incomplete reports go back to the coordinator; do not infer a rating or publish whole-PR sign-off without one.
 
+The published Risk section must remain self-contained for later reuse: preserve the rationale, main exposure, material uncertainty, and applicable split guidance. Always record the assessment's exact head, base commit, and merge-base, even when they match the current review; retain them unchanged through revalidation. Recover legacy provenance from immutable review/commit evidence where possible; if it cannot be established, return the gap to the coordinator rather than attributing the old rating to the current snapshot.
+
 Reviewers still inspect security, compatibility, dependencies, and operational behavior as part of correctness and architectural fit. If that inspection reveals concrete evidence contradicting the supplied report, identify the discrepancy, consequence, and source links separately and return it to the coordinator. Preserve the supplied rating; do not silently revise it or request an automatic reassessment. An unresolved material contradiction blocks whole-PR sign-off and merge pending explicit disposition. This is exception reporting, not a duplicate risk analysis.
 
 ## Publish or reuse
@@ -89,6 +91,7 @@ Use this exact section order. Replace placeholders; keep the whole body normally
 
 ### Risk
 **{{risk_rating}}** — {{risk_summary}}
+Risk assessed head `{{risk_head_sha}}`, base `{{risk_base_sha}}`; merge-base `{{risk_merge_base_sha}}`.
 Changed lines: {{changed_lines}} ({{additions}} added, {{deletions}} deleted).
 
 ### Validation
@@ -104,15 +107,14 @@ The assessment definitions and directions in Review assessments, Supplied risk r
 
 | Variable | Description |
 | --- | --- |
-| `opening` | The highest-priority finding opening defined in Publish or reuse; zero findings and a complete review use `LGTM ✅`. Incomplete coverage is not sign-off. |
+| `opening` | The verdict opening defined in Publish or reuse. |
 | `overall_summary` | Brief overall assessment. |
-| `reviewer_attribution` | The caller-supplied, verified identity and effort (where applicable) of the reviewer that performed the work. Use the supplied attribution exactly; do not infer it from this contract or substitute the publisher's identity. |
-| `correctness_rating` | `No issues found`, `Issues found`, or `Incomplete`, using the definitions in Review assessments. |
-| `correctness_summary` | Explicit verdict and a concise synthesis of the inline correctness findings, or the main reason for a positive assessment. One or two sentences; link to findings without repeating details. |
-| `approach_rating` | `Solid`, `OK`, or `Unacceptable`, using the definitions in Review assessments. State an incomplete assessment when necessary rather than forcing a rating. |
-| `approach_summary` | Explicit design judgment and a concise synthesis of the inline architectural findings or justified tradeoffs. One or two sentences; link to findings without repeating details. Optional advice stays clearly nonblocking. |
+| `reviewer_attribution` | The caller-supplied, verified reviewer identity and effort, used exactly; never substitute the publisher's identity. |
+| `correctness_rating`, `approach_rating` | The respective verdicts defined in Review assessments, including its incomplete-coverage rules. |
+| `correctness_summary`, `approach_summary` | One or two sentences explaining the judgment under Review assessments; link relevant inline findings rather than repeating them. |
 | `risk_rating` | Copy the coordinator-supplied report's rating exactly: `Low`, `Medium low`, `Medium`, `Medium high`, or `High`. |
-| `risk_summary` | Concise but self-contained summary of the supplied report's rationale, main exposure, and material uncertainty so this final review can support later routing. Link an already published assessment when available; do not imply a separate report was posted for a new assessment. Carry forward applicable split guidance, disclose an older assessed snapshot and any unresolved contradiction, and do not independently reassess risk. |
+| `risk_summary` | The reusable summary required by Supplied risk report, with an existing source link when available and any unresolved contradiction disclosed. |
+| `risk_head_sha`, `risk_base_sha`, `risk_merge_base_sha` | Exact commits from the supplied assessment, retained independently of current review commits. |
 | `changed_lines` | Current reviewed diff additions plus deletions, including generated files and tests. These mechanical counts may differ from the risk report's assessed snapshot; they do not create a new risk assessment. |
 | `additions`, `deletions` | Added and deleted line counts for the reviewed diff. |
 | `validation_summary` | Evidence and material gaps; identify revalidation when applicable. Follow the existing scope, evidence and review-assessment directions. |

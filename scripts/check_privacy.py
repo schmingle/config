@@ -31,10 +31,16 @@ TOKENS = re.compile(
 CREDENTIAL_URL = re.compile(r'\b[a-z][a-z0-9+.-]*://([^\s/<>:@]+):([^\s/<>@]+)@', re.I)
 WEBHOOK = re.compile(r'https://(?:hooks\.slack\.com/(?:services|triggers)/|(?:\w+\.)?discord(?:app)?\.com/api/webhooks/)\S+', re.I)
 ASSIGNMENT = re.compile(
-    r'''(?ix)^\s*(?:(?:export|const|let|var)\s+)?["']?(?:[\w.-]*[_-])?
+    r'''(?imx)(?:^[ \t]*(?:(?:export|const|let|var)[ \t]+)?|[{,][ \t]*)
+    ["']?(?:[\w.-]*[_-])?
     (?:password|passwd|pwd|secret|token|api[_-]?key|access[_-]?key|client[_-]?secret)
-    ["']?\s*[:=]\s*(.+?)\s*[,;]?\s*$'''
+    ["']?[ \t]*[:=]\s*'''
 )
+QUOTED_LITERAL = re.compile(
+    r'''("{3}|'{3}|["'`])((?:\\.|(?!\1).)*)\1[ \t]*(?=[,;}\])]|\r?\n|$|\#|//)''', re.S
+)
+SOURCE_SUFFIXES = {'.py', '.js', '.ts', '.mjs', '.cjs', '.tsx', '.jsx'}
+ENV_REFERENCE = re.compile(r'(?:os\.(?:getenv|environ)|process\.env|env\.|getenv\().*')
 QUERY_TOKEN = re.compile(r'[?&](?:access_token|api_key|token|password)=([^\s&#]+)', re.I)
 PERSONAL_PATH = re.compile(r'/' + r'Users' + r'/[^/\s]+/')
 PLACEHOLDER = re.compile(
@@ -97,21 +103,32 @@ def inspect_text(text, label):
         for match in QUERY_TOKEN.finditer(line):
             if not placeholder(match[1]):
                 reason = 'credential-bearing URL parameter'
-        assignment = ASSIGNMENT.match(line)
-        if assignment:
-            value = assignment[1].rstrip(',;').strip()
-            quoted_value = re.fullmatch(r"""(["'])(.*?)\1\s*[,;]?\s*(?:(?:#|//).*)?""", value)
-            quoted = quoted_value is not None
-            literal = quoted_value[2] if quoted else value.split(' #', 1)[0].strip()
-            # Bare source expressions/reference names are not literal credentials.
-            reference = not quoted and bool(re.fullmatch(r'[A-Z_][A-Z0-9_]*|(?:os\.(?:getenv|environ)|process\.env|env\.|getenv\().*', literal))
-            source_expression = not quoted and PurePosixPath(label).suffix in {'.py', '.js', '.ts', '.mjs', '.cjs', '.tsx', '.jsx'}
-            if not placeholder(literal) and not reference and not source_expression:
-                reason = 'possible literal credential assignment'
         if PERSONAL_PATH.search(line):
             reason = 'personal absolute path'
         if reason:
             raise PrivacyError(f'{label}:{number}: {reason}; value omitted')
+
+    source = PurePosixPath(label).suffix in SOURCE_SUFFIXES
+    for assignment in ASSIGNMENT.finditer(text):
+        remainder = text[assignment.end():].lstrip()
+        if PurePosixPath(label).suffix == '.py':
+            # Parenthesized Python literals may have comments before the opening quote.
+            remainder = re.sub(r'^(?:\(\s*|#[^\n]*(?:\n|$)\s*)+', '', remainder)
+        value = remainder.split('\n', 1)[0].strip()
+        quoted = QUOTED_LITERAL.match(remainder.lstrip('(').lstrip())
+        if quoted:
+            literal = quoted[2]
+            # Interpolated JavaScript templates are expressions, not fixed values.
+            if quoted[1] == '`' and '${' in literal:
+                continue
+        elif source or ENV_REFERENCE.fullmatch(value):
+            # Source variables, calls, and fixture-building expressions are not literals.
+            continue
+        else:
+            literal = value.rstrip(',;').split(' #', 1)[0].strip()
+        if not placeholder(literal.strip()):
+            number = text.count('\n', 0, assignment.start()) + 1
+            raise PrivacyError(f'{label}:{number}: possible literal credential assignment; value omitted')
 
 
 def scan_entries(entries, context, seen=None):

@@ -32,7 +32,7 @@ For substantial writing tasks, prefer delegating to the `writer` agent using `fo
 
 For email, SMS, and Slack, show the user the exact final message and recipients or destination, then obtain explicit confirmation immediately before sending or posting. If the message or destination changes afterward, show the revised preview and confirm again. This gate applies across conversations and delegated agents. For other channels, follow the authorization and publication rules of the task and its owning workflow; this section does not impose a separate preview-and-confirmation gate.
 
-For writing tasks handled directly, follow [the writing workflow](agents/writer.md) and the private canonical guide at `~/.codex/writing/style-guide.md`. Briefly disclose a fallback when the writer would otherwise have been used. Do not duplicate style preferences in this routing rule.
+For delegated and direct writing, resolve the private canonical guide using [the writing workflow's guide-location rules](agents/writer.md#guide-location). Include that resolved path in writer assignments. Briefly disclose a fallback when the writer would otherwise have been used. Do not duplicate style preferences in this routing rule.
 
 ## Work management
 

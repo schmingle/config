@@ -22,11 +22,16 @@ permissions to the owner (`chmod 600 .codex/AGENTS-PRIVATE.md`), and symlink
 `~/.codex/AGENTS-PRIVATE.md` to it alongside the tracked global instructions.
 The global instructions explicitly direct agents to load this file if present at
 the start of each task and apply its relevant preferences and account context.
-The tracked defaults remain usable without private settings.
+The general defaults work without private settings. Operational workflows may
+require additional private configuration: [Linear ticket triage](.codex/skills/linear-ticket/references/triage.md#private-workflow-settings)
+requires the documented team, repository, creator allowlist, and estimate settings
+in `~/.codex/private/linear-ticket-workflows.json`; it stops if they are missing or
+cannot be verified. An account map alone does not configure that workflow.
 
 Codex-managed `.system` skills are excluded by `skills/.gitignore`; runtime state is
-also excluded. The writer references
-a private `~/.codex/writing/style-guide.md`; supply your own guide outside this repo.
+also excluded. Supply your own private writing guide outside this repo; the
+[guide-location rules](.codex/agents/writer.md#guide-location) support an explicit
+path or `<codex-home>/writing/style-guide.md`.
 This repository does not include writing samples, credentials, or session history.
 
 ## Validate changes

@@ -220,6 +220,64 @@ class PublicationTests(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn('python3', result.stderr)
 
+    def test_literal_assignments_in_supported_formats_are_blocked_and_redacted(self):
+        credential = 'synthetic-' + 'value-123'
+        uppercase = 'SYNTHETIC' + 'VALUE123'
+        triple_single = "'" * 3
+        triple_double = '"' * 3
+        cases = [
+            ('settings.json', json.dumps({'password': credential})),
+            ('settings.json', json.dumps({'password': credential}, indent=2).replace(': ', ':\n')),
+            ('settings.py', 'password' + ' = ' + triple_single + '\n' + credential + '\n' + triple_single),
+            ('settings.py', 'password' + ' = ' + triple_double + '\n' + credential + '\n' + triple_double),
+            ('settings.py', 'password' + ' = (\n    # comment\n    "' + credential + '"\n)'),
+            ('settings.json', json.dumps({'name': 'public', 'password': credential})),
+            ('settings.json', json.dumps({'password': '<PASSWORD>', 'token': credential})),
+            ('settings.js', 'const password' + ' = `' + credential + '`;'),
+            ('settings.js', 'const cfg = {' + 'password: `' + credential + '`};'),
+            ('settings.py', 'cfg = {' + '"password": "' + credential + '"}'),
+            ('settings.js', 'const password' + ' = `\n' + credential + '\n`;'),
+            ('settings.py', 'password' + '=(\n    \' ' + credential + ' \'\n)\n'),
+            ('settings.ts', 'const api_key' + ' = "' + credential + '"; // comment'),
+            ('settings.py', 'password' + '=(\n    "' + credential + '"\n)\n'),
+            ('settings.py', 'password' + ' = ("' + credential + '")\n'),
+            ('.env.example', 'PASSWORD' + '=' + uppercase + ' # comment'),
+        ]
+        for name, content in cases:
+            with self.subTest(name=name, case=cases.index((name, content))):
+                self.write(name, content)
+                self.git('add', name)
+                result = self.check('--staged')
+                self.assert_blocked(result, 'possible literal credential assignment')
+                self.assertNotIn(credential, result.stderr + result.stdout)
+                self.assertNotIn(uppercase, result.stderr + result.stdout)
+                self.git('reset', '--hard', self.base)
+
+    def test_source_references_fixtures_and_unrelated_config_are_allowed(self):
+        cases = [
+            ('settings.py', 'password' + ' = PASSWORD_VALUE'),
+            ('settings.py', 'password' + ' = settings.password'),
+            ('settings.py', 'password' + ' = os.getenv("PASSWORD")'),
+            ('settings.py', 'password' + ' = (\n    os.environ["PASSWORD"]\n)'),
+            ('settings.py', 'password' + ' = (\n    # comment\n    os.getenv("PASSWORD")\n)'),
+            ('fixture.py', 'password' + ' = (\n    # fixture\n    "synthetic-" + "value-123"\n)'),
+            ('settings.json', json.dumps({'password': '${PASSWORD}'}, indent=2).replace(': ', ':\n')),
+            ('settings.js', 'const password' + ' = process.env.PASSWORD;'),
+            ('settings.ts', 'const api_key' + ' = env.API_KEY;'),
+            ('settings.js', 'const password' + ' = `${process.env.PASSWORD}`;'),
+            ('fixture.py', 'password' + ' = "synthetic-" + "value-123"'),
+            ('fixture.js', 'const token' + ' = "prefix".repeat(32);'),
+            ('fixture.py', 'token' + ' = build_fixture("synthetic")'),
+            ('.env.example', 'PASSWORD' + '=${PASSWORD}'),
+            ('settings.yaml', 'secret' + ': os.getenv("SECRET")'),
+            ('settings.json', '{"password":"<PASSWORD>","token":"example-token"}'),
+            ('settings.txt', 'PASSWORDLESS=true\nmax_tokens=1024\ndescription: password requirements'),
+            ('settings.py', '# password' + ' = "descriptive comment"'),
+        ]
+        for name, content in cases:
+            with self.subTest(name=name, case=cases.index((name, content))):
+                privacy.inspect_blob(name, '100644', content.encode())
+
     def test_content_patterns_and_safe_placeholders(self):
         unsafe = [
             'password' + ' = "synthetic-value-123"',
