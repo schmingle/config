@@ -43,6 +43,46 @@ Use Linear as the durable home for work so Khang can switch priorities and resum
 
 Keep project management in Linear and maintained technical documentation beside the code.
 
+### Project descriptions
+
+Use this structure when creating or materially updating a Linear project. The description is the project's current contract: clear enough for Khang to assess the direction and for Codex to execute without reconstructing prior conversations.
+
+```markdown
+## Summary
+[What this project is, why it matters, and the boundary of this version.]
+
+## Key Decisions
+- **Decided — [Choice]:** [Brief rationale and consequential constraints.]
+- **Starting assumption — [Choice]:** [What must be validated and when.]
+- **Open — [Decision needed]:** [How and when it will be resolved.]
+
+## Goal State
+
+### Key Results
+- [ ] [Observable outcome, capability, or measurable result.]
+
+### Completion Validation
+- **[Corresponding KR]:** [Scenario or check, expected result, and evidence
+  needed to demonstrate completion.]
+
+## Plan
+1. **[Phase name]** — [Core intention and resulting capability.]
+   Exit: [Condition that proves this phase achieved its purpose.]
+   Tracking: [Linked Linear milestone or phase ticket.]
+
+## Context and Guardrails
+[Consequential dependencies, exclusions, constraints, unresolved questions,
+and source links that are not already covered above.]
+```
+
+Apply these directions:
+
+1. **Keep it concise and specific.** Capture the intended outcome and approach; keep implementation details in tickets. Do not invent metrics or targets to fill the template.
+2. **Always include Key Decisions.** State explicitly if none have been identified. Treat decided choices as constraints and propose changes before departing from them. Keep assumptions and open decisions visibly distinct from commitments.
+3. **Separate results from proof.** KRs describe what must become true. Completion validation explains how to demonstrate it. Use user stories for capabilities and appropriate operational, recovery, reconciliation, or performance checks for other outcomes.
+4. **Make phases govern execution.** Preserve each phase's core intention and exit condition so its tickets can be checked for alignment. Identify meaningful dependencies and parallel work.
+5. **Maintain one current contract.** Refresh the description when approved goals, decisions, or approach change. Use native milestones and tickets for detailed tracking. Keep current progress, next actions, blockers, and requests for Khang in the latest project update, with historical evidence in linked records.
+
 ## Delegation
 
 Prefer delegating substantial tasks to a suitable predefined agent. Substantial work includes tasks that may take more than 30 seconds or involve more than 10 steps. Examples include creating PRs, running GitHub workflows or deployment skills, and performing bulk repeated actions. These are signals, not limits: Codex may delegate other work when doing so is useful. Respect explicit instructions to work directly, such as "don't delegate" or "do it yourself."
