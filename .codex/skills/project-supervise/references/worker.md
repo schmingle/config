@@ -1,6 +1,6 @@
 # Standalone worker protocol
 
-Read this when creating or assigning the project's paired worker. Resolve this installed reference to an absolute path, include it in the worker's task prompt, and require the worker to read it. If the worker cannot access it, include the protocol requirements in the assignment instead; otherwise pass project-specific facts without duplicating the protocol. The worker is a standalone native task, not a supervisor child agent, and has no heartbeat or other automation.
+Read this when creating or assigning the project's paired worker. Resolve this installed reference to an absolute path, include it in the worker's task prompt, and require the worker to read it. If the worker cannot access it, include the protocol requirements in the assignment instead; otherwise pass project-specific facts without duplicating the protocol. Worker creation starts execution and requires a complete initial batch brief after the supervisor has verified its own heartbeat. For a new supervisor, create a new standalone native worker titled exactly `<supervisor task title> worker` using the invoking supervisor's verified title at creation. It is not a supervisor child agent and must not create or receive a heartbeat or other automation. Resume only the recorded worker paired with that same stable supervisor/project identity; title changes do not replace the pair, and a legacy execution task is not an adoptable worker.
 
 ## Assignment
 
@@ -8,7 +8,7 @@ Supply a compact, complete brief containing:
 
 1. The live Linear project contract source, applicable decisions and boundaries, phase/ticket work with actual IDs, desired outcome, and required validation.
 2. The verified target repository, checkout/branch ownership, existing PRs, relevant guidance, and other agents' ownership. Preserve others' changes and use existing work rather than recreating it.
-3. Existing approvals and prohibited actions, the stable project and supervisor task IDs, and a retrievable task/message reference to the human invocation (no copied transcript) authorizing this pair and scoped messages in both directions. That authorization covers questions, progress requiring intervention, and final reports to this supervisor; it grants no unrelated messaging or additional approval.
+3. Existing approvals and prohibited actions, the stable project and invoking supervisor task IDs with their verified binding, and a retrievable task/message reference to the human invocation (no copied transcript) authorizing this pair and scoped messages in both directions. That authorization covers questions, progress requiring intervention, and final reports to this supervisor; it grants no unrelated messaging or additional approval.
 4. Absolute batch start and deadline with timezone, normally 50 minutes apart. Include existing outstanding corrections and their proof requirements. A steering message to an active batch does not reset these times. A correction for an idle/settled worker belongs in a full new assignment with fresh times after prior work is confirmed settled.
 
 ## Execution and reporting
