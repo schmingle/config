@@ -1,9 +1,9 @@
 ---
 name: linear-ticket
 description: >-
-    Run two sequential passes over the configured Linear work queue: triage up
-    to 10 candidate tickets, then implement or update one best eligible
-    ticket previously triaged by this workflow. Requires explicit user or
+    Triage bugs and one-off work in the configured Linear queue, recommend project
+    framing when needed, then implement or update one best eligible bounded
+    ticket in up to two focused PRs. Requires explicit user or
     authorized automation invocation; never merges or deploys.
 disable-model-invocation: true
 ---
@@ -15,6 +15,8 @@ automation. Read the [triage pass](references/triage.md) and
 [build pass](references/build.md) contracts before acting. Use the private
 workflow settings, authenticated Linear identity, and repository checks they
 require. Honor an explicit read-only or dry-run request across both passes.
+Use triage’s [work routing](references/triage.md#work-routing) for new and resumed
+work; this workflow does not execute projects.
 
 Run both passes in order on each invocation:
 
@@ -30,7 +32,8 @@ Run both passes in order on each invocation:
 2. **Build:** Select the best eligible ticket from the triage-produced list,
    re-fetch it, implement or update at most one ticket, and stop this pass. The
    ticket just prepared may qualify, but it has no automatic priority. A blocked
-   selected ticket consumes the build pass's one-ticket budget. The two passes
+   selected ticket consumes the build pass's one-ticket budget; a necessary second
+   PR for the same bounded outcome does not consume another ticket. The two passes
    may act on different tickets.
 
 In each pass, prefer verified existing workflow work with actionable new
@@ -46,8 +49,9 @@ to the ticket; it never forces the other pass onto the same ticket.
 
 Build eligibility requires verified prior triage under this workflow. The 10
 screened tickets are not automatically build candidates: exclude oversized,
-blocked, held, unsuitable, duplicate, or unanswered no-safe-default work. Include
-previously triaged Todo, In Progress, and In Review work in the buildable subset
+blocked, held, project-shaped, unresolved-routing, unsuitable, duplicate, or
+unanswered no-safe-default work. Include previously triaged Todo, In Progress,
+and In Review work in the buildable subset
 only after checking live issue history, plan, ownership, estimate, discussion,
 and linked PR evidence, using the optional private checkpoint when available.
 A new Triage/Backlog candidate enters the buildable subset only after triage

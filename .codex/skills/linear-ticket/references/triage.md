@@ -56,8 +56,9 @@ Inspect linked PRs only for screened issues. Apply the configured creator
 allowlist or verified parent-selected direct child exception below. Require an
 existing plan and source evidence establishing
 this workflow's bounded scope, verified ownership, and estimate; assignment or
-status alone is not eligibility. Re-fetch replies, edits, blockers, and observed
-PR state. Prefer a new actionable answer, scope change, newly due 48-hour
+status alone is not eligibility. Reapply [work routing](#work-routing) after
+checking ownership, including to resumed work. Re-fetch replies, edits, blockers,
+and observed PR state. Prefer a new actionable answer, scope change, newly due 48-hour
 follow-up, or verified interrupted In Progress build. When an update
 is needed, record only the material decision and next action in a concise Linear
 handoff; keep assessment bookkeeping in the private checkpoint below.
@@ -168,22 +169,28 @@ For each candidate:
    estimate from product impact, implementation complexity, and risk using the
    configured team’s estimate scale. If estimate authorship is unavailable, assess
    it rather than claiming it was verified.
-4. If larger than Medium, mark an oversized estimate disposition for the ranked
-   mutation pass. Make no other change to that ticket and keep it out of the
-   buildable list.
-5. For Medium-or-smaller parents with eligible direct sub-issues, triage the
-   newest eligible child whose ownership gate is also clear. Consider relevant
-   parent discussion as well as the child's own activity and ownership. The creator
-   filter applies only to the parent. Never move a parent to Todo.
-6. Assess Medium-or-smaller leaves for a bounded implementation and objective
-   verification path.
+4. If newly assessed larger than Medium, mark an oversized estimate disposition
+   for the ranked mutation pass and keep it out of the buildable list. A concise
+   project proposal under [work routing](#work-routing) is also permitted when
+   warranted; make no other change. Tickets already excluded by the above-Medium
+   prefilter remain excluded.
+5. Before selecting a child of a Medium-or-smaller parent, assess the parent’s
+   context under [work routing](#work-routing). Do not use child selection to
+   bypass unresolved project-level decisions. An independently bounded child
+   with settled intent may qualify even when its parent needs project framing.
+   Triage the newest eligible direct child whose own ownership and routing gates
+   are clear. Consider relevant parent discussion and the child’s own activity.
+   The creator filter applies only to the parent. Never move a parent to Todo.
+6. Route Medium-or-smaller leaves using [work routing](#work-routing), including
+   their complete outcome and objective verification path.
 
-A suitable leaf fits roughly one reviewable PR and can be implemented safely
-using explicit defaults for unanswered product questions. Missing permission,
-required data, an unfinished prerequisite, or a decision with no safe bounded
-default remains a blocker. Do not force such work into Todo or treat silence as
+A suitable leaf passes that routing and can be implemented safely using explicit
+defaults for unanswered product questions. Missing permission, required data, an
+unfinished prerequisite, or a decision with no safe bounded default remains a
+blocker. Do not force such work into Todo or treat silence as
 authorization. If more than three unresolved decisions prevent a coherent bounded
-implementation, narrow the scope or leave it in triage with the blocker explained.
+implementation, recommend project framing or leave it held with the specific gap;
+do not silently remove essential work to make it fit.
 Only verified prior workflow work and newly prepared Todo leaves that pass every
 implementation gate enter the buildable candidate list. Oversized, blocked,
 held, unsuitable, duplicate, obsolete, parent, and no-safe-default tickets stay
@@ -193,12 +200,55 @@ of a new Triage/Backlog ticket does not make it buildable.
 After screening at most 10 issues, rank needed dispositions as described in the
 entrypoint. Apply them only to screened tickets, re-fetching each affected issue
 and its sources before mutation. An oversized estimate change,
-new ownership/exceptional blocking ask, substantive continuation handoff, or
-new leaf preparation each counts as a disposition of that screened issue. If a
-candidate becomes ineligible, skip it and use the next ranked screened issue;
-do not pull in an eleventh issue. An unchanged pending ask or quiet skip counts
+new ownership/exceptional blocking ask, substantive continuation handoff,
+new leaf preparation, or material routing proposal counts as a disposition of
+that screened issue. If a candidate becomes ineligible, skip it and use the next
+ranked screened issue; do not pull in an eleventh issue. An unchanged pending ask or quiet skip counts
 among the 10 screened issues but requires no mutation. Keep the one-new-ask
 limit across both passes even if other screened tickets remain.
+
+## Work routing
+
+Apply after the ownership checks, for new selections and prior workflow work.
+Keep all creator, estimate, leaf, and ownership filters: routing never authorizes
+reassessing tickets already excluded by the above-Medium prefilter. Project
+membership alone does not exclude a bounded fix; honor an active owner or
+supervisor’s assignment and do not create competing execution.
+
+1. **Bounded bug or one-off:** The complete cohesive outcome has known acceptance
+   criteria and a credible validation path, and fits one or, when necessary, two
+   focused PRs. PR count is a sizing signal, not permission to stuff a large change
+   into two PRs or defer essential work. Ordinary unanswered details may use the
+   existing safe-default contract; no full project plan is needed for a clear fix.
+2. **Project framing needed:** Consequential unresolved decisions or coordinated
+   phases, dependencies, rollout, or acceptance need a project-level contract.
+   Exclude it from the buildable list and propose the finite outcome, known scope
+   and supporting evidence, consequential decisions, and completion validation.
+   Recommend a relevant existing project or a new one; reuse known context instead
+   of drafting a speculative full plan. Do not create or reorganize projects,
+   decompose work into new tickets, or start broader execution in this workflow.
+   Project creation/reorganization and broader execution require user approval
+   and a separately authorized handoff.
+3. **Material uncertainty:** Investigate read-only within the existing screening
+   cap. If the route remains unclear, exclude it from build and state the specific
+   evidence or decision missing instead of guessing or forcing a project plan.
+
+Apply routing proposals only in the ranked disposition pass, within the same
+10-screened/10-mutated ticket limits and comment caps. Reuse the existing plan or
+post one concise initial proposal; later proposals require a material change.
+A project-approval request or exceptional blocking ask consumes the invocation’s
+one new ownership/exceptional blocking ask, with the existing quiet-rerun rules;
+it does not open another product-question round. If that ask budget is used,
+report the needed decision here without another external ask. Silence, safe
+defaults, or 48 elapsed hours never approve project work. Leave project-shaped or
+unresolved-routing tickets out of Todo preparation; preserve existing status and
+partial work on resumed tickets. If routing evidence invalidates an existing
+PR’s readiness or completion claim, identify the affected PR links and concrete
+unsupported claim in the material proposal and user report for separately
+authorized disposition. A complete bounded PR is not unsafe merely because the
+broader ticket needs project framing. For project-shaped or unresolved-routing
+dispositions, keep issue statuses unchanged; triage never changes PRs. An unchanged
+recommendation remains quiet.
 
 ## Comment style
 
@@ -206,10 +256,10 @@ This is the shared output contract for both passes. Write naturally as the curre
 user and follow applicable writing guidance. Lead with user impact and the next
 action. Use a few short sentences or at most three top-level items; number any
 questions with compact choices. Include only a material decision/default, question,
-or blocker. Targets are guides, not minimums: write less when it is sufficient,
-and never pad to a word target. Do not repeat the ticket description, narrate the
-workflow, or append redundant acceptance criteria, implementation steps, or test
-inventories.
+or blocker, including a material routing proposal. Targets are guides, not minimums:
+write less when sufficient, and never pad to a word target. Do not repeat the
+ticket description, narrate the workflow, or append redundant acceptance criteria,
+implementation steps, or test inventories.
 
 - Initial plan/triage: aim for **60–100 words**, with a **150-word total maximum**.
   Only an initial comment with necessary product questions may use up to **180
@@ -355,7 +405,7 @@ answers:
 
 1. Re-fetch every blocker before preparing the handoff or posting a comment.
    Continue only when all are Done; otherwise skip without preparing the ticket.
-   Recheck duplicate, obsolete, and bounded-scope eligibility too.
+   Recheck duplicate, obsolete, and [work-routing](#work-routing) eligibility too.
 2. Set or confirm its Medium-or-smaller estimate, and assign it to the current
    user if unassigned.
 3. Reuse the existing plan/questions and answers, or post the single initial
@@ -366,8 +416,9 @@ answers:
    list only after verifying completed preparation and current gates.
 
 Never change priority. Never move oversized, unsuitable, duplicate, obsolete,
-parent, blocked, or ownership-held tickets to Todo. Defaults and elapsed time do
-not override those limits. Triage does not modify code or PR state.
+parent, blocked, project-shaped, unresolved-routing, or ownership-held tickets to
+Todo. Defaults and elapsed time do not override those limits. Triage does not
+modify code or PR state.
 
 Carry the verified buildable list into the build pass in this invocation. Report
 the ticket links, actual triage dispositions, resulting statuses, and material

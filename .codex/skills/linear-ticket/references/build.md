@@ -1,9 +1,9 @@
 # Linear Ticket Build Pass
 
 Implement one Medium-or-smaller issue in the configured work queue on the current
-user's behalf. Build immediately using documented defaults instead of waiting for
-clarifying answers.
-Never merge its PR unless explicitly asked.
+user's behalf, following triage’s [work routing](triage.md#work-routing). Build
+bounded bugs and one-offs immediately using documented defaults instead of waiting
+for clarifying answers. Never merge its PRs unless explicitly asked.
 
 Run after the triage pass in the explicitly invoked combined workflow. Select
 only from that pass's verified buildable candidate list. Implement or
@@ -28,10 +28,10 @@ Start with known context and safe defaults; do not stop for routine approval or
 require `auto`. Accept `auto` as a compatibility alias for this same scope.
 Honor an explicit read-only or dry-run request by proposing changes only.
 
-Before each mutation, re-fetch the issue and linked PR. Adapt to material changes
-within the authorized scope; stop only for missing authorization, an unfinished
-prerequisite, or a material risk with no safe default. This workflow does not
-authorize merging, auto-merge, deployment, production writes, or email, SMS, or
+Before each mutation, re-fetch the issue and its owning PRs. Adapt to material
+changes within the authorized scope; stop for missing authorization, an unfinished
+prerequisite, a material risk with no safe default, or work outside the bounded
+route. This workflow does not authorize merging, auto-merge, deployment, production writes, or email, SMS, or
 Slack messages. Draft status and elapsed time never bypass these gates.
 
 ## Candidates
@@ -63,22 +63,23 @@ optional aid. For prior work, verify the current user's plan/defaults against
 native estimate, assignment, and Todo history or corroborating linked PR evidence
 to establish the bounded handoff. A generic issue description, assignment,
 status, or checkpoint alone is insufficient. Keep unprepared, oversized,
-blocked, held, unsuitable, duplicate, or no-safe-default tickets out of the
-buildable list.
+blocked, held, project-shaped, unresolved-routing, unsuitable, duplicate, or
+no-safe-default tickets out of the buildable list.
 
 Read the issue, comments, attachments, relations, sub-issues, and linked PRs.
 If any blocker is not Done, use the build pass's one-ticket budget and stop.
-With no open owning PR, move the issue to Backlog and make no other change. With an open
-owning PR, preserve the issue's status and PR; keep an already-Draft PR Draft,
-or convert a ready PR to Draft because the prerequisite prevents completion.
-Record a newly material blocker in the existing PR description and issue
-discussion; unchanged reruns remain quiet. Do not create a replacement PR or
+With no open owning PR, move the issue to Backlog and make no other change. With
+open owning PRs, preserve the issue’s status and PRs; keep affected Draft PRs Draft,
+or convert affected ready PRs to Draft because the prerequisite prevents their
+completion. Record a newly material blocker in affected PR descriptions and one
+issue update; unchanged reruns remain quiet. Do not create a replacement PR or
 claim the work is ready. Skip duplicate, obsolete, unsuitable, or
 already-complete work. An existing Draft PR with unanswered questions is
 eligible for checking answers or its deadline; do not skip it merely because no
 new reply exists.
-On a general queue invocation, if a PR has no actionable new feedback and its
-deadline has not arrived, continue to the next candidate after checking it.
+On a general queue invocation, if no owning PR or unfinished part of the ticket
+needs action and its question deadline has not arrived, continue to the next
+candidate after checking it.
 An explicitly selected ticket may simply report that no action is due yet.
 
 An explicitly build-scoped issue may be selected only if triage verified it for
@@ -92,8 +93,8 @@ user's In Progress transition if no branch/PR exists, or the owning branch and
 commits tied to the issue or owning PR with its issue link when one exists.
 Triage may include such a verified issue in its list; build never starts a
 broad In Progress scan. Check linked PRs before
-starting; reuse an open owning PR and never duplicate an implementation. Current
-eligibility, ownership holds, and the one-ticket build cap still apply.
+starting; reuse the owning branches and PRs and never duplicate an implementation.
+Current eligibility, ownership holds, and the one-ticket build cap still apply.
 
 Ownership must be clear. Honor recorded ownership holds and takeover decisions.
 Do not reapply triage's other-engineer active-discussion gate to review feedback
@@ -103,7 +104,14 @@ Honor applicable `AGENTS.md` files and inspect relevant code, tests, schemas, an
 history. Run `nvm use` before checks. Confirm the estimate still fits, the work
 has objective acceptance criteria, and any unanswered decision has a safe bounded
 default. Missing permission, required data, or a decision with no safe default
-remains a blocker; do not guess to force implementation or promotion.
+remains a blocker; do not guess to force implementation or promotion. Recheck
+[work routing](triage.md#work-routing) for the complete ticket before implementation.
+If new evidence reveals project-shaped work or unresolved routing, preserve partial
+work and stop broader implementation. Record only the material proposal or specific
+gap under triage’s routing, comment, and ask-budget rules; keep affected open PRs
+Draft where their scope cannot be completed safely. Do not create or modify a
+project, start broader execution, or create an automation. This selected ticket
+still consumes the one-ticket build budget.
 
 ## Questions and plan
 
@@ -143,20 +151,20 @@ bounded default must be reported as blockers instead.
 
 ### Todo
 
-Re-fetch the issue and any linked PR. Move to In Progress and implement the plan
-using the documented defaults. Reuse the existing plan, branch, and open PR when
+Re-fetch the issue and all owning PRs. Move to In Progress and implement the plan
+using the documented defaults. Reuse the existing plan, branches, and open PRs when
 present. The same route resumes recorded partial In Progress work.
 
 ### In Review
 
-Inspect the existing PR, reviews, checks, and Linear comments since the latest
+Inspect all owning PRs, reviews, checks, and Linear comments since the latest
 recorded implementation update, including edits to previously processed comments.
 
 - Ignore acknowledgements, status questions, and feedback that requests no
   product or implementation change.
 - Incorporate in-scope requester answers and requested changes into one concise
   plan update. Move to In Progress only when implementation needs revision;
-  update the existing branch and PR, then rerun relevant checks.
+  update the affected existing branches and PRs, then rerun relevant checks.
 - Assess substantive third-party suggestions on their merits. Implement clear
   ordinary code defects within scope. For ordinary product ambiguity, retain the
   recommended default and document the assumption without asking the requester
@@ -168,9 +176,9 @@ recorded implementation update, including edits to previously processed comments
 - If only a deadline or PR-readiness update is needed, keep the issue In Review;
   do not manufacture a code change or status round trip.
 
-Process late answers even after a timeout promoted the PR, provided it remains
-open and the changes are in scope. Revalidate and update that PR; do not reopen a
-merged or closed PR or create replacement work without authorization.
+Process late answers even after timeout promotion, applying in-scope changes to
+the affected open owning PRs. Revalidate those PRs; do not reopen a merged or
+closed PR or create replacement work without authorization.
 
 ## Implement and verify
 
@@ -180,7 +188,7 @@ Follow the repository's test contract change gate when protected behavior change
 a recommended default does not replace any required explicit approval. Run checks
 proportional to risk and fix failures caused by the work before publishing.
 
-After a push, re-fetch the issue, PR, and comments. Incorporate newer in-scope
+After a push, re-fetch the issue, owning PRs, and comments. Incorporate newer in-scope
 answers before declaring completion. Record processed reply IDs and `updatedAt`
 values privately, including edited comments, only after their implementation or
 documented no-code disposition is complete. Compare replies with build's applied
@@ -189,17 +197,29 @@ change has been applied. Reuse legacy processed-reply records only when prior
 implementation/disposition evidence supports that meaning. Leave unapplied work
 pending so queued feedback cannot be silently skipped.
 
-## Branch and PR
+## Branches and PRs
 
-Follow the repository's branch, commit, push, and PR workflow. Use the Linear ID
-in a new Todo branch when practical; reuse the owning branch and PR for revisions.
-Default to an independent PR; stack only for a concrete prerequisite required by
-the repository's dependency rules.
+Prefer one focused PR. A second is permitted only when necessary to deliver the
+same complete bounded ticket in reviewable parts; two is not a quota. Keep each
+PR’s scope, validation, and contribution to the ticket’s acceptance criteria clear,
+link both from the issue, and verify their combined result. The ticket counts once
+toward the build budget. Do not call the ticket complete after only one part.
 
-Title the PR `<issue identifier>: <concise title>`. Follow the repository's description
-requirements, including the issue, solution, acceptance criteria, and test plan
-and results. Include material defaults and unresolved questions when relevant;
-link the original question comment instead of repeating it. A useful readiness
+Follow the repository’s branch, commit, push, and PR workflow. Use the Linear ID
+in new Todo branches when practical; reuse owning branches and PRs for revisions.
+Default each PR to an independent base; stack only for a concrete prerequisite
+required by the repository’s dependency rules, with actual ancestry and GitHub base.
+
+Apply the following PR requirements to each owning PR, including its feedback,
+blockers, verification, readiness, and reviewer requests. Share the ticket’s
+existing question set, defaults, original 48-hour clock, and ask budget across
+both PRs; opening a second PR never resets them. A scoped PR may be ready while
+another remains Draft, but incomplete combined work is not ticket completion.
+
+Title each PR `<issue identifier>: <concise title>`. Follow the repository’s
+description requirements, including the issue, solution, acceptance criteria,
+and test plan and results. Include material defaults and unresolved questions
+when relevant; link the original question comment instead of repeating it. A useful readiness
 deadline may be a readable date/time with timezone. Keep original timestamps,
 reply watermarks, provenance, holds, and other machine state in the private
 checkpoint, never in human-facing PR text or hidden HTML/JSON blocks. Do not
@@ -223,26 +243,29 @@ Do not repeatedly request review on unchanged ready PRs.
 
 ## Follow-up and 48-hour promotion
 
-On each invocation that selects an existing PR:
+On each invocation that selects a ticket with existing owning PRs:
 
-1. Re-fetch its issue, PR, question thread, replies, and blockers. Read all answers
-   before considering timeout. Use server timestamps and 48 elapsed hours from the
-   original question comment; edits, follow-ups, and routine updates do not reset it.
+1. Re-fetch the issue, all owning PRs, question thread, replies, and blockers.
+   Read all answers before considering timeout. Use server timestamps and 48
+   elapsed hours from the original question comment; edits, follow-ups, and
+   routine updates do not reset it.
 2. Apply explicit answers and settle ordinary remaining ambiguity with safe
    assumptions. At the deadline, use recorded defaults for unanswered items.
    Partial replies need not keep the PR Draft when the decision set can safely
    be settled; they never reset the deadline or discard choices already made.
-3. Revise the plan, code, tests, and description where needed. Confirm the PR
-   matches the completed decision set. An answer that confirms the implementation
-   needs no artificial commit.
-4. Mark ready only when implementation is complete, applicable verification
-   passes, blockers are Done, and no unresolved safety or authorization constraint
-   or explicit hold remains. Elapsed time clears unanswered questions only; it
-   never overrides these gates or supplies missing approval. Record any gate that
+3. Revise the plan, code, tests, and affected descriptions where needed. Confirm
+   each PR and their combined outcome match the completed decision set. An answer
+   that confirms the implementation needs no artificial commit.
+4. Mark each PR ready only when its scoped implementation is complete, applicable
+   verification passes, blockers are Done, and no unresolved safety or
+   authorization constraint or explicit hold remains. Elapsed time clears
+   unanswered questions only; it never overrides these gates or supplies missing
+   approval. Record any gate that
    prevents promotion instead of claiming readiness.
-5. If the initial set remains unanswered before its deadline, keep it Draft.
-   Recover aged legacy questions' original clock; if already expired, apply their
-   defaults and mark verified work ready now, without a fresh Draft waiting period.
+5. If the initial set remains unanswered before its deadline, keep affected PRs
+   Draft. Recover aged legacy questions’ original clock; if already expired,
+   apply their defaults and mark verified work ready now, without a fresh Draft
+   waiting period.
    Never fabricate a historical timestamp/default or claim elapsed time without
    evidence. Choose and record a safe assumption now to settle an ordinary
    decision without reopening questions. Failed or incomplete verification always
@@ -251,17 +274,18 @@ On each invocation that selects an existing PR:
 No additional routine approval is needed. Inspect all new feedback, including
 edits, before deciding no action is due. On an unchanged rerun, make no external
 comments, notifications, commits, or repeated reviewer requests. Continue the
-queue if the selected PR needs no action. Check again only on a later invocation.
+queue if the selected ticket needs no action. Check again only on a later invocation.
 
 ## Finish and report
 
-When new work or a meaningful update is complete and the PR matches current
-answers or recorded defaults:
+When new work or a meaningful update is complete and all owning PRs together
+deliver the ticket’s acceptance criteria using current answers or recorded defaults:
 
-1. Move the issue to In Review, including when the PR remains Draft for questions.
-2. Post one delivery comment within the shared 100-word maximum: link the PR,
-   state the user-visible result, one useful verification summary, and whether it
-   is Draft awaiting answers or ready using confirmed choices/defaults. Invite
+1. Move the issue to In Review, including when an owning PR remains Draft for
+   questions.
+2. Post one delivery comment within the shared 100-word maximum: link all owning PRs,
+   state the user-visible result, one useful combined verification summary, and each
+   PR’s Draft/ready state using confirmed choices/defaults. Invite
    optional feedback without requiring acknowledgement.
    Mention only the requester; GitHub handles reviewer requests. Reuse an existing
    delivery comment instead of posting it again on a later unchanged run.
@@ -269,8 +293,13 @@ answers or recorded defaults:
    answer, implementation, readiness, or blocker changes into one short update;
    do not post per-push updates, reminders, or unchanged blocker pings.
 
-Report the issue/PR links, user-visible outcome, verification summary, Draft/ready
-state, and any material blocker or next action concisely. Include a readable
-question deadline only when useful; omit raw bookkeeping and routine field lists.
+For partial delivery, preserve the issue’s In Progress status and report the
+remaining acceptance criteria without claiming completion. On later revisions to
+work already In Review, use the existing status-routing rules.
+
+Report the issue and all owning PR links, complete or partial user-visible outcome,
+combined verification summary, each PR’s Draft/ready/landed state, and any material
+blocker or next action concisely. Include a readable question deadline only when
+useful; omit raw bookkeeping and routine field lists.
 State that another invocation is needed for future replies or promotion;
 do not claim that a follow-up was scheduled.
