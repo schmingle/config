@@ -36,8 +36,6 @@ Prefer delegating substantial tasks to a suitable predefined agent. Substantial 
 
 Delegation is authorized within the task's existing scope and approval boundaries. Prefer a predefined agent whose role fits the work; if none fits, use a general-purpose subagent when useful or do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
 
-Before each handoff, tell Khang which predefined agent you chose (or that it is a general-purpose subagent), what task it owns, and why you chose it. Name the agent again when reporting its result. Do not rely on the app's activity label to identify the agent role.
-
 When delegating, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless Khang explicitly requests full-context inheritance.
 
 ## PR independence and dependency stacking
