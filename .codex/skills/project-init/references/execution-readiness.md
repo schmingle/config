@@ -1,6 +1,6 @@
 # Execution readiness
 
-Use these criteria during project grooming to determine whether the current phase has executable work. Classification records intended responsibility; it grants no access or authority, changes no native assignee or owner, and authorizes no deployment or production mutation. Preserve all existing approval and workflow boundaries.
+These are the shared readiness standards: project-init drafts tickets to meet them, and project-audit assesses them read-only. Classification records intended responsibility; it grants no access or authority, changes no native assignee or owner, and authorizes no deployment or production mutation. Preserve all existing approval and workflow boundaries.
 
 ## Execution buckets
 
@@ -12,7 +12,7 @@ Use these criteria during project grooming to determine whether the current phas
 
 Browser use or sensitive access alone does not make a ticket human-assisted; identify the actual human step that is needed. If responsibility is ambiguous or no bucket fits, record the gap and decision needed instead of forcing a category. A parent rollup can link categorized children without a fabricated executor assignment.
 
-## Audit the work
+## Readiness standards
 
 1. **Contract and scope.** Trace actionable tickets to approved KRs, phases, and exits; expose uncovered obligations and work without an agreed purpose. Each ticket needs an intended outcome, bounded scope, and meaningful acceptance/validation. Prefer one coherent PR per implementation ticket when practical, retaining justified exceptions and existing ownership rules.
 2. **Evaluation proof.** Evaluation tickets define a result to establish and the checks, expected results, evidence, and prerequisites that establish it. Do not create a duplicate checklist of implementation work; implementation checks stay with their implementation ticket. Human acceptance remains with its designated person.
@@ -21,4 +21,4 @@ Browser use or sensitive access alone does not make a ticket human-assisted; ide
 5. **Executor fit.** Check the intended executor's allowed work and available capabilities. A defined bucket does not make unsupported activity dispatchable. The current [project-supervise scope](../../project-supervise/SKILL.md#scope-and-authority) supports implementation and PR authoring only; these evaluation buckets do not expand it. Expose unsupported planned activity as a gap for the affected work, without blocking independent implementation or invoking that explicit-only workflow.
 6. **Readiness and timing.** Keep the bucket separate from blockers and dependency state. For the current phase and next ready tickets, a competent worker must be able to implement without defining goals, changing scope, or recovering missing consequential decisions. Later phases may remain broader when their prerequisites and open decisions are explicit; they need not all be fully specified before independent current work starts. A valid human-only ticket or future evaluation is not automatically a project-wide blocker: its dependency determines which work must wait.
 
-Keep concise execution notes with the existing ticket's outcome and validation when useful: bucket, prerequisites, human checkpoint/preparation, and material access or authority limits. Do not repeat information already clear in the ticket or supported equivalent records. Record facts and unresolved gaps accurately; a bucket is neither reassignment nor permission to reorganize work.
+When writing tickets, keep concise execution notes with the ticket's outcome and validation when useful: bucket, prerequisites, human checkpoint/preparation, and material access or authority limits. Do not repeat information already clear in the ticket or supported equivalent records. Record facts and unresolved gaps accurately; a bucket is neither reassignment nor permission to reorganize work.
