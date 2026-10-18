@@ -1,6 +1,6 @@
 # Shared project contract and alignment rules
 
-Read this reference for project creation, grooming, or routine maintenance during supervision. It is guidance, not another executable workflow or permission grant. Linear is the durable recorded source of truth for project intent, assignments, decisions, evidence, and controls; native task/automation records establish live execution and scheduling state. Task history is supporting context, not a recovery dependency. Keep no local markers, memory, or repository project-management mirrors.
+Read this reference for project creation, grooming, or routine maintenance during supervision. It is guidance, not another executable workflow or permission grant. Apply the [project PR merge ownership rule](../../../AGENTS.md#pr-merge-ownership-in-project-workflows); contract approval and assignments do not grant merge execution. Linear is the durable recorded source of truth for project intent, assignments, decisions, evidence, and controls; native task/automation records establish live execution and scheduling state. Task history is supporting context, not a recovery dependency. Keep no local markers, memory, or repository project-management mirrors.
 
 ## Contract and cohesion
 

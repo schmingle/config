@@ -50,6 +50,11 @@ Use Linear as the durable home for work so the user can switch priorities and re
 
 Keep project management in Linear and maintained technical documentation beside the code.
 
+### PR merge ownership in project workflows
+
+1. **The PR merge queue automation owns merge execution.** `project-create`, `project-groom`, and `project-supervise`, including their supervisors, workers, and delegates, must not merge PRs, enable auto-merge, submit PRs for merge-queue execution, or invoke/trigger merge automation or merge skills as a workaround. Project contracts, assignments, and general execution approval do not grant merge authority.
+2. **Prepare and verify within scope.** Project workflows may prepare/update PRs, resolve review findings and CI failures, verify queue-produced merges, and continue eligible independent work. Waiting for a merge is an external/time blocker under the existing supervision blocked/pause and project reporting rules. Do not routinely ask the human for merge permission as a bypass; surface concrete queue failures or exclusions for resolution without taking over merge execution.
+
 ### Project status updates
 
 1. **Batch meaningful changes.** Publish routine project status updates at most once every two hours, measured from the last published project update, including exceptions. Count a later edit timestamp only when it represents a meaningful published revision. Post only meaningful accumulated changes to project progress, outlook, or next action; unchanged runs skip posting even after two hours. Do not bypass this cadence by editing an existing status update or substituting project comments.
