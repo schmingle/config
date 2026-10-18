@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Audit project readiness
 
-**Goal:** Determine whether the project is prepared for effective execution and has a clear, finite end state.
+**Goal:** Ensure the project is prepared for effective execution and has a clear, finite end state by proactively identifying gaps and recommending concrete actions to resolve them.
 
 **Key questions:**
 
