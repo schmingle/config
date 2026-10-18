@@ -1,12 +1,12 @@
 ---
 name: project-audit
-description: Read-only assessment of whether an existing Linear project's plan meets the shared execution-readiness standards, reporting gaps and recommendations. Run only when explicitly invoked; it changes no records.
+description: Groom an existing Linear project to reflect verified reality, then assess execution readiness. Recommend fixes for readiness gaps, or next execution steps when ready. Run only when explicitly invoked; audit-only requests remain read-only.
 disable-model-invocation: true
 ---
 
-# Audit project readiness
+# Groom and audit a project
 
-**Goal:** Ensure the project is prepared for effective execution and has a clear, finite end state by proactively identifying gaps and recommending concrete actions to resolve them.
+**Goal:** Ensure the project is prepared for effective execution and has a clear, finite end state by reconciling verified facts, proactively identifying gaps, and recommending concrete next actions.
 
 **Key questions:**
 
@@ -14,16 +14,18 @@ disable-model-invocation: true
 2. Is it organized so work can progress smoothly?
 3. Does it have clear, finite completion criteria so it can be finished and closed?
 
-Run on explicit human invocation. Creating or reviewing this configuration does not invoke it. Read [the shared readiness standards](../project-init/references/execution-readiness.md) and [the shared project contract rules](../project-init/references/project-contract.md). Follow the [shared PR ownership model](../../AGENTS.md#pr-delivery-ownership-in-project-workflows).
+Run on explicit human invocation. Creating or reviewing this configuration does not invoke it. Read [the shared project contract rules](../project-init/references/project-contract.md) and [the shared readiness standards](../project-init/references/execution-readiness.md). Follow the [shared PR ownership model](../../AGENTS.md#pr-delivery-ownership-in-project-workflows). Keep durable project state in Linear, with no local registry or project-management files. An explicit audit-only or read-only request skips writes, assesses the project against verified evidence, and reports factual corrections as recommendations.
 
-1. **Resolve and read.** Accept a project URL, ID, or name, or derive a unique project from verified context; clarify only genuine ambiguity. Verify the workspace/account, then read the contract, milestones, relevant tickets, and linked evidence. Disclose coverage or access gaps.
-2. **Assess against the shared standards.** Audit each ticket against its intended executor. Check KR and phase coverage, decisions, priorities, dependencies and phase exits, acceptance and validation, execution buckets, human checkpoints, and access and executor capabilities. Distinguish readiness defects from optional opportunities to reduce human work. Report optional improvements separately; they do not change the readiness verdict.
-3. **Report.** Give **Ready**, **Gaps found**, or **Unverified**. List each finding with its affected ticket links, followed by a nested numbered list of concrete recommendations. Include multiple items when several actions or viable options exist; distinguish actions to take together from alternative choices. Order alternatives from most recommended, label the preferred option **Recommended**, and briefly explain material tradeoffs. Do not invent alternatives merely to fill the list. Keep it concise and use this format:
+1. **Resolve and inspect.** Accept a project URL, ID, or name, or derive a unique project from verified context; clarify only genuine ambiguity. Verify the workspace/account. Read the contract, decisions, relevant updates, milestones, ticket inventory, linked evidence, and current execution ownership. Separate verified facts from unknowns and disclose coverage or access gaps.
+2. **Groom verified facts first.** Reconcile outcomes, PR links, blockers, approved superseding decisions, duplicate dispositions, and statuses with evidence. Normalize the description while preserving meaning and provenance; never rewrite goals to fit delivered code or infer deployment/acceptance from a merged PR. Preserve intent, ownership, relationships, and active or paused work. Hold affected changes that would cancel, move, split, or reassign owned work, or materially change the contract, scope, or organization, pending a concrete human decision unless already specifically approved. Re-read before consequential writes, apply minimal patches, and read back results; unchanged records need no writes. Propose missing work or plan changes rather than silently designing a new plan.
+3. **Audit the resulting project.** Assess the three questions against the shared standards, including KR and phase coverage, finite scope and completion validation, decisions, priorities, dependencies and phase exits, acceptance, and executor fit, access, and checkpoints. Audit each ticket against its intended executor. Distinguish readiness defects from optional improvements; human-owned work and the absence of autonomous implementation work are not themselves gaps. Give **Ready**, **Gaps found**, or **Unverified**. Ready means prepared for its remaining work, not completed.
+4. **Recommend according to readiness.** If gaps remain, focus recommendations on resolving them before advancing execution. If readiness is unverified, identify the evidence or decision needed to establish it. If Ready, recommend the next concrete execution steps in dependency/priority order, with intended executors and human checkpoints. Include meaningful opportunities for agents to reduce human work, separately from readiness defects. Recommend work without performing it or starting another workflow.
+5. **Report concisely.** State the verdict, summarize the three answers, and report material grooming changes, held proposals, and recommendations with affected ticket links. For each finding or next step, use a nested numbered list of concrete actions or viable options. Distinguish actions to take together from alternatives; order alternatives from most recommended, label the preferred choice **Recommended**, and briefly explain material tradeoffs. Do not invent alternatives to fill the list. Post project summaries only when the [status update policy](../../AGENTS.md#project-status-updates) permits. Use this format:
 
    ```markdown
-   1. [Finding and affected ticket links]
+   1. [Finding or next step and affected ticket links]
       1. Recommendation: [Concrete action or option; label Recommended for a preferred choice]
       2. [Additional action or alternative, when applicable]
    ```
 
-Stay read-only: make no Linear or other record writes, probe no sensitive access, and run no acceptance checks. Do not fix the plan or create a readiness certificate, registry, or audit ledger. Do not invoke another explicit-only skill.
+Do not execute tickets, change PRs, run acceptance checks, probe sensitive access, deploy, or mutate production. Do not start supervision, tasks, or automations, create a readiness certificate or audit ledger, or invoke another explicit-only skill.

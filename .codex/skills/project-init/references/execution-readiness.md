@@ -1,6 +1,6 @@
 # Execution readiness
 
-These are the shared readiness standards: project-init drafts tickets to meet them, and project-audit assesses them read-only. Classification records intended responsibility; it grants no access or authority, changes no native assignee or owner, and authorizes no deployment or production mutation. Preserve all existing approval and workflow boundaries.
+These are the shared readiness standards: project-init drafts tickets to meet them, and project-audit assesses them after factual grooming, or read-only when requested. Classification records intended responsibility; it grants no access or authority, changes no native assignee or owner, and authorizes no deployment or production mutation. Preserve all existing approval and workflow boundaries.
 
 ## Execution buckets
 

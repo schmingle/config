@@ -1,6 +1,6 @@
 ---
 name: project-init
-description: Interactively define a finite Linear project, new or reused, with an approved contract, milestones, and scoped tickets ready for execution. Run only when explicitly invoked; reconciling an existing project's current state belongs to project-groom.
+description: Interactively define a finite Linear project, new or reused, with an approved contract, milestones, and scoped tickets ready for execution. Run only when explicitly invoked; grooming and auditing an existing project belong to project-audit.
 disable-model-invocation: true
 ---
 
@@ -13,4 +13,4 @@ Run on explicit human invocation. Creating or reviewing this configuration does 
 3. **Propose.** Draft the canonical contract, initial milestones, and scoped tickets that cover its KRs, phase exits, and validation, with the current phase executable under the shared readiness standards and later phases broad but explicit about their conditions. Identify records to reuse, open decisions, and any reorganization or ownership change.
 4. **Apply and verify.** Obtain approval before creating a project, reorganizing existing work, or materially changing scope or ownership, unless that concrete action is already specifically approved. Apply only the approved portion under the shared in-flight and Linear maintenance rules, then read back actual contents and bindings. Post a project summary only when the [status update policy](../../AGENTS.md#project-status-updates) permits. Report what was created, reused, held, or still open.
 
-Do not start implementation, supervision, tasks, or schedules. An independent readiness check is available through project-audit when the human invokes it; never invoke it or another explicit-only skill automatically.
+Do not start implementation, supervision, tasks, or schedules. Grooming and readiness assessment are available through project-audit when the human invokes it; never invoke it or another explicit-only skill automatically.
