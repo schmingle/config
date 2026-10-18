@@ -50,10 +50,11 @@ Use Linear as the durable home for work so the user can switch priorities and re
 
 Keep project management in Linear and maintained technical documentation beside the code.
 
-### PR merge ownership in project workflows
+### PR delivery ownership in project workflows
 
-1. **The PR merge queue automation owns merge execution.** `project-create`, `project-groom`, and `project-supervise`, including their supervisors, workers, and delegates, must not merge PRs, enable auto-merge, submit PRs for merge-queue execution, or invoke/trigger merge automation or merge skills as a workaround. Project contracts, assignments, and general execution approval do not grant merge authority.
-2. **Prepare and verify within scope.** Project workflows may prepare/update PRs, resolve review findings and CI failures, verify queue-produced merges, and continue eligible independent work. Waiting for a merge is an external/time blocker under the existing supervision blocked/pause and project reporting rules. Do not routinely ask the human for merge permission as a bypass; surface concrete queue failures or exclusions for resolution without taking over merge execution.
+1. **Project workflows deliver the implementation and PR.** `project-create`, `project-groom`, and `project-supervise`, including their supervisors, workers, and delegates, may within existing scope and authority implement and locally validate approved changes and create/update PRs for that implementation. After publication, the PR merge queue automation owns formal PR risk assessment, review, review-finding resolution, CI repair, and merging. Project workflows observe the queue's published outcomes and continue eligible project work.
+2. **Keep queue execution with the queue.** Project workflows must not perform formal PR risk assessment or review, dispatch PR risk/review/fix specialists, repeat PR review/signoff, repair published PRs' findings or CI, merge PRs, enable auto-merge, submit PRs for merge-queue execution, or invoke/trigger queue automation or its skills. Contracts, assignments, and general execution approval do not grant these responsibilities. Do not routinely ask the human for permission as a bypass; surface concrete queue failures or exclusions for resolution without taking over execution.
+3. **Preserve project acceptance.** Local implementation validation and project contract, phase, and operational acceptance checks remain required. An independent acceptance assessor may evaluate combined goals and operational proof without redoing PR review. Waiting for queue processing is an external/time blocker under the existing supervision blocked/pause and project reporting rules.
 
 ### Project status updates
 
