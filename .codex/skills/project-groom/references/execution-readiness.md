@@ -1,0 +1,24 @@
+# Execution readiness
+
+Use these criteria during project grooming to determine whether the current phase has executable work. Classification records intended responsibility; it grants no access or authority, changes no native assignee or owner, and authorizes no deployment or production mutation. Preserve all existing approval and workflow boundaries.
+
+## Execution buckets
+
+1. **Worker — autonomous implementation.** A ready implementation ticket has clear requirements and sufficient access and authorization for a worker to implement, run its meaningful local checks, and publish a self-contained PR. The author owns these implementation checks.
+2. **Worker — human-assisted implementation.** Implementation needs a specified human decision, authentication, approval, or guidance. The worker can prepare independently within its existing authority, stops at the exact checkpoint, and resumes dependent work only after a valid unblock.
+3. **Supervisor — autonomous evaluation.** A bounded phase or project outcome evaluation specifies prerequisites, concrete checks, expected results, and evidence. It evaluates the agreed outcome without repeating PR review, changing the plan, or performing operational mutations.
+4. **Supervisor — human-assisted evaluation.** The supervisor prepares independent evidence within its authority, but a named person participates in or owns acceptance, usability assessment, or business judgment. The agent does not declare that person's acceptance for them.
+5. **Human-only.** A designated human must perform an action or judgment that cannot be delegated. Agents may prepare material only within their own allowed work.
+
+Browser use or sensitive access alone does not make a ticket human-assisted; identify the actual human step that is needed. If responsibility is ambiguous or no bucket fits, record the gap and decision needed instead of forcing a category. A parent rollup can link categorized children without a fabricated executor assignment.
+
+## Audit the work
+
+1. **Contract and scope.** Trace actionable tickets to approved KRs, phases, and exits; expose uncovered obligations and work without an agreed purpose. Each ticket needs an intended outcome, bounded scope, and meaningful acceptance/validation. Prefer one coherent PR per implementation ticket when practical, retaining justified exceptions and existing ownership rules.
+2. **Evaluation proof.** Evaluation tickets define a result to establish and the checks, expected results, evidence, and prerequisites that establish it. Do not create a duplicate checklist of implementation work; implementation checks stay with their implementation ticket. Human acceptance remains with its designated person.
+3. **Human checkpoints.** For assisted work, identify the checkpoint, who supplies which decision/input/approval/authentication, when the agent stops and before what action, and what preparation can proceed independently. Human-only work names its owner and concrete action or judgment. Missing owners or unsettled consequential decisions are gaps, not implied agent discretion.
+4. **Dependencies and access.** Check real prerequisite behavior, order, phase exits, needed tools/access, and approval boundaries from available facts, not ticket status alone. Distinguish missing evidence from a verified blocker. Do not test sensitive access or perform acceptance merely to label work ready.
+5. **Executor fit.** Check the intended executor's allowed work and available capabilities. A defined bucket does not make unsupported activity dispatchable. The current [project-supervise scope](../../project-supervise/SKILL.md#scope-and-authority) supports implementation and PR authoring only; these evaluation buckets do not expand it. Expose unsupported planned activity as a gap for the affected work, without blocking independent implementation or invoking that explicit-only workflow.
+6. **Readiness and timing.** Keep the bucket separate from blockers and dependency state. For the current phase and next ready tickets, a competent worker must be able to implement without defining goals, changing scope, or recovering missing consequential decisions. Later phases may remain broader when their prerequisites and open decisions are explicit; they need not all be fully specified before independent current work starts. A valid human-only ticket or future evaluation is not automatically a project-wide blocker: its dependency determines which work must wait.
+
+Keep concise execution notes with the existing ticket's outcome and validation when useful: bucket, prerequisites, human checkpoint/preparation, and material access or authority limits. Do not repeat information already clear in the ticket or supported equivalent records. Record facts and unresolved gaps accurately; a bucket is neither reassignment nor permission to reorganize work.
