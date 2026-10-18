@@ -4,7 +4,7 @@ These are the shared readiness standards: project-init drafts tickets to meet th
 
 ## Execution buckets
 
-1. **Worker — autonomous implementation.** A ready implementation ticket has clear requirements and sufficient access and authorization for a worker to implement, run its meaningful local checks, and publish a self-contained PR. The author owns these implementation checks.
+1. **Worker — autonomous implementation.** A ready implementation ticket has clear requirements and sufficient access and authorization for a worker to implement, run its meaningful local checks, and mark a self-contained PR ready for review. The author owns these implementation checks.
 2. **Worker — human-assisted implementation.** Implementation needs a specified human decision, authentication, approval, or guidance. The worker can prepare independently within its existing authority, stops at the exact checkpoint, and resumes dependent work only after a valid unblock.
 3. **Supervisor — autonomous evaluation.** A bounded phase or project outcome evaluation specifies prerequisites, concrete checks, expected results, and evidence. It evaluates the agreed outcome without repeating PR review, changing the plan, or performing operational mutations.
 4. **Supervisor — human-assisted evaluation.** The supervisor prepares independent evidence within its authority, but a named person participates in or owns acceptance, usability assessment, or business judgment. The agent does not declare that person's acceptance for them.
