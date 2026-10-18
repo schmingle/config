@@ -6,6 +6,14 @@ disable-model-invocation: true
 
 # Audit project readiness
 
+**Goal:** Determine whether the project is prepared for effective execution and has a clear, finite end state.
+
+**Key questions:**
+
+1. Is this project ready for work by its intended executors?
+2. Is it organized so work can progress smoothly?
+3. Does it have clear, finite completion criteria so it can be finished and closed?
+
 Run on explicit human invocation. Creating or reviewing this configuration does not invoke it. Read [the shared readiness standards](../project-init/references/execution-readiness.md) and [the shared project contract rules](../project-init/references/project-contract.md). Follow the [shared PR ownership model](../../AGENTS.md#pr-delivery-ownership-in-project-workflows).
 
 1. **Resolve and read.** Accept a project URL, ID, or name, or derive a unique project from verified context; clarify only genuine ambiguity. Verify the workspace/account, then read the contract, milestones, relevant tickets, and linked evidence. Disclose coverage or access gaps.
