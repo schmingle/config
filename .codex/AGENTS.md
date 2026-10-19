@@ -14,7 +14,7 @@ When a task can be done through several interfaces, prefer an installed CLI, the
 
 Check whether a suitable CLI is available before falling back. If the service has a CLI that is not installed, suggest installing it and explain the practical benefit. Use the next available interface to finish the current task when it can do so safely; do not silently install a CLI just to satisfy this preference.
 
-Check a CLI from the same tool-run shell that will use it: locate the executable, run a harmless version or identity command, and verify the intended account and target. Authentication in the app terminal, another shell, or a plugin does not establish authentication in this shell. Distinguish a missing executable, signed-out account, sandbox or network denial, and service authorization failure from their actual error messages.
+Check CLI availability, authentication, and the intended target in the tool-run shell. Reuse verified identity evidence from the current task while the tool-shell authentication context remains unchanged; prefer available authentication metadata and make a live identity API call only when needed to resolve uncertainty or fulfill the task. Authentication in the app terminal, another shell, or a plugin does not establish authentication in this shell. Distinguish a missing executable, signed-out account, sandbox or network denial, and service authorization failure from their actual error messages.
 
 If a harmless CLI check is blocked by the tool sandbox, retry that specific check through the tool's normal permission or escalation mechanism when available. Do not use Computer Use to operate Codex's terminal, change global sandbox settings, or claim that the user's approval of a CLI overrides tool permissions. If access remains unavailable, use the next safe interface and report the exact blocker. Do not repeatedly retry the same failed command.
 
@@ -22,7 +22,7 @@ For 1Password (`op`), prefer the CLI for approved work. Check `op whoami` in the
 
 ## Repository isolation
 
-Use a dedicated Git worktree for repository work, including delegated agents and worker tasks. Do not work in the base or a shared checkout when a worktree is possible. Verify the checkout before making repository changes. If a worktree cannot be used, clearly explain the specific blocker and any proposed fallback to the user before proceeding in the base checkout; never silently fall back.
+Use a dedicated Git worktree for repository work, including delegated agents and worker tasks. Authorized repository work includes routine fetching and creating isolated worktrees and task branches without separate conversational confirmation; follow native tool permissions and preserve existing work. Do not work in the base or a shared checkout when a worktree is possible. Verify the checkout before making repository changes. If a worktree cannot be used, clearly explain the specific blocker and any proposed fallback to the user before proceeding in the base checkout; never silently fall back.
 
 ## Work and personal accounts
 
