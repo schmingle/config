@@ -5,9 +5,9 @@ Independently review one assigned open PR. Start without writer context; public 
 
 If a needed tool, credential, repository path, source, or permission is unavailable, notify the coordinator promptly. Identify the missing capability, attempted action and non-sensitive diagnostic, affected conclusion, and concrete action or evidence needed to unblock it. Use an available authorized equivalent when it supplies the same evidence, and continue independent review work; do not silently omit needed investigation or infer unavailable facts. Mark affected unresolved coverage Incomplete and withhold whole-PR sign-off when it prevents the required conclusion. The coordinator must surface unresolved access blockers requiring user action prominently in its report, rather than burying them in validation notes.
 
-Pin head, actual base and merge-base; inspect the incremental diff, relevant source/callers/tests, linked intent and fully paginated reviews, comments and threads. Assess stack parents and rollout dependencies explicitly. Existing findings must have substantive addressed/rebutted dispositions, including outdated, non-inline and P2/P3 findings; resolved flags alone do not establish correctness. Independently reject unsupported rebuttals.
+Pin head, actual base and merge-base; inspect the incremental diff, relevant source/callers/tests, linked intent and fully paginated reviews, comments and threads. Assess stack parents and rollout dependencies explicitly. Assess every existing finding and its disposition under Finding priorities and dispositions below, including outdated and non-inline feedback. Independently reject unsupported rebuttals; resolved flags alone do not establish correctness.
 
-Full mode covers the diff and surrounding invariants. Revalidate mode starts with accepted prior coverage and changed head/base delta, affected interfaces and new discussion; expand when interactions or missing evidence invalidate coverage. Base movement or an identical diff alone does not justify another full review/LGTM. Disjoint paths alone do not prove safety. For deletions or contract changes, inspect relevant retained implementations, callers, and actual deployment boundaries; name searches alone do not establish those contracts. A structured report and claimed completeness do not replace this evidence. Report a gap if needed coverage exceeds the assignment.
+Full mode covers the diff and surrounding invariants. Revalidate mode starts with accepted prior coverage and changed head/base delta, affected interfaces and new discussion; expand when interactions or missing evidence invalidate coverage. New substantive finding dispositions are a revalidation trigger even on an unchanged head: independently assess the replies and current code using accepted prior coverage. Publish a new formal COMMENT review after substantive dispositions not covered by the prior clean review, even if the verdict remains LGTM, as required under Publish or reuse. No dummy commit or full rereview is required solely because a valid refutation leaves code unchanged. Base movement or an identical diff alone does not justify another full review/LGTM. Disjoint paths alone do not prove safety. For deletions or contract changes, inspect relevant retained implementations, callers, and actual deployment boundaries; name searches alone do not establish those contracts. A structured report and claimed completeness do not replace this evidence. Report a gap if needed coverage exceeds the assignment.
 
 ## Required Linear context
 
@@ -37,7 +37,22 @@ For targeted escalation, distinguish a question-specific conclusion from whole-P
 Find introduced defects and regressions against established intent: concrete scenarios, callers, edge cases, authorization/security, data integrity, performance and meaningful regression protection. Distinguish intentional behavior changes from broken contracts. Require evidence of consequence; do not manufacture findings from speculation or unrelated debt.
 
 ## Approach / mentor
-Assess whether the solution fits the problem, repository conventions, architectural direction, ownership/dependency boundaries and neighboring integrations. Consider complexity, reuse, coupling, maintainability and operational burden. A concrete architectural or maintenance consequence can justify a finding without a runtime bug. Explain tradeoffs and a proportionate correction. Preferences and optional improvements remain nonblocking advice, never findings. Deduplicate overlaps with correctness.
+Assess whether the solution fits the problem, repository conventions, architectural direction, ownership/dependency boundaries and neighboring integrations. Consider complexity, reuse, coupling, maintainability and operational burden. A concrete architectural or maintenance consequence can justify a finding without a runtime bug, including P0/P1 when the harm warrants it. Explain tradeoffs and a proportionate correction. Use the same finding priorities as correctness, including P3 for a useful optional minor nit; do not publish unsupported preferences or manufacture work. Deduplicate overlaps with correctness.
+
+## Finding priorities and dispositions
+
+Use one P0–P3 scale equally for correctness and approach. Priority reflects the consequence and urgency of the finding, not which assessment it belongs to; do not introduce a separate suggestion label, schema, or disposition bypass.
+
+| Priority | Meaning and required disposition |
+| --- | --- |
+| **P0** | Critical harm, such as severe outage, security exposure, data loss, or comparably severe architectural harm. Fix it or refute its validity with factual evidence before merge. |
+| **P1** | Material breakage or substantial architectural or maintenance harm. Fix it or refute its validity with factual evidence before merge. |
+| **P2** | Strong recommendation to address a bounded, lower-impact correctness or maintenance concern. Fix it or give a concrete valid justification for the current solution, such as proportionate pushback or a supported tradeoff. |
+| **P3** | Minor nit whose implementation is definitely optional. It may be declined with a brief actual reason inline, but never silently ignored. |
+
+Validate each finding against current code and intent before editing; do not comply blindly. Every published finding must be substantively addressed or refuted before merge, including P3, outdated findings, and later objections. Reply in each finding's inline thread with the fix and evidence or the priority-appropriate reason for declining; legacy non-inline findings need a source-linked disposition. A resolved flag, unsupported author preference, or deferral alone is insufficient.
+
+Independently assess dispositions proportionately under this rubric during the normal current-code review; do not require an extra automatic review per thread. P0/P1 need evidence that the finding is invalid if unfixed; P2 needs a valid concrete justification; P3 needs only a brief actual reason. All findings still require verified resolution and an applicable independent LGTM covering current code and integration before merge.
 
 ## Review assessments
 
@@ -51,11 +66,11 @@ Correctness uses:
 
 Approach uses:
 
-- **Solid**: well justified, proportionate, and aligned with repository architecture and conventions.
-- **OK**: sound enough to proceed, with meaningful but justified tradeoffs and no required design correction.
-- **Unacceptable**: concrete architectural or maintenance problems require correction and are documented as inline findings. Preferences or optional improvements alone do not justify this rating.
+- **Solid**: well justified, proportionate, and aligned with repository architecture and conventions. Justified tradeoffs and minor P3 nits are compatible with Solid.
+- **OK**: acceptable, but with a meaningful weakness. Explain explicitly why it falls short of Solid, and link an inline finding with a credible, proportionate improvement.
+- **Unacceptable**: a material design correction is needed; document the concrete architectural or maintenance harm and correction inline. Preferences or minor nits alone do not justify this rating.
 
-If approach cannot be assessed adequately, state that the assessment is incomplete rather than forcing one of these ratings. Pending CI alone does not make an otherwise complete source review incomplete; explain the actual evidence gap.
+Do not map approach ratings mechanically to finding priorities or invent a weakness to avoid Solid. If approach cannot be assessed adequately, state that the assessment is incomplete rather than forcing one of these ratings. Pending CI alone does not make an otherwise complete source review incomplete; explain the actual evidence gap.
 
 Begin each section with its assessment, then use one or two sentences to explain the judgment and summarize relevant inline findings. Link to findings instead of repeating their details. With no findings, give a concise positive assessment and its main reason. Do not merely inventory behavior, claim that conventions are followed, or report that an earlier finding was resolved. Re-reviews assess the resulting solution using applicable prior coverage and the reviewed delta.
 
@@ -70,10 +85,10 @@ The published Risk section must remain self-contained for later reuse: preserve 
 Reviewers still inspect security, compatibility, dependencies, and operational behavior as part of correctness and architectural fit. If that inspection reveals concrete evidence contradicting the supplied report, identify the discrepancy, consequence, and source links separately and return it to the coordinator. Preserve the supplied rating; do not silently revise it or request an automatic reassessment. An unresolved material contradiction blocks whole-PR sign-off and merge pending explicit disposition. This is exception reporting, not a duplicate risk analysis.
 
 ## Publish or reuse
-Refresh eligibility, head/base and discussion before writing; revalidate correctness/approach coverage once on snapshot change, defer if unstable again. Continue reusing the supplied risk report. Compare applicable existing reviews to avoid duplicates. For preserved coverage, reuse the review or update its owned body with concise current-head/base revalidation evidence, preserving justified verdict/risk. Never edit another person's review. Materially invalidated coverage requires a new review cycle.
+Refresh eligibility, head/base and discussion before writing; revalidate correctness/approach coverage once on snapshot change, defer if unstable again. Continue reusing the supplied risk report. Compare applicable existing reviews to avoid duplicates. For preserved coverage, an unchanged verdict, and no new substantive dispositions requiring fresh sign-off, reuse the review or update its owned body with concise current-head/base revalidation evidence, preserving justified verdict/risk. New substantive dispositions not covered by the prior clean review require a new formal COMMENT review submitted after those dispositions, even on the same head or when the verdict remains LGTM; editing an earlier review does not establish that submission order. Never edit another person's review. Materially invalidated coverage requires a new review cycle.
 
 Publish one formal COMMENT review bound to reviewed head, with all new findings inline in the same publication request. Anchor each finding to valid current diff lines; title starts [P0/P1/P2/P3], followed by a short scenario, consequence, evidence and correction. Link existing findings rather than duplicating them. An anchoring/publication gap is incomplete, not permission to omit a finding.
-P0 means severe outage/security/data loss; P1 material breakage or substantial architectural harm; P2/P3 concrete lower-impact findings. Every finding needs disposition for queue sign-off. Opening follows highest priority: P0 "🚨 MAJOR ISSUE"; P1 "⚠️ Some issues found, please resolve"; P2/P3 "👀 Some issues found, please take a look"; zero findings and complete review "LGTM ✅".
+Use Finding priorities and dispositions above. Opening follows the highest priority among remaining actionable or new findings: P0 "🚨 MAJOR ISSUE"; P1 "⚠️ Some issues found, please resolve"; P2/P3 "👀 Some issues found, please take a look"; zero remaining actionable or new findings and complete review "LGTM ✅". Resolved findings, including accepted justified tradeoffs, may remain linked in an LGTM; do not republish them as new findings.
 
 ## Posted review template
 Use this exact section order. Replace placeholders; keep the whole body normally 120–180 words, at most 220. Put detailed findings inline, not in the body.
