@@ -20,6 +20,10 @@ If a harmless CLI check is blocked by the tool sandbox, retry that specific chec
 
 For 1Password (`op`), prefer the CLI for approved work. Check `op whoami` in the tool-run shell and select the intended account using the private account map; use an explicit account selector for commands when needed. A desktop-app connection or daemon error may be a sandbox boundary, so test the same read-only command through normal escalation before diagnosing 1Password setup. If the escalated check says the account is signed out, follow the supported `op signin` flow and let the user complete any 1Password prompt. Never print secret values, pass them through chat, or put them in command arguments or logs. If the CLI still cannot authenticate, use the connected 1Password plugin when it meets the task's needs.
 
+## Repository isolation
+
+Use a dedicated Git worktree for repository work, including delegated agents and worker tasks. Do not work in the base or a shared checkout when a worktree is possible. Verify the checkout before making repository changes. If a worktree cannot be used, clearly explain the specific blocker and any proposed fallback to the user before proceeding in the base checkout; never silently fall back.
+
 ## Work and personal accounts
 
 Keep work and personal accounts separate. Use the private account map to select the intended service account and browser profile. Verify the authenticated account before accessing data or making changes, especially when a service is available in both contexts. Do not use a work connection for personal activity, or a personal connection for work activity, merely because it is available. If the intended account remains unclear, ask before accessing either one.
