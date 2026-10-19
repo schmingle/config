@@ -57,6 +57,18 @@ copy its contents into this repository.
 
 ## Make configuration portable
 
+Keep reusable skills and agent definitions repository-agnostic unless an explicit
+policy names a repository. Resolve repository targets from the invocation context,
+not the definition's installation or configuration-repository location: use an
+explicit PR URL or `OWNER/REPO`, then an unambiguous current task or project
+repository, then the invocation worktree's remote. Honor a clear explicit target;
+clarify unexplained conflicts or ambiguous remotes rather than inventing an upstream
+default. For GitHub actions, verify the host and canonical repository, pass that
+target to delegated agents, and scope commands explicitly. Never infer a
+target from an authenticated username or unrelated task history. Preserve explicit
+repository policies and non-GitHub workflows; do not add repository discovery when
+the task needs no repository action.
+
 Use environment variables, home-relative paths, and clearly labeled placeholders
 instead of personal absolute paths, real account identifiers, or private service
 addresses. Reference secrets by environment-variable name; never supply real values.
