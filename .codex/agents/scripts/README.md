@@ -21,9 +21,15 @@ Native signoffs come from `reviewer_attribution.py pr-review` or
 `reviewer_attribution.py pr-risk`, which reads
 the native agent's `model` and `model_reasoning_effort` fields.
 
-Claude runners require POSIX `waitid`/`WNOWAIT` support and `ps` (available on macOS
-and Linux) to verify process-group settlement; they stop if ownership or settlement
-cannot be verified.
+Claude runners require Python 3.11+ with POSIX `waitid`/`WNOWAIT` support
+and `ps` to verify process-group settlement. Both entrypoints check the current
+interpreter before importing the runner, then search installed Python executables
+beside it, on `PATH`, and in standard Homebrew/system locations. They probe each
+candidate and replace the launcher process with the first compatible runtime,
+preserving arguments, environment, working directory, and absolute deadlines.
+On macOS, install Python 3.14+ if no compatible build is available. Nothing is
+installed automatically; missing runtime capabilities fail before invoking Claude.
+Ownership and settlement checks still fail closed.
 
 ## Prepare and run
 

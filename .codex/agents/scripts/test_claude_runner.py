@@ -31,7 +31,7 @@ if sys.argv[2] == 'timeout':
 '''
 
 
-@unittest.skipUnless(hasattr(os, 'WNOWAIT') and hasattr(os, 'fork'), 'requires POSIX waitid/fork')
+@unittest.skipUnless(hasattr(os, 'waitid') and hasattr(os, 'WNOWAIT') and hasattr(os, 'fork'), 'requires POSIX waitid/fork')
 class ProcessSettlementTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()

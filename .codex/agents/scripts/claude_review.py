@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """Prepare full review evidence and run one owned Claude session. Never publishes."""
+if __name__ == '__main__':
+    from claude_runtime import ensure_runtime
+    ensure_runtime()
+
 import argparse
 import json
 import os

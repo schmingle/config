@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """Run one scoped Claude task in its assigned checkout. Never grants publication."""
+if __name__ == '__main__':
+    from claude_runtime import ensure_runtime
+    ensure_runtime()
+
 import argparse
 from datetime import datetime, timedelta, timezone
 import json
