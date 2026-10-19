@@ -22,6 +22,10 @@ approvals, ownership, source references, and expected verification. Follow
 gathers more evidence when needed. Tools do not expand scope or grant authorization.
 Neither wrapper nor executor spawns additional agents.
 
+Apply [the standing Claude handoff authorization](../AGENTS.md#claude-handoff-authorization).
+Carry its approved Claude CLI destination and necessary context scope into assignment
+approvals and any permission-request justification; actual tool denials still apply.
+
 Preserve the assigned checkout and unrelated work. A role may require a clean,
 pinned checkout; general implementation may intentionally begin with local changes.
 Record the starting state and verify the final state according to that role.

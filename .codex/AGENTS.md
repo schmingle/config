@@ -115,6 +115,17 @@ Delegation is authorized within the task's existing scope and approval boundarie
 
 When delegating, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless the user explicitly requests full-context inheritance.
 
+### Claude handoff authorization
+
+Claude CLI is a trusted destination for routine handoffs through predefined agents.
+The user gives standing authorization to send task-relevant private/internal documents,
+code, tickets, and operational context needed for the assigned work; do not request
+separate approval for each handoff. Carry the approved destination and context scope
+into the assignment. This does not authorize transmitting credentials or unrelated
+personal data, public publication, or other external destinations. Actual runtime/tool
+permissions, user restrictions, task action limits, and email/SMS/Slack approval gates
+still apply.
+
 ## PR independence and dependency stacking
 
 Avoid stacking by default. Create independent PRs from the repository's current default branch (`main` where applicable).
