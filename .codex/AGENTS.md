@@ -126,7 +126,7 @@ Use this structure when creating or materially updating a Linear project. The de
 ## Plan
 1. **[Phase name]** — [Core intention and resulting capability.]
    Exit: [Condition that proves this phase achieved its purpose.]
-   Tracking: [Linked Linear milestone or phase ticket.]
+   Tracking: [Linked native Linear milestone.]
 
 ## Context and Guardrails
 [Consequential dependencies, exclusions, constraints, unresolved questions,
@@ -138,7 +138,7 @@ Apply these directions:
 1. **Keep it concise and specific.** Capture the intended outcome and approach; keep implementation details in tickets. Do not invent metrics or targets to fill the template.
 2. **Always include Key Decisions.** State explicitly if none have been identified. Treat decided choices as constraints and propose changes before departing from them. Keep assumptions and open decisions visibly distinct from commitments.
 3. **Separate results from proof.** KRs describe what must become true. Completion validation explains how to demonstrate it. Use user stories for capabilities and appropriate operational, recovery, reconciliation, or performance checks for other outcomes.
-4. **Make phases govern execution.** Preserve each phase's core intention and exit condition so its tickets can be checked for alignment. Identify meaningful dependencies and parallel work.
+4. **Make phases govern execution.** Represent each phase with a native Linear milestone, named for its intended end state or specific initiative. Preserve its core intention and exit condition so assigned tickets can be checked for alignment. Parent tickets group scoped initiatives needing subtasks; do not use them as phase containers. Identify meaningful dependencies and parallel work.
 5. **Maintain one current contract.** Refresh the description when approved goals, decisions, or approach change. Use native milestones and tickets for detailed tracking. Keep current progress, next actions, blockers, and requests for the user in the records permitted by the owning workflow. The latest published project update is a concise summary under the reporting policy, with supporting evidence in linked records.
 
 ## Delegation

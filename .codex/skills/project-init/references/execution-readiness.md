@@ -10,7 +10,7 @@ These are the shared readiness standards: project-init drafts tickets to meet th
 4. **Supervisor — human-assisted evaluation.** The supervisor prepares independent evidence within its authority, but a named person participates in or owns acceptance, usability assessment, or business judgment. The agent does not declare that person's acceptance for them.
 5. **Human-only.** A designated human must perform an action or judgment that cannot be delegated. Agents may prepare material only within their own allowed work.
 
-Browser use or sensitive access alone does not make a ticket human-assisted; identify the actual human step that is needed. If responsibility is ambiguous or no bucket fits, record the gap and decision needed instead of forcing a category. A parent rollup can link categorized children without a fabricated executor assignment.
+Browser use or sensitive access alone does not make a ticket human-assisted; identify the actual human step that is needed. If responsibility is ambiguous or no bucket fits, record the gap and decision needed instead of forcing a category. A scoped initiative's parent ticket can link categorized children without a fabricated executor assignment; phases use native milestones as defined in the [shared contract rules](project-contract.md#contract-and-cohesion).
 
 ## Readiness standards
 
