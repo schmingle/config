@@ -82,13 +82,6 @@ Use the complete coordinator-supplied [risk assessment](pr-risk.md), including i
 
 The published Risk section must remain self-contained for later reuse: preserve the rationale, main exposure, material uncertainty, and applicable split guidance. Always record the assessment's exact head, base commit, and merge-base, even when they match the current review; retain them unchanged through revalidation. Recover legacy provenance from immutable review/commit evidence where possible; if it cannot be established, return the gap to the coordinator rather than attributing the old rating to the current snapshot.
 
-Keep risk-reuse attribution out of the opening risk rationale. Put it at the end of
-Risk with the assessed snapshot. In Risk and Validation, display commit hashes as
-12-character prefixes (longer if needed for uniqueness), linked to verified commit
-URLs containing the full SHA. Retain full SHAs in internal evidence, supplied
-reports, and API arguments; shortening is presentation only. If no verified commit
-URL is available, show the full SHA rather than lose exact provenance.
-
 Reviewers still inspect security, compatibility, dependencies, and operational behavior as part of correctness and architectural fit. If that inspection reveals concrete evidence contradicting the supplied report, identify the discrepancy, consequence, and source links separately and return it to the coordinator. Preserve the supplied rating; do not silently revise it or request an automatic reassessment. An unresolved material contradiction blocks whole-PR sign-off and merge pending explicit disposition. This is exception reporting, not a duplicate risk analysis.
 
 ## Publish or reuse
@@ -114,11 +107,12 @@ Use this exact section order. Replace placeholders; keep the whole body normally
 ### Risk
 **{{risk_rating}}** — {{risk_summary}}
 Changed lines: {{changed_lines}} ({{additions}} added, {{deletions}} deleted).
-{{risk_provenance}}
+{{risk_reuse_note}}
+Risk assessed head [{{risk_head_short}}](https://{{git_host}}/{{owner_repo}}/commit/{{risk_head_sha}}), base [{{risk_base_short}}](https://{{git_host}}/{{owner_repo}}/commit/{{risk_base_sha}}); merge-base [{{risk_merge_base_short}}](https://{{git_host}}/{{owner_repo}}/commit/{{risk_merge_base_sha}}).
 
 ### Validation
 {{validation_summary}}
-Reviewed head {{head_commit_link}} against `{{base_ref}}` at {{base_commit_link}}.
+Reviewed head [{{head_short}}](https://{{git_host}}/{{owner_repo}}/commit/{{head_sha}}) against `{{base_ref}}` at [{{base_short}}](https://{{git_host}}/{{owner_repo}}/commit/{{base_sha}}).
 
 {{reviewer_attribution}}
 ```
@@ -135,13 +129,15 @@ The assessment definitions and directions in Review assessments, Supplied risk r
 | `correctness_rating`, `approach_rating` | The respective verdicts defined in Review assessments, including its incomplete-coverage rules. |
 | `correctness_summary`, `approach_summary` | One or two sentences explaining the judgment under Review assessments; link relevant inline findings rather than repeating them. |
 | `risk_rating` | Copy the coordinator-supplied report's rating exactly: `Low`, `Medium low`, `Medium`, `Medium high`, or `High`. |
-| `risk_summary` | The reusable summary required by Supplied risk report, with an existing source link when available and any unresolved contradiction disclosed. |
-| `risk_provenance` | End-of-section provenance: say whether the supplied assessment was reused, identify its original assessor when known, and link its source when one exists. Then show assessed head, base, and merge-base using short-label/full-SHA commit links. Preserve the supplied assessment's exact commits independently of current review commits. Omit reuse wording for a new assessment. |
+| `risk_summary` | Risk rationale, exposure, and uncertainty under Supplied risk report, including any unresolved contradiction. |
+| `risk_reuse_note` | Optional "Reused assessment by [original assessor]" with a source link when available; empty for a new assessment. |
+| `risk_head_sha`, `risk_base_sha`, `risk_merge_base_sha` | Full assessed commits from the supplied report, unchanged through revalidation. |
+| `*_short`, `git_host`, `owner_repo` | Unique 12-character SHA prefixes (longer if necessary); verified GitHub hostname and canonical `OWNER/REPO`. |
 | `changed_lines` | Current reviewed diff additions plus deletions, including generated files and tests. These mechanical counts may differ from the risk report's assessed snapshot; they do not create a new risk assessment. |
 | `additions`, `deletions` | Added and deleted line counts for the reviewed diff. |
 | `validation_summary` | Evidence and material gaps; identify revalidation when applicable. Follow the existing scope, evidence and review-assessment directions. |
-| `head_commit_link` | Short-label/full-SHA link to the exact head covered by the review or current-head revalidation. |
-| `base_ref`, `base_commit_link` | The actual reviewed base branch and short-label/full-SHA link to its verified commit, as required in Scope and evidence; use the prerequisite branch when it is the PR's actual base. |
+| `head_sha` | Full head commit covered by the review or current-head revalidation. |
+| `base_ref`, `base_sha` | Actual reviewed base branch and full verified commit; use the prerequisite branch when it is the PR's actual base. |
 
 Use the active reviewer's exact attribution for new reviews. When updating an owned review, the attribution must accurately identify who performed the work supporting the resulting review: preserve truthful prior coverage attribution and identify the current reviewer for revalidation when the tiers differ. Do not relabel a reused historical review as a different reviewer. Do not invent reviewer identity claims or add execution-configuration disclaimers. The caller is responsible for verifying and supplying the attribution. No required hidden marker/schema. COMMENT does not replace GitHub-required APPROVE.
 
