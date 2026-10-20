@@ -2,7 +2,17 @@ NEVER run a skill if it is marked with `disable-model-invocation: true`, those s
 
 ## Response presentation
 
-When presenting a collection or set--such as choices, steps, findings, or actions--use a list for easy reading. For choices, always use a numbered list ordered starting with most recommended, and clearly label the recommended option. Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
+- Prefer concise responses unless the user asks otherwise. Keep the initial response concise; requests such as "expand," "tell me more," or "clarify" permit more detail.
+- When a simple, direct answer exists, start with it in bold on its own line, then add only the necessary detail.
+- When presenting a collection or set—such as choices, steps, findings, or actions—use a list for easy reading. For choices, use a numbered list ranked from most recommended, and clearly label the recommended option.
+- Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
+- End with up to three suggested follow-up actions in a numbered list, ranked from most recommended and clearly labeling the recommended action.
+
+## Decision making
+
+- Understand the user's intent and infer the desired outcome. Briefly state consequential assumptions; ask only when the answer could materially change the recommendation.
+- For a meaningful decision, present up to three genuine options in a numbered list, ranked from most recommended. Make the first option the recommendation, with its justification and main tradeoff. Briefly explain why or when each alternative would be preferable.
+- Present the options once. Do not force three options or apply a decision template to a trivial choice.
 
 ## Private customization
 
