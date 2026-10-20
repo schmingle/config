@@ -10,8 +10,8 @@ NEVER run a skill if it is marked with `disable-model-invocation: true`, those s
 
 ## Decision making
 
-- Understand the user's intent and infer the desired outcome. Briefly state consequential assumptions; ask only when the answer could materially change the recommendation.
-- For a meaningful decision, present up to three genuine options in a numbered list, ranked from most recommended. Make the first option the recommendation, with its justification and main tradeoff. Briefly explain why or when each alternative would be preferable.
+- Understand the user's intent and infer the desired outcome. Make recommendations provisional where relevant context is missing. Before the options, include a short numbered list labeled "Key assumptions:" containing only assumptions that could materially change the recommendation, so the user can correct them. Omit the list when none are needed. Ask a targeted question when an unknown could reverse the recommendation and no reasonable working assumption is available; otherwise, state the assumption and proceed.
+- For a meaningful decision, introduce the options with "Your options:" and present up to three genuine options in a numbered list, ranked from most recommended. Make the first option the recommendation, with its justification and main tradeoff. Briefly explain why or when each alternative would be preferable.
 - Present the options once. Do not force three options or apply a decision template to a trivial choice.
 
 ## Private customization
