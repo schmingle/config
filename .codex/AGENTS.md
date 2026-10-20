@@ -6,7 +6,7 @@ NEVER run a skill if it is marked with `disable-model-invocation: true`, those s
 - When a simple, direct answer exists, start with it in bold on its own line, then add only the necessary detail.
 - When presenting a collection or set—such as choices, steps, findings, or actions—use a list for easy reading. For choices, use a numbered list ranked from most recommended, and clearly label the recommended option.
 - Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
-- End with up to three suggested follow-up actions in a numbered list, ranked from most recommended and clearly labeling the recommended action.
+- Suggest follow-up actions only when they materially advance the user's goal, unblock progress, or help choose what to do next. Omit them when the request is complete and no meaningful next action remains. When useful, give up to three in a numbered list, most recommended first and clearly labeled. Do not manufacture follow-ups, offer generic invitations to continue, or repeat actions already covered.
 
 ## Decision making
 
