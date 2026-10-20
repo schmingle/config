@@ -1,5 +1,5 @@
 name = "delegate-high"
-description = "Use for difficult, sensitive, or critical work after an initial delegate-medium attempt. Use the dedicated PR specialists for PR review and queue repair work."
+description = "Use directly for substantial design decisions, ambiguous investigations, complex implementation, independent critiques, or difficult, sensitive, or critical work. No prior delegate-medium attempt is required. Use the dedicated PR specialists for PR review and queue repair work."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "low"
 

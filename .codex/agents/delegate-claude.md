@@ -23,7 +23,8 @@ Save a JSON assignment outside the checkout and public configuration repository:
 - `owned_paths`: an array of files or modules Claude may edit; use an empty array
   for analysis-only tasks.
 - `constraints`, `approvals`, `sources`, and `verification`: string arrays.
-  Include the prior medium attempt's findings and remaining question in sources.
+  When a prior attempt exists, include its useful findings and remaining question
+  in sources; a prior attempt is not required.
   Record actual approvals and prohibitions without inventing authorization.
 - Optional `finish_by`: an ISO 8601 absolute deadline with timezone.
 
