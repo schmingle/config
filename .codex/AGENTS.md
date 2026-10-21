@@ -94,15 +94,19 @@ For delegated and direct writing, resolve the private canonical guide using [the
 Use Linear as the durable home for work so the user can switch priorities and resume without reconstructing Codex conversations.
 
 **Build a rounded picture of priorities.** Use enough current context to understand
-what matters and what needs the user's involvement. Signals may include ownership,
-Linear settings, recent work, communications, commitments, dependencies, and human
-direction; these are examples, not a mandatory checklist. Investigate gaps that
-could materially change the answer, then stop.
+what matters and what needs the user's involvement. Signals may include Linear
+settings, **Codex task activity and conversations**, other recent work,
+communications, ownership, commitments, dependencies, and human direction. These
+are examples, not a mandatory checklist. Investigate gaps that could materially
+change the answer, then stop.
 
-Separate **needs your attention or hands** from **important but delegated or
-monitored**. State the user's concrete next action in the first group and the
-execution owner in the second. Importance, ownership, and activity alone do not
-establish a need for attention.
+Separate **actively driving or needing attention** from **important but not
+actively involved**. Judge involvement from ongoing behavior and commitments,
+including decisions, supervision, and follow-through—not just ownership or
+unanswered blockers. Delegating implementation does not delegate the user's
+attention. Keep work active while the user remains in the driver's seat, even
+between decisions. For active work, state their current role and next action when
+one exists; for monitored work, identify the execution owner.
 
 Explain the ranking's main basis. Surface conflicting or stale signals and solicit
 targeted input, offering a provisional ranking when useful. Don't silently
