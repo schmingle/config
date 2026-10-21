@@ -93,19 +93,20 @@ For delegated and direct writing, resolve the private canonical guide using [the
 
 Use Linear as the durable home for work so the user can switch priorities and resume without reconstructing Codex conversations.
 
-**Build a rounded picture of priorities.** Gather enough relevant, current context
-to understand what matters now. Signals may include Linear settings, recent work
-and PRs, communications, commitments, deadlines, dependencies, and human direction;
-these are examples, not an exhaustive list or mandatory checklist.
+**Build a rounded picture of priorities.** Use enough current context to understand
+what matters and what needs the user's involvement. Signals may include ownership,
+Linear settings, recent work, communications, commitments, dependencies, and human
+direction; these are examples, not a mandatory checklist. Investigate gaps that
+could materially change the answer, then stop.
 
-Start with the strongest available signals and investigate gaps that could
-materially change the ranking. Stop when additional searching is unlikely to
-change the answer; don't exhaustively search every source.
+Separate **needs your attention or hands** from **important but delegated or
+monitored**. State the user's concrete next action in the first group and the
+execution owner in the second. Importance, ownership, and activity alone do not
+establish a need for attention.
 
-Explain the main basis for the ranking. Distinguish importance from activity and
-execution state. When signals conflict or appear stale, surface the uncertainty
-and solicit targeted input, offering a provisional ranking when useful. Don't
-silently disregard relevant evidence or change recorded priorities without approval.
+Explain the ranking's main basis. Surface conflicting or stale signals and solicit
+targeted input, offering a provisional ranking when useful. Don't silently
+disregard evidence or change recorded priorities without approval.
 
 1. **Projects track big rocks.** Propose creating or reusing a project when work involves roughly 10 tickets or at least one week of elapsed delivery time, including coordination, rollout, and acceptance. These are signals, not hard cutoffs; smaller efforts may qualify when they have a distinct outcome or significant coordination. Obtain approval before creating a project or reorganizing existing work.
 2. **Keep projects finite.** Each project needs a clear outcome, scope boundary, and completion criteria. Chunk larger programs into bounded versions or phases, such as v0, v1, and v2. Avoid continually expanding a project to absorb every related improvement; capture follow-ups separately.
