@@ -15,25 +15,16 @@ of a particular ticket now, or promise a background follow-up.
 
 ## Private workflow settings
 
-Before accessing the queue, read `~/.codex/private/linear-ticket-workflows.json`.
-It must supply `team` (the exact Linear team key), `repository` (the GitHub
-`owner/repository`), `triageCreatorEmails` (the nonempty exact creator allowlist),
-`maxEstimate` (the numeric upper bound), and `mediumEstimateLabel` (the scale label
-used as Medium below). Resolve these values from that private file only; never
-copy them into this skill or public configuration. Verify the intended authenticated
-Linear workspace, team/estimate scale, and repository against those settings.
-If the file or any required value is missing, invalid, or cannot be verified,
-stop before ticket mutations and report the configuration blocker. Never guess
-settings, substitute the current repository/team, or broaden queue filters.
+Reuse the private settings, fetched listing metadata, and remaining cursors from
+[lightweight discovery](../SKILL.md#lightweight-discovery). Resume each listing
+without refetching its completed pages. Verify the intended repository against the
+private settings before repository access. Never guess missing settings, substitute
+the current repository/team, or broaden queue filters.
 
 ## Identity and authorization
 
-Resolve the current user through the authenticated Linear connector's current-user
-lookup (`get_user` with `query: "me"`, or the equivalent available tool). Alternatively, resolve an explicit Linear identity or reuse an identity
-already explicitly confirmed in this conversation. Use the resulting Linear user
-ID for assignee, creator, and estimate-history comparisons. Never infer identity
-from the OS account, Git, repository history, or an unrelated conversation.
-Ask for identity only when it cannot be resolved unambiguously.
+Reuse discovery's verified authenticated Linear identity. Use its user ID for
+assignee, creator, and estimate-history comparisons; never infer a missing identity.
 
 The combined invocation authorizes normal Linear comments, assignment, estimate,
 and status changes in this triage pass. Only the build pass may implement or
@@ -76,11 +67,13 @@ implemented or consumes build's applied-reply watermark.
 
 ## Candidates
 
-Use listing metadata and checkpoint hints to rank likely actionable or due
-prior workflow work first, newest `updatedAt` first within that tier; then rank
-new candidates by newest `updatedAt`. Paginate listing pages until 10 candidate
-issues have been fully screened or the eligible listing set is exhausted. Do
-not read full issue/comment/PR detail for more than 10 candidates. Paginate
+Use the discovery metadata and optional checkpoint hints to rank likely actionable
+or due prior workflow work first, newest `updatedAt` first within that tier; then
+rank new candidates by newest `updatedAt`. Continue the independent discovery
+listings as needed, including both new and possible prior work. Stop after fully
+screening 10 candidate issues or exhausting both listings and their collected
+candidates. An unfinished listing cannot establish that no candidates remain.
+Do not read full issue/comment/PR detail for more than 10 candidates. Paginate
 comments and relations for each screened issue before deciding suitability or
 whether feedback is new. A parent whose detailed discussion is read to gate a
 child counts as one of the 10 distinct screened issues:

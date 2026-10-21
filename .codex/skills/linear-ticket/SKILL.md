@@ -12,17 +12,61 @@ disable-model-invocation: true
 # Linear Ticket Workflow
 
 Run only when explicitly invoked by the user or an existing user-authorized
-automation. Read the [triage pass](references/triage.md) and
-[build pass](references/build.md) contracts before acting. Use the private
-workflow settings, authenticated Linear identity, and repository checks they
-require. Honor an explicit read-only or dry-run request across both passes.
-Use triage’s [work routing](references/triage.md#work-routing) for new and resumed
-work; this workflow does not execute projects.
+automation. Honor an explicit read-only or dry-run request throughout. This
+workflow does not execute projects.
 
-Run both passes in order on each invocation:
+## Lightweight discovery
+
+Before loading either detailed pass, read
+`~/.codex/private/linear-ticket-workflows.json`. Require `team` (exact Linear team
+key), `repository` (GitHub `owner/repository`), `triageCreatorEmails` (nonempty exact
+creator allowlist), `maxEstimate` (numeric upper bound), and `mediumEstimateLabel`
+(the scale label used as Medium). Keep these values private. Verify the intended
+authenticated Linear workspace, team, statuses, and estimate scale against the
+settings. Resolve the current Linear user through the authenticated connector's
+current-user lookup (`get_user` with `query: "me"`, or equivalent), or reuse an
+explicitly confirmed Linear identity from this conversation. Never infer identity
+or settings from the OS, Git, unrelated history, or the current repository.
+Missing, invalid, ambiguous, or unverifiable configuration/access is a blocker;
+report it, never treat it as an empty queue or broaden the configured team.
+
+List issue metadata in the configured team for **both** sets:
+
+- New work: Triage or Backlog, unassigned or assigned to the current user.
+- Possible prior work: Todo, In Progress, or In Review, unassigned or assigned to
+  the current user. This is a conservative superset; assignment/status does not
+  establish workflow provenance or final eligibility.
+
+Use supported server-side team, status, and assignee filters, separate queries
+when needed, and request only IDs/identifiers/URLs, status, assignee, creator,
+estimate, parent ID, and `updatedAt` where field selection is supported. If a
+filter is unsupported, filter the metadata locally without narrowing coverage.
+Keep each listing's pagination independent and deduplicate by issue ID. As soon
+as metadata yields a possible candidate, proceed to the detailed passes with the
+fetched metadata and remaining cursors; do not exhaust listings first.
+Do not filter by recent activity, unchanged `updatedAt`, or presumed provenance:
+pending unapplied replies, elapsed 48-hour deadlines, and interrupted builds can
+remain actionable without an issue metadata change. Defer creator exceptions,
+parent/leaf checks, and other detailed eligibility gates to triage.
+
+Only after exhausting both listing sets without possible candidates, report that
+no action is due and stop. Do not load pass references, full issues, comments,
+PRs, repositories, broader context, checkpoints or automation memory; do not
+write, spawn agents, or start a build. Failed queries or unverifiable coverage
+are blockers; unfinished listings never prove an empty queue.
+
+Otherwise, read the [triage pass](references/triage.md) and
+[build pass](references/build.md), verify the configured repository as they
+require, and reuse the metadata and listing cursors in triage. Apply all live
+provenance, ownership, eligibility, and [work-routing](references/triage.md#work-routing)
+gates; discovery alone authorizes no disposition or build.
+
+## Detailed passes
+
+Run both passes in order after discovery finds possible candidates:
 
 1. **Triage:** Use listing metadata and checkpoint hints to rank likely
-   actionable/due prior work and new candidates. Paginate as needed, but fully
+   actionable/due prior work and new candidates. Fully
    screen at most **10 candidate issues** before choosing mutations. Oversized,
    held, blocked, unsuitable, and quiet outcomes still count among the 10.
    Rank and apply bounded dispositions to those screened tickets, then derive an
