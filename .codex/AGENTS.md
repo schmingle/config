@@ -93,6 +93,20 @@ For delegated and direct writing, resolve the private canonical guide using [the
 
 Use Linear as the durable home for work so the user can switch priorities and resume without reconstructing Codex conversations.
 
+**Build a rounded picture of priorities.** Gather enough relevant, current context
+to understand what matters now. Signals may include Linear settings, recent work
+and PRs, communications, commitments, deadlines, dependencies, and human direction;
+these are examples, not an exhaustive list or mandatory checklist.
+
+Start with the strongest available signals and investigate gaps that could
+materially change the ranking. Stop when additional searching is unlikely to
+change the answer; don't exhaustively search every source.
+
+Explain the main basis for the ranking. Distinguish importance from activity and
+execution state. When signals conflict or appear stale, surface the uncertainty
+and solicit targeted input, offering a provisional ranking when useful. Don't
+silently disregard relevant evidence or change recorded priorities without approval.
+
 1. **Projects track big rocks.** Propose creating or reusing a project when work involves roughly 10 tickets or at least one week of elapsed delivery time, including coordination, rollout, and acceptance. These are signals, not hard cutoffs; smaller efforts may qualify when they have a distinct outcome or significant coordination. Obtain approval before creating a project or reorganizing existing work.
 2. **Keep projects finite.** Each project needs a clear outcome, scope boundary, and completion criteria. Chunk larger programs into bounded versions or phases, such as v0, v1, and v2. Avoid continually expanding a project to absorb every related improvement; capture follow-ups separately.
 3. **Labels track ongoing workstreams.** Use labels such as Foundation, Recruiting, Security, and Ops for continuing categories of work. Tickets can carry these labels without belonging to a project. Use a project when a finite initiative emerges within a workstream.
