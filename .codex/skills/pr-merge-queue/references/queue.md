@@ -66,6 +66,13 @@ Merge ASAP when: GitHub permits a normal merge; latest applicable independent re
 
 GitHub owns checks and branch protections. Do not independently require all checks passing or `mergeStateStatus=CLEAN`. `mergeable=MERGEABLE` confirms conflict-free computation, not permission to bypass protections. With our review/risk/ownership gates satisfied, use `gh pr merge NUMBER --repo HOST/OWNER/REPO --squash --match-head-commit SHA` normally. Never use `--admin` or `--auto`. Verify actual merged state and landing before counting. Diagnose definite rejection; retry only after relevant state changes. Reconcile ambiguous outcomes before further merges. Count=0 permits the preparation writes authorized above, but never a trial merge.
 
+Before squash merging, collect and deduplicate the `Co-authored-by` trailers
+from all commits in the PR at the verified head. Preserve them in the final squash
+message alongside its normal summary/body; pass the complete body with
+`--body-file` when supplying it to `gh pr merge`. Do not add Codex attribution
+merely for queue review, coordination, or merging. Verify the landed squash commit
+retains the trailers; report any loss without rewriting published history.
+
 Never merge into an unmerged parent. Stack only verified prerequisites, with actual ancestry and the correct GitHub base; keep independent siblings separate. After a parent lands, assign safe history-preserving reconciliation onto the live verified `DEFAULT_BRANCH`, verify remaining diff/base/ancestry, and refresh relevant review evidence. Missing intent or unsafe history changes hold that component, not other PRs.
 
 ## Reporting

@@ -198,6 +198,13 @@ personal data, public publication, or other external destinations. Actual runtim
 permissions, user restrictions, task action limits, and email/SMS/Slack approval gates
 still apply.
 
+## Commit attribution
+
+For commits you create containing work authored by Codex, append
+`Co-authored-by: Codex <codex@openai.com>` exactly once. Preserve the human author
+and existing co-author trailers. Reviewing or merging alone does not establish
+Codex co-authorship.
+
 ## PR independence and dependency stacking
 
 Avoid stacking by default. Create independent PRs from the repository's current default branch (`main` where applicable).
