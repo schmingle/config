@@ -1,5 +1,5 @@
 name = "delegate-low"
-description = "Use for bounded, verifiable mechanical work with an established approach. Use delegate-medium when implementation choices or investigation require judgment."
+description = "Use when the approach is established but the task requires navigating repository context and routine adaptations, such as following an existing pattern, updating callers, or fixing a diagnosed defect. Use delegate-basic for prescribed mechanical work and delegate-medium when investigation or implementation choices require judgment."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "low"
 

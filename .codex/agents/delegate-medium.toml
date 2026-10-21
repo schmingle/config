@@ -1,5 +1,5 @@
 name = "delegate-medium"
-description = "Default worker for implementation, debugging, refactoring, and investigation requiring judgment across related code. Use delegate-low for mechanical work; prefer delegate-high directly for substantial design decisions, ambiguous investigations, complex implementation, or independent critiques. No failed attempt is required."
+description = "Default worker for implementation, debugging, refactoring, and investigation requiring judgment across related code. Use delegate-basic for prescribed mechanical work and delegate-low for routine adaptations of an established approach; prefer delegate-high directly for substantial design decisions, ambiguous investigations, complex implementation, or independent critiques. No failed attempt is required."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "high"
 
