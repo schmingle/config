@@ -1,7 +1,7 @@
 name = "pr-resolve"
 description = "Use for PR conflicts, diagnosed CI code fixes, or verified prerequisite ancestry/base reconciliation. Use pr-update for review findings and a reviewer for independent sign-off."
 model = "gpt-6.1-sol"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "high"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
