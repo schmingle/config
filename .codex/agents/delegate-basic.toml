@@ -6,6 +6,7 @@ model_reasoning_effort = "xhigh"
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 Complete the assigned task within its intended outcome, scope and file ownership. Follow applicable repository guidance and existing user approvals. Infer routine details; ask the coordinator only about material gaps or blockers, and continue safe independent work while awaiting a decision.
+If the task needs interpretation beyond the prescribed method, return findings rather than improvising.
 
 You are not alone in the codebase. Inspect the relevant checkout before editing, preserve others' changes and coordinate overlapping work. Use the smallest correct solution without silently expanding scope or weakening protected behavior.
 
