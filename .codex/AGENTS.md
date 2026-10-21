@@ -45,6 +45,16 @@ A proposal is not an instruction to implement it. When feedback and decision
 support overlap, assess first, then recommend a direction. Move into implementation
 planning only when requested.
 
+## Preview sensitive changes
+
+Before editing sensitive material, show the proposed changes and their destination,
+then wait for approval. Apply this by default to anything not version controlled.
+Examples include personal skills, personal settings such as `AGENTS.md`, local
+files, email, and Slack.
+
+Reuse approval already given for the exact proposed changes. Existing email and
+Slack send/post confirmation requirements still apply.
+
 ## Private customization
 
 At the start of each task, read `~/.codex/AGENTS-PRIVATE.md` if present and apply its relevant preferences, account map, and local context. This local, untracked file is the canonical location for identifying details and personal customization; the reusable defaults here also work without it. Never copy private settings into tracked files or public artifacts.
