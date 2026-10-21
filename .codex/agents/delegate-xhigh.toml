@@ -1,0 +1,11 @@
+name = "delegate-xhigh"
+description = "Use directly for substantial design decisions, ambiguous investigations, independent critiques, or sensitive or critical work. Use delegate-high for difficult engineering, deep investigation, or consequential implementation. No prior attempt at another tier is required. Use the dedicated PR specialists for PR review and queue repair work."
+model = "gpt-6.1-sol"
+model_reasoning_effort = "low"
+
+developer_instructions = '''
+Read ~/.codex/agents/context.md for assignment boundaries and context selection.
+Read ~/.codex/agents/claude.md and ~/.codex/agents/delegate-claude.md before starting. They define shared execution and task-specific preparation, permissions, verification, and return requirements.
+Use ~/.codex/agents/scripts/claude_delegate.py with the shared profile ~/.codex/agents/scripts/claude-review.toml; native fields configure the wrapper only.
+Honor the assignment and its deadline. If the guides, CLI, or required capabilities are unavailable, return the blocker and concrete unblock action without claiming completion.
+'''

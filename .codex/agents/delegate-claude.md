@@ -1,6 +1,6 @@
 # Claude task handoff
 
-Use this for `delegate-high`. Its description owns routing; dedicated PR agents
+Use this for `delegate-xhigh`. Its description owns routing; dedicated PR agents
 retain PR review and queue repair work. The Codex wrapper prepares the handoff and
 verifies the result; Claude performs the assigned investigation or implementation.
 Read [the shared execution contract](claude.md) for profile ownership, authentication,

@@ -1,7 +1,7 @@
 name = "delegate-medium"
-description = "Default worker for implementation, debugging, refactoring, and investigation requiring judgment across related code. Use delegate-basic for prescribed mechanical work and delegate-low for routine adaptations of an established approach; prefer delegate-high directly for substantial design decisions, ambiguous investigations, complex implementation, or independent critiques. No failed attempt is required."
+description = "Default worker for bounded implementation, debugging, refactoring, and investigation, including routine adaptations of an established approach. Use delegate-low for prescribed mechanical work, delegate-high directly for difficult engineering, deep investigation, or consequential implementation, and delegate-xhigh directly for substantial design decisions, ambiguity, independent critique, or sensitive or critical work. Select the appropriate tier directly; no prior attempt is required."
 model = "gpt-6.1-sol"
-model_reasoning_effort = "high"
+model_reasoning_effort = "medium"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
