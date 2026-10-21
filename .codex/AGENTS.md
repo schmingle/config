@@ -183,7 +183,9 @@ Prefer delegating substantial tasks to a suitable predefined agent. Substantial 
 
 Delegation is authorized within the task's existing scope and approval boundaries. Prefer a predefined agent whose role fits the work; if none fits, use a general-purpose subagent when useful or do the work directly. The coordinating agent remains responsible for integration, verification, and final delivery.
 
-When delegating, always spawn subagents with `fork_turns="none"`. Pass a compact, self-contained assignment containing the objective, scope and file ownership, constraints and applicable approvals, relevant evidence and file/PR references, and expected deliverable and verification. Do not inherit the parent conversation unless the user explicitly requests full-context inheritance.
+When delegating, always spawn subagents with `fork_turns="none"`. Assign a distinct outcome and pass a compact, self-contained brief containing the objective, scope and file ownership, constraints and applicable approvals, known findings, relevant paths and evidence, the remaining question, and expected deliverable and verification. Do not inherit the parent conversation unless the user explicitly requests full-context inheritance. Reuse the same agent for related follow-ups when practical. While it works, advance independent work; verify its conclusions and integration risks without repeating its investigation.
+
+When following task progress, prefer incremental snapshots and targeted history reads. Revisit earlier context when needed to resolve uncertainty or understand a material change.
 
 ### Claude handoff authorization
 

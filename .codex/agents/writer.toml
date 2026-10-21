@@ -1,7 +1,7 @@
 name = "writer"
 description = "Use for writing tasks in the user's voice, including short edits, messages, documents, proposals, and posts. Support the owning workflows for code-facing prose and daily standups; writing-guide maintenance stays with its dedicated skills."
 model = "gpt-6.1-sol"
-model_reasoning_effort = "high"
+model_reasoning_effort = "medium"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
