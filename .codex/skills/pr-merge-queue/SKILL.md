@@ -15,11 +15,12 @@ Every manual or scheduled run must end with a concise, user-visible final reply,
 After parameter validation and recording the invocation start below, but before
 GitHub discovery, loading specialists, dispatching work, or making queue changes,
 use native task tools (`list_threads` and targeted `read_thread` as needed) to
-identify this invocation’s chat ID, execution
-host, and **current live title**, then list chats and inspect their live execution
-status. Resolve the current ID from trusted invocation/runtime context; never
-identify this chat by title alone. Include both pinned and unpinned results,
-across available hosts, with enough coverage to find all exact-title matches.
+identify this invocation’s chat ID, execution host, and **current live title**,
+then list chats and inspect their live execution status. Resolve the current ID from trusted invocation/runtime context; never
+identify this chat by title alone. Call `list_threads` with `limit=50` (the
+supported maximum) and inspect both pinned and unpinned results across available
+hosts. Recheck known same-title peers from this invocation’s native task context
+with targeted `read_thread` calls when they are absent from the listing.
 Do not hardcode a title such as "PR merge queue": use the invoking chat's title
 so the guard follows future renames. Exclude this chat by identity, not by name.
 
@@ -31,16 +32,22 @@ avoid concurrent runs and made no PR changes. Idle, completed, archived, or
 not-loaded chats are not actively running merely because their titles match;
 use the native execution status, not recency or an old automation-memory entry.
 
-If this chat's identity/title, a relevant peer's execution status, or listing
-coverage cannot be verified (including an unavailable host), stop and report that
-the concurrency check could not be completed; do not assume no other run exists.
+If this chat’s identity/title cannot be verified, the native listing fails, or a
+known same-title peer’s live execution status cannot be verified, stop and report
+the specific concurrency-check failure. A successful listing containing 50 chats,
+without pagination or a completeness indicator, is **not** a failure and does not
+by itself block the run. Do not request unsupported larger limits or require an
+exhaustive chat inventory. When visible and known peers show no active match,
+continue; note capped coverage or unavailable hosts briefly in the final report
+without claiming that no other run exists globally.
 Recheck immediately before first specialist dispatch or queue mutation if that
 boundary follows the initial check, using the current title and live statuses.
 If a same-title peer has become active, stop new work and settle any already
 started work under the workflow's existing stopping rules before the final reply.
 Use native inspection only; do not introduce persistent locks, registries, or
 custom concurrency scripts. This guard detects observed concurrent chats; native
-listing and dispatch are not an atomic lock.
+listing and dispatch are not an atomic lock, and capped visibility may miss
+peers outside the returned results.
 
 ## Lightweight discovery
 
