@@ -80,6 +80,8 @@ The explicit local-only exception is `.codex/AGENTS-PRIVATE.md`, which holds pri
 preferences, identifying details, and account context. Keep it gitignored and
 untracked; never force-add it, copy its contents into tracked files, or include it
 in public artifacts. Its installed path is `~/.codex/AGENTS-PRIVATE.md`, symlinked to the ignored file.
+`.claude/CLAUDE-PRIVATE.md` is the same kind of local-only file for Claude Code (installed as
+`~/.claude/CLAUDE-PRIVATE.md`): keep it ignored and untracked under the same rules.
 
 ## Before staging, committing, or pushing
 

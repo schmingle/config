@@ -18,7 +18,7 @@ PRIVATE_DIRS = {
     'archived_sessions', 'benchmark-evidence', 'benchmark_evidence',
 }
 PRIVATE_FILES = {
-    'agents-private.md', 'auth.json', 'history.jsonl', 'history.ndjson',
+    'agents-private.md', 'claude-private.md', 'auth.json', 'history.jsonl', 'history.ndjson',
     'credentials.json', 'credentials', '.ds_store', '.env', '.netrc',
     'cookies.txt', 'cookies.json',
 }

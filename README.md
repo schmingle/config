@@ -15,6 +15,10 @@ folders to these tracked paths to edit the same files from either location. Back
 existing files and folders before linking.
 Other local Codex settings are not included.
 
+The Claude Code counterpart is the gitignored `.claude/CLAUDE-PRIVATE.md`, installed
+as `~/.claude/CLAUDE-PRIVATE.md` and read by `.claude/CLAUDE.md`. Create it the same
+way (`chmod 600`, symlink); never commit it.
+
 `.claude/` follows the same rules for `~/.claude/`: symlink or copy the `agents`,
 `agent-guides`, `skills`, and `bin` folders from the tracked paths after backing up
 existing files. Its definitions reference `~/.claude/` paths. Claude Code settings,

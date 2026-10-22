@@ -57,7 +57,7 @@ Slack send/post confirmation requirements still apply.
 
 ## Private customization
 
-At the start of each task, read `~/.codex/AGENTS-PRIVATE.md` if present and apply its relevant preferences, account map, and local context. This local, untracked file is the canonical location for identifying details and personal customization; the reusable defaults here also work without it. Never copy private settings into tracked files or public artifacts.
+At the start of each task, read `~/.claude/CLAUDE-PRIVATE.md` if present and apply its relevant preferences, account map, and local context. This local, untracked file is the canonical location for identifying details and personal customization; the reusable defaults here also work without it. Never copy private settings into tracked files or public artifacts.
 
 ## Tools
 

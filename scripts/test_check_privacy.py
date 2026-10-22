@@ -98,8 +98,8 @@ class PublicationTests(unittest.TestCase):
         self.assert_blocked(self.check('--pre-push', input=update), 'private/local-only filename')
 
     def test_forced_private_file_and_nested_runtime_paths(self):
-        self.write('.gitignore', 'AGENTS-PRIVATE.md\n')
-        for name in ('AGENTS-PRIVATE.md', 'nested/AGENTS-PRIVATE.md', 'nested/.codex/sessions/run.json',
+        self.write('.gitignore', 'AGENTS-PRIVATE.md\nCLAUDE-PRIVATE.md\n')
+        for name in ('AGENTS-PRIVATE.md', 'CLAUDE-PRIVATE.md', 'nested/AGENTS-PRIVATE.md', 'nested/.codex/sessions/run.json',
                      'nested/memories/private.md', 'nested/auth.json', '.codex/config.toml',
                      '.codex/private/account-context.md', 'nested/private/local.md'):
             with self.subTest(name=name):
