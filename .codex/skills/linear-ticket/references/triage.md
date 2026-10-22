@@ -48,9 +48,12 @@ allowlist or verified parent-selected direct child exception below. Require an
 existing plan and source evidence establishing
 this workflow's bounded scope, verified ownership, and estimate; assignment or
 status alone is not eligibility. Reapply [work routing](#work-routing) after
-checking ownership, including to resumed work. Re-fetch replies, edits, blockers,
-and observed PR state. Prefer a new actionable answer, scope change, newly due 48-hour
-follow-up, or verified interrupted In Progress build. When an update
+checking ownership, including to resumed work. Apply the
+[directed-ownership rule](#ownership-gate), including relevant Slack decisions;
+refresh relevant source evidence before a continuation write. Re-fetch replies,
+edits, blockers, and observed PR state. Prefer a new actionable answer, scope
+change, newly due 48-hour follow-up, or verified interrupted In Progress build.
+When an update
 is needed, record only the material decision and next action in a concise Linear
 handoff; keep assessment bookkeeping in the private checkpoint below.
 Do not change the code, PR, readiness, review requests, or existing issue status
@@ -108,15 +111,40 @@ ownership gate. The assignee filter above always applies:
 assignment to another engineer excludes the issue even when stale or a takeover
 is offered.
 
-Read all comments, replies, and available linked-PR conversation, code activity,
-and reviews. Identify another engineer's actual participation using available
-people/role context; a mention, bot comment, or configured-team membership alone
-does not establish engineer participation. If participant identity, discussion coverage,
-or activity cannot be established reliably, skip with the reason.
+For a screened candidate that might be claimed, search the intended Slack
+workspace by exact issue identifier or URL and read relevant human discussion
+and linked threads for ownership, current work, and handoffs before normal
+triage mutations or handoff preparation. Keep this within the screened-candidate
+cap; do not search tickets already excluded by metadata gates. Reuse verified
+source context from this invocation, refreshing it before a write when ownership
+may have changed. If required Slack evidence cannot be checked reliably, skip
+the affected candidate and report the limitation. Finding no discussion does not
+itself establish that work is available.
+
+Read all issue comments, replies, relevant Slack threads, and available linked-PR
+conversation, code activity, and reviews. Treat explicit assignments, handoffs,
+or requests directing another person to investigate or implement as ownership
+evidence, even when the native assignee is empty or the recipient has not replied.
+Distinguish directed responsibility from incidental mentions. Follow the latest
+authoritative ownership decision; skip if conflicting directions cannot be
+resolved. Work directed to someone else is a quiet exclusion: do not claim it,
+change fields, prepare another handoff, or post a takeover question merely because
+it is unassigned, unanswered, or old. Only a subsequent explicit handoff to the
+current user can supersede that direction, subject to the assignee filter and
+other eligibility gates. Apply this directed-ownership rule to prior-work
+continuations too.
+
+Otherwise, identify another engineer's actual participation using available
+people/role context; an incidental mention, bot comment, or configured-team
+membership alone does not establish participation. If participant identity,
+discussion coverage, or activity cannot be established reliably, skip with the
+reason. Retain the participation and stale-takeover rules below for work without
+an outstanding direction to someone else.
 
 Use server timestamps and a current evaluation time. Latest activity is the
-maximum of issue `createdAt`/`updatedAt`, every comment/reply's creation/update,
-and available linked-PR conversation, code, and review timestamps. **Active** means
+maximum of issue `createdAt`/`updatedAt`, every issue comment/reply's
+creation/update, relevant Slack message/reply creation/edit timestamps, and
+available linked-PR conversation, code, and review timestamps. **Active** means
 any activity at or after `now - 7 * 24 hours`, including the cutoff; **stale** means
 all activity is older. Count activity from anyone, including bots and people who
 are not engineers; engineer participation and activity recency are separate checks.

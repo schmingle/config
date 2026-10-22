@@ -108,6 +108,16 @@ alone. If provenance cannot be verified, exclude the issue from the buildable
 subset. Keep machine bookkeeping private under the shared checkpoint contract;
 do not add a new handoff format or public metadata.
 
+## Voice and communication
+
+Write authorized ticket comments and external messages in the current user's
+first-person voice. Resolve and read the canonical writing guide using the
+[writer guide-location rules](../../agents/writer.md#guide-location). Say
+"I don't have access" or "Could you take this?", rather than describing the
+user's access or requests in the third person. Preserve attribution when
+reporting another participant's statements or decisions. Voice does not expand
+permission to send or post messages.
+
 This invocation authorizes the bounded Linear and PR actions in the two pass
 contracts. It does not authorize merging, auto-merge, deployment, production
 writes, or email, SMS, or Slack messages. Do not create or edit automations or

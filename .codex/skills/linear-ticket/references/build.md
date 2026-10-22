@@ -96,9 +96,12 @@ broad In Progress scan. Check linked PRs before
 starting; reuse the owning branches and PRs and never duplicate an implementation.
 Current eligibility, ownership holds, and the one-ticket build cap still apply.
 
-Ownership must be clear. Honor recorded ownership holds and takeover decisions.
-Do not reapply triage's other-engineer active-discussion gate to review feedback
-on an existing PR already owned by the current user.
+Ownership must remain clear. Recheck current assignments, directed ownership,
+holds, and authoritative handoffs using the relevant issue, Slack, and PR source
+evidence under triage's [ownership gate](triage.md#ownership-gate). Stop affected
+implementation if newer evidence directs the work elsewhere. Do not reapply
+triage's other-engineer participation veto to ordinary review feedback on an
+existing implementation PR already owned by the current user.
 
 Honor applicable `AGENTS.md` files and inspect relevant code, tests, schemas, and
 history. Run `nvm use` before checks. Confirm the estimate still fits, the work
