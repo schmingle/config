@@ -59,4 +59,4 @@ Gather the full range of work in the reporting window before choosing themes. Us
 - Check that the most prominent or worth-sharing themes lead, supported by evidence rather than activity counts.
 - Check the final structure: related outcome items should be visibly nested under shared themes. A flat list of all activity should be rare; reconsider shared objectives and initiatives before concluding every item is unrelated. Keep grouping meaningful rather than forcing arbitrary buckets.
 - Preserve uncertainty when evidence is incomplete.
-- Do not expose sensitive details from private notes, email, or Codex task history. Summarize at the appropriate audience level.
+- Do not expose sensitive details from private notes, email, or Codex chat history. Summarize at the appropriate audience level.

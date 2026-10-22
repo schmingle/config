@@ -34,7 +34,7 @@ For each sample include:
 
 - Stable sample ID and a short scenario label.
 - Provenance and review status, with date when known.
-- Direct source URL or local task ID and turn/time; label unavailable sources. No invented citations.
+- Direct source URL or local chat ID and turn/time; label unavailable sources. No invented citations.
 - Exact authored text in a blockquote or suitable literal block preserving paragraphs, punctuation, and emoji.
 - A short bullet list of traits observed in actual text or applied to generated candidates. Say which is which.
 - Material user corrections and why they mattered. Keep original and accepted revision distinguishable; avoid retaining needless drafts.

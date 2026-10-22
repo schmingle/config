@@ -8,6 +8,13 @@ NEVER run a skill if it is marked with `disable-model-invocation: true`, those s
 - Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
 - Suggest follow-up actions only when they materially advance the user's goal, unblock progress, or help choose what to do next. Omit them when the request is complete and no meaningful next action remains. When useful, give up to three in a numbered list, most recommended first and clearly labeled. Do not manufacture follow-ups, offer generic invitations to continue, or repeat actions already covered.
 
+## Codex terminology
+
+- **Chat** is the user-facing conversation; **thread** is the technical/API term for that container. Preserve actual tool names and fields such as `create_thread` and `threadId`.
+- **Task** means the work or assignment, not the chat containing it. Interpret older uses of "task" for a conversation from context; use "chat" in new prose.
+- **Automation** is a saved prompt and schedule; a **run** is one execution. A **turn** is a request and the agent work that follows within a chat.
+- **Agent** is the worker executing instructions; a **subagent** is a delegated worker spawned by the main agent. A standalone worker chat created with `create_thread` is a separate chat, not a subagent.
+
 ## Advice and assessment
 
 The top priority in advice is to help the user become better at the roles they
@@ -73,7 +80,7 @@ For 1Password (`op`), prefer the CLI for approved work. Check `op whoami` in the
 
 ## Repository isolation
 
-Use a dedicated Git worktree for repository work, including delegated agents and worker tasks. Authorized repository work includes routine fetching and creating isolated worktrees and task branches without separate conversational confirmation; follow native tool permissions and preserve existing work. Do not work in the base or a shared checkout when a worktree is possible. Verify the checkout before making repository changes. If a worktree cannot be used, clearly explain the specific blocker and any proposed fallback to the user before proceeding in the base checkout; never silently fall back.
+Use a dedicated Git worktree for repository work, including subagents and standalone worker chats. Authorized repository work includes routine fetching and creating isolated worktrees and task branches without separate conversational confirmation; follow native tool permissions and preserve existing work. Do not work in the base or a shared checkout when a worktree is possible. Verify the checkout before making repository changes. If a worktree cannot be used, clearly explain the specific blocker and any proposed fallback to the user before proceeding in the base checkout; never silently fall back.
 
 ## Work and personal accounts
 
@@ -95,7 +102,7 @@ Use Linear as the durable home for work so the user can switch priorities and re
 
 **Build a rounded picture of priorities.** Use enough current context to understand
 what matters and what needs the user's involvement. Signals may include Linear
-settings, **Codex task activity and conversations**, other recent work,
+settings, **Codex chat activity and conversations**, other recent work,
 communications, ownership, commitments, dependencies, and human direction. These
 are examples, not a mandatory checklist. Investigate gaps that could materially
 change the answer, then stop.
@@ -116,7 +123,7 @@ disregard evidence or change recorded priorities without approval.
 2. **Keep projects finite.** Each project needs a clear outcome, scope boundary, and completion criteria. Chunk larger programs into bounded versions or phases, such as v0, v1, and v2. Avoid continually expanding a project to absorb every related improvement; capture follow-ups separately.
 3. **Labels track ongoing workstreams.** Use labels such as Foundation, Recruiting, Security, and Ops for continuing categories of work. Tickets can carry these labels without belonging to a project. Use a project when a finite initiative emerges within a workstream.
 4. **Pins reflect current focus.** The user generally focuses on one or two big rocks at a time. Keep roughly two or three major priorities pinned in Codex; use Linear to track the rest. Do not change pins without a request.
-5. **Make switching easy.** Keep each project's current state, next action, blockers, consequential decisions, and important links easy to find. A fresh Codex chat should be able to recover the project contract and work evidence from Linear; workflow runtime state may live in native tasks and automations.
+5. **Make switching easy.** Keep each project's current state, next action, blockers, consequential decisions, and important links easy to find. A fresh Codex chat should be able to recover the project contract and work evidence from Linear; workflow runtime state may live in native chats and automations.
 6. **Maintain state; preserve the approved plan.** Follow the shared [plan and state permissions](skills/project-init/references/project-contract.md#plan-and-state-permissions): agents may reconcile verified statuses, PR links, evidence, and observed blockers; changes to the approved project contract or ticket specifications require human approval. Reuse concrete approvals already given. Prefer native fields and integrations, reserving comments for significant outcomes, exceptions, or decisions needing attention. Distinguish implementation, deployment, and operational acceptance; never infer human acceptance from implementation progress. Unchanged records need no writes. Project posts follow the [status update policy](#project-status-updates).
 7. **Keep shared status updates quick to read.** Follow the project status update policy below for project posts. For other external status updates, aim for a five-second scan and at most 30 seconds to read, leading with the outcome, blocker, or next action and linking supporting detail. These limits do not apply to useful supervisor own-chat replies or worker own-chat execution reports, which may be detailed when useful, or to project contracts, ticket specifications, and PR descriptions requiring sufficient context.
 8. **Reference tickets by ID.** Include the actual ticket identifier whenever mentioning a ticket, optionally followed by its short title, so Linear can link it automatically. In chat and other formats, link the identifier to the known ticket URL when available; never invent identifiers or links.
@@ -135,7 +142,7 @@ Keep project management in Linear and maintained technical documentation beside 
 1. **Batch meaningful changes.** Publish routine project status updates at most once every two hours, measured from the last published project update, including exceptions. Count a later edit timestamp only when it represents a meaningful published revision. Post only meaningful accumulated changes to project progress, outlook, or next action; unchanged runs skip posting even after two hours. Do not bypass this cadence by editing an existing status update or substituting project comments.
 2. **Keep exceptions narrow.** Only a genuinely urgent project risk or verified project completion may justify an immediate post. Do not repeat unchanged exceptions. Routine blockers, questions, pauses, stops, resumes, handoffs, worker dispatches, checkpoints, or individual PR/CI changes do not bypass the cadence. Surface needed human input immediately in the owning supervisor chat and, when the owning workflow permits, the relevant ticket without an extra project post.
 3. **Use a short summary and bullets.** Write one summary sentence and two to four useful bullets, usually under 100 words total. Cover the material outcome, blocker or decision, and next action as applicable. Link key tickets by actual ID, PRs, and evidence directly using verified URLs. Omit control metadata, exhaustive activity lists, and details already available in linked records.
-4. **Keep current state durable separately.** Update native tickets, fields, and links promptly as permitted by the owning workflow; these writes do not require a project status post or reset its publication window. Supervision runtime state belongs in native task history/automation records, not Linear progress records.
+4. **Keep current state durable separately.** Update native tickets, fields, and links promptly as permitted by the owning workflow; these writes do not require a project status post or reset its publication window. Supervision runtime state belongs in native chat history/automation records, not Linear progress records.
 
 ### Project descriptions
 

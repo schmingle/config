@@ -1,6 +1,6 @@
 ---
 name: gather-context
-description: Gather evidence of the user's work across connected sources and Codex tasks for a specified time frame, defaulting to the last 24 hours. Use for work-context collection or as input to summaries and reports.
+description: Gather evidence of the user's work across connected sources and Codex chats for a specified time frame, defaulting to the last 24 hours. Use for work-context collection or as input to summaries and reports.
 ---
 
 # Gather Context
@@ -12,11 +12,11 @@ Collect a deduplicated, source-backed account of the user's work for use directl
 Use this mode when a writing-guide caller explicitly asks for authored writing evidence. This specializes the general work-report output below; candidate-focused mode is for issue enrichment, not writing samples.
 
 - Use the caller's exact window, intended writer, source scope, and exclusions. Resolve the current user's identity from connected account evidence and the conversation; the user-specific defaults in ordinary work collection do not apply to this mode. If account ownership is ambiguous, ask before reading that account. Do not mix personal and work accounts without authorization.
-- Collect actual authored text across relevant channels: sent email bodies, authorized Slack messages, user-written documents or passages with established authorship, and the user's drafts, edits, and explicitly accepted writing in Codex tasks. Fetch enough surrounding context to identify audience, intent, and thread stage. Exclude other authors' quoted replies, signatures, boilerplate, and forwarded text from the user's sample.
+- Collect actual authored text across relevant channels: sent email bodies, authorized Slack messages, user-written documents or passages with established authorship, and the user's drafts, edits, and explicitly accepted writing in Codex chats. Fetch enough surrounding context to identify audience, intent, and thread stage. Exclude other authors' quoted replies, signatures, boilerplate, and forwarded text from the user's sample.
 - Calendar, Fathom, and generated meeting notes may explain context or help locate a source, but they are not authored writing samples. GitHub and Linear text can be included when relevant to the writer's requested channels; distinguish bot or AI-generated text from personal voice evidence. Presence in a document, account, or meeting is not proof of authorship.
 - Slack review still requires authorization in the current task. A caller may carry existing authorization forward, but may not invent it. If absent, omit Slack and report the gap while continuing other permitted sources.
 - Preserve exact wording, punctuation, line breaks, and emojis. Remove sensitive identifiers only when needed and label every redaction; retain a source pointer. Do not store credentials or unnecessary third-party private content.
-- Deduplicate copies and cross-posts. Return each sample's stable ID, exact text, author and attribution confidence, source URL or task ID plus turn, occurrence time, channel, audience/relationship, thread stage, inferred intent, and evidence status (user-authored, explicitly approved, provisional, or unapproved draft).
+- Deduplicate copies and cross-posts. Return each sample's stable ID, exact text, author and attribution confidence, source URL or chat ID plus turn, occurrence time, channel, audience/relationship, thread stage, inferred intent, and evidence status (user-authored, explicitly approved, provisional, or unapproved draft).
 - Report counts of unique observed samples by channel and intent, the exact window and timezone, reviewed/unavailable/excluded sources, pagination limits, and material uncertainty. These counts describe sampled usage, not exhaustive communication volume. Keep inferred traits separate from explicit user preferences.
 - Return the evidence packet to the writing-guide caller without generating a work summary or publishing anything. The caller handles synthesis, user review, guide persistence, and final rendering. Normal work and candidate-focused modes are unchanged.
 
@@ -51,7 +51,7 @@ Use the available connectors, APIs, or read-only local history. Start with sourc
 - Google Drive: meeting notes, including Gemini-generated notes, and relevant documents. Search proactively and follow calendar-linked notes for decisions, commitments, and outcomes; attendance alone is not work.
 - Fathom: meeting summaries, action items, and transcripts when needed to clarify decisions, outcomes, or the user's contribution. Use the meeting's occurrence time to place it in the window, not the notes' creation or update time.
 - Email: material sent updates, replies, decisions, and commitments.
-- Codex tasks: material investigation, planning, browser work, reviews, decisions, and outcomes absent from tracked systems. Discover actual task IDs and read relevant activity within the window.
+- Codex chats: material investigation, planning, browser work, reviews, decisions, and outcomes absent from tracked systems. Discover actual chat IDs and read relevant activity within the window.
 - Slack: messages and surrounding threads only when the user has authorized Slack review in the current task; retain that authorization when called by another skill.
 
 Follow relevant linked evidence to understand ownership and outcome. Include unshipped analysis and proposals. Do not attribute a teammate's work to the user merely because he appeared in a conversation. Distinguish unavailable or unreviewed sources from sources reviewed with no relevant activity.
@@ -61,7 +61,7 @@ Follow relevant linked evidence to understand ownership and outcome. Include uns
 - Deduplicate related evidence into work items, preserving significant distinct outcomes.
 - Reconcile Fathom, Gemini/Google Drive notes, and calendar entries for the same meeting before counting outcomes. Match shared meeting or calendar IDs when available; otherwise use meeting date/time, participants, and topic together. A matching title alone is insufficient, especially for recurring meetings.
 - Combine overlapping meeting accounts into one set of outcomes and action items, retaining complementary details and useful source links. Prefer the clearest direct evidence for each claim rather than favoring a notes provider. Preserve conflicting decisions or ownership as uncertainty; do not count duplicate notes as separate work or independent corroboration.
-- Prefer the source that proves the claim: GitHub for merge state, deployment-provider evidence for completed deployment, and task or meeting notes for decisions and analysis.
+- Prefer the source that proves the claim: GitHub for merge state, deployment-provider evidence for completed deployment, and chat or meeting notes for decisions and analysis.
 - A merged PR or promotion PR does not prove deployment. Confirm the relevant code reached production before labeling it deployed; distinguish deployment from verified production behavior.
 - Reconcile PR state with conversation context so proposals and ownership handoffs remain clear. Preserve uncertainty and conflicting evidence.
 

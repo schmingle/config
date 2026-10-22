@@ -1,4 +1,4 @@
 interface:
   display_name: "Gather Context"
-  short_description: "Gather work context across sources and Codex tasks"
+  short_description: "Gather work context across sources and Codex chats"
   default_prompt: "Use $gather-context to gather my work context from the last 24 hours."
