@@ -1,7 +1,7 @@
 # Linear Ticket Build Pass
 
-Implement one Medium-or-smaller issue in the configured work queue on the current
-user's behalf, following triage’s [work routing](triage.md#work-routing). Build
+Implement one independently sized Large-or-smaller leaf issue in the configured
+work queue on the current user's behalf, following triage’s [work routing](triage.md#work-routing). Build
 bounded bugs and one-offs immediately using documented defaults instead of waiting
 for clarifying answers. Never merge its PRs unless explicitly asked.
 
@@ -48,16 +48,20 @@ feedback is new. Recheck these underlying filters:
 team = settings.team
 status in (Todo, In Review), or verified interrupted In Progress
 assignee = current user
-verified creator != current user
-estimate is set and Medium-or-smaller (at most settings.maxEstimate on the configured team scale)
+verified creator != current user, or verified authorized decomposition child
+estimate is independently set and at most settings.maxEstimate (Large on the live team scale)
 leaf issue
 ```
 
-The same self-created-ticket exclusion governs both passes, including selected
-direct children. Compare verified creator IDs with the authenticated current
-user; any other creator may qualify, and an unverifiable creator is a skip.
-For a selected child, verify its parent's workflow selection and ownership
-decision, then the child's own ownership and eligibility. Confirm the issue was
+The same creator rule governs both passes: exclude self-created tickets except
+verified native children of an eligible parent created by this workflow's
+[authorized decomposition](triage.md#large-ticket-decomposition). A parent link or
+self-created child alone is insufficient; verify the live parent, original
+requester and outcome, decomposition evidence, and the child's own ownership
+and eligibility. Any other verified creator may qualify; an unverifiable creator
+is a skip. Cleanly decomposable Large work must first be split during triage;
+select one prepared eligible child. A coherent Large leaf that cannot be cleanly
+split may build within the same one-ticket budget. Confirm the issue was
 triaged by this workflow from this run's completed preparation or prior live
 plan, native field history, discussion, and linked PR evidence, with the private
 checkpoint as an
@@ -76,11 +80,11 @@ or convert affected ready PRs to Draft because the prerequisite prevents their
 completion. Record a newly material blocker in affected PR descriptions and one
 issue update; unchanged reruns remain quiet. Do not create a replacement PR or
 claim the work is ready. Skip duplicate, obsolete, unsuitable, or
-already-complete work. An existing Draft PR with unanswered questions is
-eligible for checking answers or its deadline; do not skip it merely because no
-new reply exists.
+already-complete work. An existing Draft PR awaiting questions or material
+approach feedback is eligible for checking replies or its original deadline;
+do not skip it merely because no new reply exists.
 On a general queue invocation, if no owning PR or unfinished part of the ticket
-needs action and its question deadline has not arrived, continue to the next
+needs action and its feedback deadline has not arrived, continue to the next
 candidate after checking it.
 An explicitly selected ticket may simply report that no action is due yet.
 
@@ -119,6 +123,17 @@ project, start broader execution, or create an automation. This selected ticket
 still consumes the one-ticket build budget.
 
 ## Questions and plan
+
+Use triage's [independent approach and sizing](triage.md#independent-approach-and-sizing)
+for bugs and specific requests. Revalidate the approach against code and the
+requested outcome; update its estimate and concise plan when evidence changes.
+Explain material implementation departures to the requester once, with the
+reason and a link to the Draft PR, inviting feedback without requiring routine
+acknowledgement. Safe technical defaults may proceed; changes to expected
+behavior, permissions, compatibility, approved scope, or protected tests require
+the applicable approval, and unsafe unknowns remain blocked. Keep affected PRs
+Draft under the same feedback clock as clarifying questions. Decomposition does
+not reset existing questions, answers, holds, or clocks for the same decision.
 
 Follow the shared [comment style](triage.md#comment-style),
 [questions and defaults](triage.md#questions-and-defaults), and
@@ -165,8 +180,9 @@ present. The same route resumes recorded partial In Progress work.
 Inspect all owning PRs, reviews, checks, and Linear comments since the latest
 recorded implementation update, including edits to previously processed comments.
 
-- Ignore acknowledgements, status questions, and feedback that requests no
-  product or implementation change.
+- Ignore generic acknowledgements and status questions. Explicit requester
+  agreement with a material approach settles that review even without a code
+  change; a generic thanks does not.
 - Incorporate in-scope requester answers and requested changes into one concise
   plan update. Move to In Progress only when implementation needs revision;
   update the affected existing branches and PRs, then rerun relevant checks.
@@ -206,9 +222,10 @@ pending so queued feedback cannot be silently skipped.
 
 Prefer a one-to-one mapping between implementation tickets and focused PRs. If a
 bounded outcome needs two PRs, follow triage’s
-[split rules](triage.md#work-routing) to split tickets/sub-issues where already
-authorized or propose the split. Do not
-build multiple children under one selected ticket’s budget or bypass screening.
+[decomposition rules](triage.md#large-ticket-decomposition) for the authorized
+split of cleanly decomposable Large work. Other ticket creation or splitting
+still needs its own authorization. Do not build multiple children under one
+selected ticket's budget or bypass screening.
 
 Preserve existing multi-PR work. A necessary exception may still use two PRs for
 the same complete bounded ticket; state the scope rationale and why the one-to-one
@@ -217,15 +234,16 @@ acceptance criteria clear, link both from the issue, and verify their combined
 result. The ticket counts once toward the build budget. Do not call it complete
 after only one part; two PRs are not a quota.
 
-Follow the repository’s branch, commit, push, and PR workflow. Use the Linear ID
+Create each new implementation PR as Draft while work is underway; the readiness
+rules below govern the handoff. Follow the repository’s branch, commit, push,
+and PR workflow. Use the Linear ID
 in new Todo branches when practical; reuse owning branches and PRs for revisions.
 Default each PR to an independent base; stack only for a concrete prerequisite
 required by the repository’s dependency rules, with actual ancestry and GitHub base.
 
 Apply the following PR requirements to each owning PR, including its feedback,
-blockers, verification, readiness, and reviewer requests. Share the ticket’s
-existing question set, defaults, original 48-hour clock, and ask budget across
-both PRs; opening a second PR never resets them. A scoped PR may be ready while
+blockers, verification, readiness, and reviewer requests. Share the ticket's existing question set, material approach-review notice,
+defaults, original 48-hour feedback clock, and ask budget across both PRs; opening a second PR never resets them. A scoped PR may be ready while
 another remains Draft, but incomplete combined work is not ticket completion.
 
 Title each PR `<issue identifier>: <concise title>`. Follow the repository’s
@@ -240,12 +258,12 @@ create repository tracking files or a new question round to normalize old record
 Both Draft and ready-for-review PRs are open on GitHub; use `isDraft` to distinguish
 them. Choose or update readiness after implementation and verification:
 
-| Questions | PR readiness |
+| Requester feedback | PR readiness |
 | --- | --- |
-| No questions posted | Open, ready for review |
-| Initial questions unanswered and less than 48 hours elapsed | Open, Draft |
-| Meaningful answers incorporated; remaining ordinary ambiguity settled with safe assumptions | Open, ready for review |
-| At least 48 hours elapsed; answered choices honored and defaults applied to remaining questions | Open, ready for review, subject to the gates below |
+| No questions or material approach departure needing feedback | Open, ready for review after implementation and verification |
+| Initial questions or material approach-review notice unanswered and less than 48 hours elapsed | Open, Draft |
+| Meaningful feedback incorporated; remaining ordinary ambiguity settled with safe assumptions | Open, ready for review after verification |
+| At least 48 hours elapsed; answered choices honored and safe defaults applied | Open, ready for review, subject to the gates below |
 
 Track why the workflow made a PR Draft. Do not promote a human-held Draft or
 override an explicit request to wait, including a hold on an already-ready PR.
@@ -257,10 +275,10 @@ Do not repeatedly request review on unchanged ready PRs.
 
 On each invocation that selects a ticket with existing owning PRs:
 
-1. Re-fetch the issue, all owning PRs, question thread, replies, and blockers.
-   Read all answers before considering timeout. Use server timestamps and 48
-   elapsed hours from the original question comment; edits, follow-ups, and
-   routine updates do not reset it.
+1. Re-fetch the issue, all owning PRs, original question or material approach-review
+   thread, replies, and blockers. Read all answers before considering timeout.
+   Use server timestamps and 48 elapsed hours from the original feedback comment;
+   edits, follow-ups, and routine updates do not reset it.
 2. Apply explicit answers and settle ordinary remaining ambiguity with safe
    assumptions. At the deadline, use recorded defaults for unanswered items.
    Partial replies need not keep the PR Draft when the decision set can safely
@@ -271,11 +289,12 @@ On each invocation that selects a ticket with existing owning PRs:
 4. Mark each PR ready only when its scoped implementation is complete, applicable
    verification passes, blockers are Done, and no unresolved safety or
    authorization constraint or explicit hold remains. Elapsed time clears
-   unanswered questions only; it never overrides these gates or supplies missing
-   approval. Record any gate that
+   the ordinary unanswered-question or approach-feedback wait only; it never
+   overrides these gates or supplies missing approval. Record any gate that
    prevents promotion instead of claiming readiness.
-5. If the initial set remains unanswered before its deadline, keep affected PRs
-   Draft. Recover aged legacy questions’ original clock; if already expired,
+5. If initial questions or the material approach-review notice remain unanswered
+   before the original deadline, keep affected PRs Draft. Recover the original
+   feedback clock; if already expired,
    apply their defaults and mark verified work ready now, without a fresh Draft
    waiting period.
    Never fabricate a historical timestamp/default or claim elapsed time without
@@ -294,12 +313,14 @@ When new work or a meaningful update is complete and all owning PRs together
 deliver the ticket’s acceptance criteria using current answers or recorded defaults:
 
 1. Move the issue to In Review, including when an owning PR remains Draft for
-   questions.
+   questions or approach feedback.
 2. Post one delivery comment within the shared 100-word maximum: link all owning PRs,
    state the user-visible result, one useful combined verification summary, and each
    PR’s Draft/ready state using confirmed choices/defaults. Invite
    optional feedback without requiring acknowledgement.
-   Mention only the requester; GitHub handles reviewer requests. Reuse an existing
+   Mention only the requester; for an authorized decomposition child, inherit
+   the original requester from the parent/source instead of treating the child's
+   automation author as requester. GitHub handles reviewer requests. Reuse an existing
    delivery comment instead of posting it again on a later unchanged run.
 3. Keep the private checkpoint current without publishing it. Combine substantive
    answer, implementation, readiness, or blocker changes into one short update;

@@ -2,8 +2,9 @@
 name: linear-ticket
 description: >-
     Triage bugs and one-off work in the configured Linear queue, recommend project
-    framing when needed, then implement or update one best eligible bounded
-    ticket, preferring a one-to-one mapping between implementation tickets and
+    framing when needed, independently size work through Large and split cleanly
+    decomposable Large tickets, then implement or update one eligible bounded
+    leaf, preferring a one-to-one mapping between implementation tickets and
     focused PRs. Requires explicit user or authorized automation invocation;
     never merges or deploys.
 disable-model-invocation: true
@@ -20,7 +21,9 @@ workflow does not execute projects.
 Before loading either detailed pass, read
 `~/.codex/private/linear-ticket-workflows.json`. Require `team` (exact Linear team
 key), `repository` (GitHub `owner/repository`), `maxEstimate` (numeric upper bound),
-and `mediumEstimateLabel` (the scale label used as Medium). Keep these values
+and `mediumEstimateLabel` (the scale label used as Medium for smaller subtickets).
+The configured execution ceiling is Large on the team's verified live scale;
+resolve `maxEstimate` independently from the Medium label. Keep these values
 private. Verify the intended
 authenticated Linear workspace, team, statuses, and estimate scale against the
 settings. Resolve the current Linear user through the authenticated connector's
@@ -46,10 +49,14 @@ as metadata yields a possible candidate, proceed to the detailed passes with the
 fetched metadata and remaining cursors; do not exhaust listings first.
 Do not filter by recent activity, unchanged `updatedAt`, or presumed provenance:
 pending unapplied replies, elapsed 48-hour deadlines, and interrupted builds can
-remain actionable without an issue metadata change. Exclude tickets created by
-the verified current user; any other verified creator may qualify. Do not require
-or filter by `triageCreatorEmails`, even if legacy settings contain that field.
-Defer parent/leaf checks and other detailed eligibility gates to triage.
+remain actionable without an issue metadata change. Reported or existing estimates
+are not discovery exclusions: triage independently sizes the chosen approach.
+Exclude tickets created by the verified current user, except native children
+created by this workflow's authorized Large-ticket decomposition; a parent ID
+alone does not establish that exception. Defer possible decomposition children
+to triage for live provenance and eligibility checks; any other verified creator
+may qualify. Do not require or filter by `triageCreatorEmails`, even if legacy
+settings contain that field. Defer parent/leaf and other detailed gates to triage.
 
 Only after exhausting both listing sets without possible candidates, report that
 no action is due and stop. Do not load pass references, full issues, comments,
@@ -75,7 +82,11 @@ Run both passes in order after discovery finds possible candidates:
    in-memory buildable subset with source evidence. Mutate at most 10 distinct tickets and
    make at most one new ownership/exceptional blocking ask across the entire
    invocation. That ask and any oversized estimate change count within the 10.
-   Then proceed to build.
+   Before completing screening, reserve capacity for a clean Large-ticket split:
+   the parent and every created or reused child count against screening and
+   mutation limits. Follow the [decomposition rules](references/triage.md#large-ticket-decomposition)
+   without expanding the parent outcome or approved project plan. Then proceed
+   to build.
 2. **Build:** Select the best eligible ticket from the triage-produced list,
    re-fetch it, implement or update at most one ticket, and stop this pass. The
    ticket just prepared may qualify, but it has no automatic priority. A blocked
@@ -102,8 +113,10 @@ and In Review work in the buildable subset
 only after checking live issue history, plan, ownership, estimate, discussion,
 and linked PR evidence, using the optional private checkpoint when available.
 A new Triage/Backlog candidate enters the buildable subset only after triage
-completes its preparation, moves it to Todo, and confirms all implementation
-gates; read-only assessment alone is insufficient.
+completes independent sizing, any clean Large-ticket decomposition, and its
+preparation, moves the selected leaf to Todo, and confirms all implementation
+gates. Build at most one leaf per invocation, never the parent and its children
+as a batch; read-only assessment alone is insufficient.
 The checkpoint is a cache, never proof by itself. Do not independently scan a
 generic assigned queue during build or infer In Progress eligibility from status
 alone. If provenance cannot be verified, exclude the issue from the buildable

@@ -4,9 +4,11 @@ Inspect repository code and linked PRs read-only. Never implement code, change a
 PR, or request reviews during triage. The combined skill's build pass follows
 after triage and selects independently from the verified candidate list.
 
-Fully screen at most 10 candidate issues in this invocation, then prepare or
-substantively update only screened tickets. Oversized, held, blocked,
-unsuitable, and quiet outcomes still count among the 10; each issue counts once
+Fully screen at most 10 distinct issues in this invocation, then create, prepare,
+or substantively update at most 10 distinct screened issues. A decomposition
+parent and every child screened, created, reused, or changed count within these
+caps; reserve capacity before completing the scan as described below. Oversized,
+held, blocked, unsuitable, and quiet outcomes still count among the 10; each issue counts once
 even if preparation changes several fields. Post at most one new ownership or
 exceptional blocking ask in the combined invocation. After it, continue with
 other screened eligible tickets without another such ask. Do not create or edit
@@ -27,8 +29,10 @@ Reuse discovery's verified authenticated Linear identity. Use its user ID for
 assignee, creator, and estimate-history comparisons; never infer a missing identity.
 
 The combined invocation authorizes normal Linear comments, assignment, estimate,
-and status changes in this triage pass. Only the build pass may implement or
-mutate a PR. No separate approval or `auto` keyword is required for triage actions.
+and status changes, plus the narrow native-child creation described in
+[Large-ticket decomposition](#large-ticket-decomposition) in this triage pass.
+Only the build pass may implement or mutate a PR. No separate approval or `auto`
+keyword is required for triage actions.
 Honor an explicit read-only or dry-run request: inspect and report proposed actions
 without mutations.
 
@@ -44,7 +48,8 @@ gates under applicable `AGENTS.md` guidance.
 While choosing up to 10 issues to screen, consider the current user's previously
 managed leaves in the configured team in Todo, In Progress, or In Review.
 Inspect linked PRs only for screened issues. Exclude tickets created by the
-current user; any other verified creator may qualify. Require an existing plan
+current user except verified decomposition children under the narrow provenance
+rule below; any other verified creator may qualify. Require an existing plan
 and source evidence establishing this workflow's bounded scope, verified
 ownership, and estimate; assignment or
 status alone is not eligibility. Reapply [work routing](#work-routing) after
@@ -64,7 +69,8 @@ conflicting ownership. Do not reapply the new-work seven-day participation veto
 to ordinary reviews on the current user's recorded implementation PR. An unchanged
 record is a quiet skip, including a previously recorded due follow-up; continue
 the queue so waiting work does not starve new candidates. This continuation path
-does not waive the self-created-ticket exclusion. Triage records what it assessed
+does not broaden the decomposition-child exception to the self-created-ticket
+exclusion. Triage records what it assessed
 separately from what build has applied; reading feedback never marks it
 implemented or consumes build's applied-reply watermark.
 
@@ -85,20 +91,29 @@ child counts as one of the 10 distinct screened issues:
 team = settings.team
 status in (Triage, Backlog)
 assignee in (none, current user)
-verified creator != current user
-estimate = unset or Medium-or-smaller (at most settings.maxEstimate)
+verified creator != current user, or verified authorized decomposition child
+estimate = independently assessed later; no reported/native-size prefilter
 ```
 
 Compare the verified issue creator's user ID with the authenticated current
 user's ID. Any other creator may qualify; skip if the creator cannot be verified.
-Apply this exclusion to every selected issue, including direct children; parent
-selection never waives it. Verify the parent's selection and ownership decision
-when selecting its child, then apply the child's own ownership and eligibility
-gates. Skip tickets already estimated above Medium. Read existing questions and
-answers; do not repost questions or skip an otherwise suitable ticket merely
-because answers are pending. After the
-ownership gate is clear, include any linked PR in the candidate evidence. Do
-not create or update an implementation PR during triage.
+A self-created issue qualifies only when it is a verified native child actually
+created by this workflow's authorized decomposition of an otherwise eligible,
+non-self-created parent. Require the live native parent relation and human-readable
+scope/source evidence tying the child to the parent's bounded outcome and split;
+a checkpoint, arbitrary parent relation, or self-authored claim alone is insufficient.
+Revalidate provenance and the parent's eligibility apart from its parent role on
+later runs. This exception does not recurse through self-created parents or cover
+arbitrary self-created children.
+Parent selection never waives the child's own ownership and other gates.
+
+Do not exclude an issue because of its reported size, native estimate, or estimate
+author. Independently assess the chosen approach before comparing it with
+`settings.maxEstimate`. Explicit human execution caps and holds remain binding.
+Read existing questions and answers; do not repost questions or skip an otherwise
+suitable ticket merely because answers are pending. After the ownership gate is
+clear, include linked PR evidence. Do not create or update an implementation PR
+during triage.
 
 ## Ownership gate
 
@@ -179,7 +194,7 @@ assigning, or moving to Todo. Once confirmed, retain the question and affirmativ
 reply references in the private checkpoint; re-read those sources on later runs
 to verify that ownership was cleared. Link them in a human handoff only when useful.
 
-## Assess
+## Independent approach and sizing
 
 For each candidate:
 
@@ -187,25 +202,36 @@ For each candidate:
    sub-issues, then apply the ownership gate before proceeding.
 2. Inspect the configured repository’s relevant code, tests, schemas, history, and
    applicable `AGENTS.md` files. Run `nvm use` first. Investigation is read-only.
-3. Trust an existing estimate only when the current user set it. Otherwise
-   estimate from product impact, implementation complexity, and risk using the
-   configured team’s estimate scale. If estimate authorship is unavailable, assess
-   it rather than claiming it was verified.
-4. If newly assessed larger than Medium, mark an oversized estimate disposition
-   for the ranked mutation pass and keep it out of the buildable list. A concise
-   project proposal under [work routing](#work-routing) is also permitted when
-   warranted; make no other change. Tickets already excluded by the above-Medium
-   prefilter remain excluded.
-5. Before selecting a child of a Medium-or-smaller parent, assess the parent’s
-   context under [work routing](#work-routing). Do not use child selection to
-   bypass unresolved project-level decisions. An independently bounded child
-   with settled intent may qualify even when its parent needs project framing.
-   Triage the newest eligible direct child whose own ownership and routing gates
-   are clear. Consider relevant parent discussion and the child’s own activity.
-   The self-created-ticket exclusion applies to the selected child too. Never
-   move a parent to Todo.
-6. Route Medium-or-smaller leaves using [work routing](#work-routing), including
-   their complete outcome and objective verification path.
+3. For a bug, extract the reported problem, observed and expected behavior,
+   reproduction facts, and actual constraints. Independently inspect the code and
+   choose the smallest complete fix before comparing reporter-suggested designs or
+   estimates. For a specific nonbug request, preserve the requested outcome while
+   independently choosing the implementation and size. Treat suggestions and
+   estimates, including the current user's earlier estimate, as hypotheses.
+   Preserve security, approved intended behavior, compatibility, explicit scope,
+   and other real constraints; a simpler approach cannot discard essential work.
+4. Estimate that chosen approach using the configured team's scale and update the
+   native estimate when it differs. Use `settings.maxEstimate` as the execution
+   ceiling, distinct from `settings.mediumEstimateLabel`, the smaller-child
+   reference. If above the ceiling, keep it out of build and prepare a concise sizing
+   and next-step disposition, rather than silently changing only the estimate.
+   Do not claim oversized work or automatically remove its existing assignee.
+5. Apply [work routing](#work-routing) to the complete outcome. For each independently
+   assessed Large issue, evaluate [Large-ticket decomposition](#large-ticket-decomposition).
+   A bounded Large leaf at or below the ceiling may qualify when no clean split
+   exists. For existing children, assess parent context before selecting the newest
+   eligible direct child; settled independently bounded work may qualify even when
+   its parent needs project framing, but cannot bypass unresolved project decisions.
+   Apply the child's own ownership, provenance, estimate, and routing gates. Never
+   move a parent with children to Todo.
+6. Record the chosen approach and material departure from a proposed implementation
+   once in the short plan, with the reason in the user's voice. Invite requester
+   feedback and link the eventual draft PR when available. Technical differences
+   with a safe default can proceed; changed intended behavior, permissions,
+   compatibility, approved scope, or a decision without a safe default requires
+   approval before affected work. Record the approach-review reason and original
+   publication timestamp for the shared Draft window below; do not open a second
+   questioning or waiting round.
 
 A suitable leaf passes that routing and can be implemented safely using explicit
 defaults for unanswered product questions. Missing permission, required data, an
@@ -222,8 +248,8 @@ of a new Triage/Backlog ticket does not make it buildable.
 
 After screening at most 10 issues, rank needed dispositions as described in the
 entrypoint. Apply them only to screened tickets, re-fetching each affected issue
-and its sources before mutation. An oversized estimate change,
-new ownership/exceptional blocking ask, substantive continuation handoff,
+and its sources before mutation. An oversized sizing/next-step disposition,
+authorized decomposition, new ownership/exceptional blocking ask, substantive continuation handoff,
 new leaf preparation, or material routing proposal counts as a disposition of
 that screened issue. If a candidate becomes ineligible, skip it and use the next
 ranked screened issue; do not pull in an eleventh issue. An unchanged pending ask or quiet skip counts
@@ -233,9 +259,8 @@ limit across both passes even if other screened tickets remain.
 ## Work routing
 
 Apply after the ownership checks, for new selections and prior workflow work.
-Keep all creator, estimate, leaf, and ownership filters: routing never authorizes
-reassessing tickets already excluded by the above-Medium prefilter. Project
-membership alone does not exclude a bounded fix; honor an active owner or
+Keep all provenance, independently assessed ceiling, leaf, and ownership gates.
+Project membership alone does not exclude a bounded fix; honor an active owner or
 supervisor’s assignment and do not create competing execution.
 
 1. **Bounded bug or one-off:** The complete cohesive outcome has known acceptance
@@ -250,8 +275,9 @@ supervisor’s assignment and do not create competing execution.
    Exclude it from the buildable list and propose the finite outcome, known scope
    and supporting evidence, consequential decisions, and completion validation.
    Recommend a relevant existing project or a new one; reuse known context instead
-   of drafting a speculative full plan. Do not create or reorganize projects,
-   decompose work into new tickets, or start broader execution in this workflow.
+   of drafting a speculative full plan. Do not create or reorganize projects
+   or start broader execution in this workflow. The narrow bounded Large split
+   below does not authorize decomposing project-shaped work or changing its contract.
    Project creation/reorganization and broader execution require user approval
    and a separately authorized handoff.
 3. **Material uncertainty:** Investigate read-only within the existing screening
@@ -260,9 +286,9 @@ supervisor’s assignment and do not create competing execution.
 
 For a bounded outcome needing two PRs, prefer appropriately scoped tickets or
 sub-issues where creation/splitting is already authorized; otherwise propose the
-split. This workflow alone does not authorize ticket creation or splitting. Each
-child must independently pass screening, triage, and build selection under the
-existing ownership, estimate, and self-created-ticket exclusion rules.
+split. Only the narrow Large decomposition below adds creation authority. Each
+child independently passes screening, triage, and build selection under the
+existing ownership, estimate, and creator/provenance rules.
 Preserve the 10-screened/10-mutated caps and one-ticket build cap; a selected parent never authorizes building multiple
 children. Preserve existing multi-PR work rather than retroactively splitting it;
 use the build pass’s documented exception when necessary.
@@ -283,6 +309,48 @@ authorized disposition. A complete bounded PR is not unsafe merely because the
 broader ticket needs project framing. For project-shaped or unresolved-routing
 dispositions, keep issue statuses unchanged; triage never changes PRs. An unchanged
 recommendation remains quiet.
+
+## Large-ticket decomposition
+
+For every independently assessed Large issue, determine whether the existing
+bounded outcome splits cleanly into smaller coherent, independently testable
+deliverables, each independently sized below Large (Medium-or-smaller on the
+verified scale, using `settings.mediumEstimateLabel`). When it does, create or
+reuse native children automatically; no separate split approval is
+needed within that outcome. If no clean split exists, a coherent Large leaf may
+build when it meets the configured ceiling and all other gates. Never split only
+by implementation versus testing, invent artificial children to evade a gate,
+expand scope, alter an approved project contract, or use this rule to claim
+above-ceiling or project-shaped work.
+
+Before any split mutation, screen the parent and existing children, assess every
+planned child's eligibility and scope, preserve existing children/PRs, and identify
+the complete split. Reserve slots for new children and verify them after creation.
+Count the parent and every screened, created, reused, or changed child within
+the applicable 10-issue caps;
+reserve remaining screening and mutation capacity before completing the scan.
+If the full split will not fit, defer the entire split, report the bounded next
+step, and create no partial set. Reconcile an ambiguous write against live native
+relations and issue contents before retrying; never blindly create duplicates.
+
+Keep the parent responsible for the full outcome and completion validation.
+Give each child explicit scope, acceptance criteria, validation, an independent
+estimate, an appropriate assignee, the parent's priority, original requester/source,
+and relevant context. Add native dependencies only for actual prerequisites. Preserve existing priority;
+copying it to a new child does not reprioritize work. Record concise human-readable
+source/scope evidence for creation provenance. Every child has its own
+creator/provenance, ownership, Slack, routing, blockers, and implementation checks;
+parent eligibility grants no takeover permission. Defer a split that needs
+unresolved ownership or scope permission rather than creating competing work.
+A child waiting on a recorded prerequisite may be created within the complete
+split, but remains out of Todo and build until its blockers and all other gates clear.
+
+Only children actually created under this rule may use the narrow self-created
+exception; reused self-created children need verified prior authorized provenance.
+Do not recursively split such a child to extend the exception. Keep parents out
+of Todo and the buildable list. The build cap remains one selected eligible leaf,
+never the parent batch; splitting adds no merge, deployment, or broader execution
+authority.
 
 ## Comment style
 
@@ -355,8 +423,15 @@ as `1A, 2C`; add `Other — please specify` only when useful.
 During triage, state that these defaults are recorded for build; do not promise
 that this ticket will be the one built in the current invocation. When build
 selects it, implementation proceeds immediately using those defaults. An
-initial unanswered question set keeps any implementation PR Draft until a reply
-settles the assumptions or 48 elapsed hours after the original question `createdAt`.
+initial unanswered question set and a material technical approach departure
+share one Draft review window. Keep the implementation PR Draft until substantive
+requester feedback settles the relevant assumptions/approach or 48 elapsed hours
+after the original comment that first published the questions or material approach
+departure. An earlier routine plan without either feedback trigger starts no
+window. Retain that first server timestamp and the approach-review reason;
+questions, plan edits, or later passes never restart the same review window.
+Approval-required behavior/scope/permission changes remain held even after the
+review window.
 Only build may update a verified PR's readiness during its own pass; time
 alone never substitutes for verification or authorizes triage to change a PR.
 Do not imply an automatic wake-up or merge.
@@ -366,10 +441,10 @@ ambiguous parts. Record the best-supported assumptions in the implementation
 plan (and, during build only, the PR); **do not ask a routine follow-up**, repeat
 a question, send a reminder or ping, or notify people about question edits. A thanks or status question alone is
 not a substantive answer. After the first substantive reply/answer, exhaustion of
-the question budget, expiration of the original 48-hour deadline, or a declined
+the question budget, expiration of the shared original 48-hour deadline, or a declined
 clarification, settle ordinary questions using answers and safe defaults. Silence
 at the deadline has the same result. Exhausting the question budget forbids more
-questions; it does not shorten the fresh unanswered set's Draft window. Later
+questions; it does not shorten the shared Draft window. Later
 replies may change the implementation but do not reopen ordinary questioning.
 An old ambiguous follow-up is historical context, not evidence of a new risk.
 
@@ -399,7 +474,8 @@ When durable idempotency needs a checkpoint, use
 issue UUID verified from the authenticated workspace/team. Keep it outside all
 repositories, with directory mode `0700` and file mode `0600`. Store only necessary
 source IDs/links and timestamps, bounded decisions/defaults, the original question
-reference/`createdAt` and deadline, ownership/risk holds and their source references,
+reference/`createdAt`, original approach-review notice reference/publication
+timestamp and shared deadline, ownership/risk holds and their source references,
 and separate `triageSeen` and `buildApplied` reply IDs/`updatedAt`. No copied
 threads, ticket dumps, credentials, or secrets. Update only the current pass's
 assessment/applied state and necessary shared decisions; preserve the other state.
@@ -411,7 +487,7 @@ and PRs. A checkpoint is a cache, never authorization or evidence that a hold
 cleared. If absent, stale, or unavailable, reconstruct from live source comments,
 server timestamps, native fields, and implementation/disposition evidence.
 Legacy machine blocks may be read for reconstruction but must not be recreated
-or copied into new comments or PR text. Do not reset the original question clock,
+or copied into new comments or PR text. Do not reset the shared original review clock,
 reopen the lifetime question budget, repeat an ownership ask, or treat silence as
 ownership permission. Never invent a timestamp or applied result. If evidence
 cannot establish a needed gate, keep that gate closed and report only the concise
@@ -440,7 +516,8 @@ answers:
 1. Re-fetch every blocker before preparing the handoff or posting a comment.
    Continue only when all are Done; otherwise skip without preparing the ticket.
    Recheck duplicate, obsolete, and [work-routing](#work-routing) eligibility too.
-2. Set or confirm its Medium-or-smaller estimate, and assign it to the current
+2. Set or confirm its independently assessed estimate at or below
+   `settings.maxEstimate`, and assign it to the current
    user if unassigned.
 3. Reuse the existing plan/questions and answers, or post the single initial
    short plan/questions comment when needed. Link useful existing criteria rather
