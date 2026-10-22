@@ -18,7 +18,8 @@ workflow does not execute projects.
 
 ## Lightweight discovery
 
-Before loading either detailed pass, read
+Read the [reporting contract](references/reporting.md) for every invocation,
+including blocked and empty runs. Before loading either detailed pass, read
 `~/.codex/private/linear-ticket-workflows.json`. Require `team` (exact Linear team
 key), `repository` (GitHub `owner/repository`), `maxEstimate` (numeric upper bound),
 and `mediumEstimateLabel` (the scale label used as Medium for smaller subtickets).
@@ -58,11 +59,13 @@ to triage for live provenance and eligibility checks; any other verified creator
 may qualify. Do not require or filter by `triageCreatorEmails`, even if legacy
 settings contain that field. Defer parent/leaf and other detailed gates to triage.
 
-Only after exhausting both listing sets without possible candidates, report that
-no action is due and stop. Do not load pass references, full issues, comments,
-PRs, repositories, broader context, checkpoints or automation memory; do not
-write, spawn agents, or start a build. Failed queries or unverifiable coverage
-are blockers; unfinished listings never prove an empty queue.
+Only after exhausting both listing sets without possible candidates, skip the
+detailed passes. Still reconcile and report the outstanding inventory and recent
+closures under the reporting contract; no eligible new action does not mean no
+work remains. Load only the reporting sources needed for that reconciliation,
+not implementation context or unrelated full issues. Do not mutate Linear or PRs,
+spawn agents, or start a build on this path. Failed queries or unverifiable
+coverage are blockers; unfinished listings never prove an empty queue.
 
 Otherwise, read the [triage pass](references/triage.md) and
 [build pass](references/build.md), verify the configured repository as they
@@ -137,5 +140,6 @@ This invocation authorizes the bounded Linear and PR actions in the two pass
 contracts. It does not authorize merging, auto-merge, deployment, production
 writes, or email, SMS, or Slack messages. Do not create or edit automations or
 promise an automatic follow-up. Future replies and deadlines require another
-explicit user or authorized automation invocation. Report the triage dispositions
-and build result, or that no eligible action was due, with issue/PR links when known.
+explicit user or authorized automation invocation. Finish with one consolidated
+user-facing report under the [reporting contract](references/reporting.md),
+including actions, all outstanding workflow tickets, and recent closures.

@@ -336,3 +336,6 @@ blocker or next action concisely. Include a readable question deadline only when
 useful; omit raw bookkeeping and routine field lists.
 State that another invocation is needed for future replies or promotion;
 do not claim that a follow-up was scheduled.
+
+Combine these results with triage and the full outstanding inventory in one
+[run report](reporting.md). PR delivery does not remove an open ticket from it.

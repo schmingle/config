@@ -47,7 +47,9 @@ gates under applicable `AGENTS.md` guidance.
 
 While choosing up to 10 issues to screen, consider the current user's previously
 managed leaves in the configured team in Todo, In Progress, or In Review.
-Inspect linked PRs only for screened issues. Exclude tickets created by the
+Substantively assess linked PRs only for screened issues; metadata-only PR-state
+reads for the reporting inventory follow [reporting](reporting.md).
+Exclude tickets created by the
 current user except verified decomposition children under the narrow provenance
 rule below; any other verified creator may qualify. Require an existing plan
 and source evidence establishing this workflow's bounded scope, verified
@@ -476,7 +478,8 @@ repositories, with directory mode `0700` and file mode `0600`. Store only necess
 source IDs/links and timestamps, bounded decisions/defaults, the original question
 reference/`createdAt`, original approach-review notice reference/publication
 timestamp and shared deadline, ownership/risk holds and their source references,
-and separate `triageSeen` and `buildApplied` reply IDs/`updatedAt`. No copied
+separate `triageSeen` and `buildApplied` reply IDs/`updatedAt`, and the minimal
+reporting inventory fields described in [reporting](reporting.md). No copied
 threads, ticket dumps, credentials, or secrets. Update only the current pass's
 assessment/applied state and necessary shared decisions; preserve the other state.
 Settled product choices do not mean code was applied. Triage never advances
@@ -506,7 +509,9 @@ comments require a material decision, newly due follow-up, or blocker change;
 combine related changes within the follow-up word cap. No acknowledgements,
 reminders, unchanged plans, repeated questions, edit notifications, or metadata-only
 updates. The skill's own comment update never triggers another question. Only
-build posts implementation/delivery results, and unchanged runs post nothing.
+build posts implementation/delivery results, and unchanged runs post nothing
+externally. Every run still produces the user-facing inventory report; quiet
+Linear activity does not suppress that report.
 
 ## Finish triage and pass candidates to build
 
@@ -538,3 +543,6 @@ or decision; do not dump timestamps or internal state. An existing PR's observed
 state is read-only context, never a verified implementation outcome of triage.
 Mention a readable question deadline only when useful. In read-only mode, label
 actions as proposed and do not mutate the handoff or checkpoint.
+
+Carry these outcomes into the consolidated [run report](reporting.md); triage
+does not replace the outstanding inventory with only this run’s screened issues.
