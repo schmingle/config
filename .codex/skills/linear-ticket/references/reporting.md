@@ -99,17 +99,22 @@ with ticket-level accounting:
 4. **Still in play:** One row per unresolved tracked ticket that remains for the
    current user or has unresolved ownership, intervention first, then actionable
    work, then waits. Use exactly these columns, in this order:
-   `Ticket | Status | Estimate | PRs | Update/notes`.
+   `Ticket | Status | Estimate | PRs | Action | Update/notes`.
    Link ticket IDs and all owning PRs; show Draft/ready/merged state in PRs. Include
-   unchanged tickets and tickets not screened this run. Put this run’s changes,
-   blockers, next owner/action, useful deadlines, and parent/child relationships
+   unchanged tickets and tickets not screened this run. Action describes what
+   this invocation actually did, using concise labels such as `Skipped`,
+   `Assessed`, `Triaged`, `Split`, `PR started`, `PR updated`, or `Marked ready`.
+   Use `Not assessed` for inventory-only rows; explain skips and deferrals in
+   Update/notes. Read-only assessment is not completed triage, a proposed split
+   is not `Split`, and an observed merge by someone else is not this run’s action.
+   Put concrete changes, blockers, next owner/action, useful deadlines, and parent/child relationships
    in Update/notes. Use `unknown` for missing evidence and `—` only for verified none.
    Tickets determined to belong to someone else appear in the final ownership
    list instead of duplicating them in this table. Uncertain ownership stays here
    with the uncertainty explained; never invent an owner.
 5. **Closed in the last 24 hours:** Linked ticket, terminal outcome and time,
    owning PRs, and any material delivery limitation. Do not duplicate these rows
-   in Still in play or Owned by others. If presented as a table, use the same five
+   in Still in play or Owned by others. If presented as a table, use the same six
    columns, with closure time and delivery limitations in Update/notes. Omit the
    section when empty.
 6. **Owned by others:** End the report with a bullet list, one linked ticket per
