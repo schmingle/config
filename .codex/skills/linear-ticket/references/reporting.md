@@ -97,8 +97,14 @@ with ticket-level accounting:
    other people. Say explicitly when no changes were made. Never call a proposed
    read-only action completed.
 4. **Still in play:** One row per unresolved tracked ticket that remains for the
-   current user or has unresolved ownership, intervention first, then actionable
-   work, then waits. Use exactly these columns, in this order:
+   current user or has unresolved ownership. Sort report-table rows by Action
+   alphabetically, except `Skipped` always sorts last; within each action, sort
+   by the team’s native workflow status order, then oldest issue `createdAt` first.
+   Unknown creation times sort last within their action/status group; use ticket
+   ID to break ties. Fetch creation metadata as needed for reporting; do not use
+   `updatedAt` as ticket age. This changes presentation only, not triage or build
+   selection order. Keep intervention callouts in their separate section.
+   Use exactly these columns, in this order:
    `Ticket | Status | Estimate | PRs | Action | Update/notes`.
    Link ticket IDs and all owning PRs; show Draft/ready/merged state in PRs. Include
    unchanged tickets and tickets not screened this run. Action describes what
@@ -115,7 +121,7 @@ with ticket-level accounting:
 5. **Closed in the last 24 hours:** Linked ticket, terminal outcome and time,
    owning PRs, and any material delivery limitation. Do not duplicate these rows
    in Still in play or Owned by others. If presented as a table, use the same six
-   columns, with closure time and delivery limitations in Update/notes. Omit the
+   columns and sorting, with closure time and delivery limitations in Update/notes. Omit the
    section when empty.
 6. **Owned by others:** End the report with a bullet list, one linked ticket per
    item, using exactly `<ticket> - owned by <owner>`. Include tickets excluded this
