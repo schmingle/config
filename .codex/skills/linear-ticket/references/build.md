@@ -48,17 +48,19 @@ feedback is new. Recheck these underlying filters:
 team = settings.team
 status in (Todo, In Review), or verified interrupted In Progress
 assignee = current user
-creator in settings.triageCreatorEmails and creator != current user,
-  except a verified parent-selected direct child
+verified creator != current user
 estimate is set and Medium-or-smaller (at most settings.maxEstimate on the configured team scale)
 leaf issue
 ```
 
-The same creator allowlist and self-created-ticket exclusion govern both passes. For the child exception, verify
-the allowlisted parent's workflow selection and ownership decision, then the
-child's own ownership and eligibility. Confirm the issue was triaged by this
-workflow from this run's completed preparation or prior live plan, native field
-history, discussion, and linked PR evidence, with the private checkpoint as an
+The same self-created-ticket exclusion governs both passes, including selected
+direct children. Compare verified creator IDs with the authenticated current
+user; any other creator may qualify, and an unverifiable creator is a skip.
+For a selected child, verify its parent's workflow selection and ownership
+decision, then the child's own ownership and eligibility. Confirm the issue was
+triaged by this workflow from this run's completed preparation or prior live
+plan, native field history, discussion, and linked PR evidence, with the private
+checkpoint as an
 optional aid. For prior work, verify the current user's plan/defaults against
 native estimate, assignment, and Todo history or corroborating linked PR evidence
 to establish the bounded handoff. A generic issue description, assignment,

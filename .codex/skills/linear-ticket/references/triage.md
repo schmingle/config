@@ -43,10 +43,10 @@ gates under applicable `AGENTS.md` guidance.
 
 While choosing up to 10 issues to screen, consider the current user's previously
 managed leaves in the configured team in Todo, In Progress, or In Review.
-Inspect linked PRs only for screened issues. Apply the configured creator
-allowlist or verified parent-selected direct child exception below. Require an
-existing plan and source evidence establishing
-this workflow's bounded scope, verified ownership, and estimate; assignment or
+Inspect linked PRs only for screened issues. Exclude tickets created by the
+current user; any other verified creator may qualify. Require an existing plan
+and source evidence establishing this workflow's bounded scope, verified
+ownership, and estimate; assignment or
 status alone is not eligibility. Reapply [work routing](#work-routing) after
 checking ownership, including to resumed work. Apply the
 [directed-ownership rule](#ownership-gate), including relevant Slack decisions;
@@ -64,8 +64,8 @@ conflicting ownership. Do not reapply the new-work seven-day participation veto
 to ordinary reviews on the current user's recorded implementation PR. An unchanged
 record is a quiet skip, including a previously recorded due follow-up; continue
 the queue so waiting work does not starve new candidates. This continuation path
-does not broaden the creator filter. Triage records what it
-assessed separately from what build has applied; reading feedback never marks it
+does not waive the self-created-ticket exclusion. Triage records what it assessed
+separately from what build has applied; reading feedback never marks it
 implemented or consumes build's applied-reply watermark.
 
 ## Candidates
@@ -85,17 +85,18 @@ child counts as one of the 10 distinct screened issues:
 team = settings.team
 status in (Triage, Backlog)
 assignee in (none, current user)
-creator in settings.triageCreatorEmails and creator != current user
-  (except a verified parent-selected direct child)
+verified creator != current user
 estimate = unset or Medium-or-smaller (at most settings.maxEstimate)
 ```
 
-Resolve the configured creators by exact email and compare user IDs. The only
-creator exception is a direct child selected from an allowlisted parent under
-this workflow; verify the parent's selection and ownership decision, then apply
-the child's own ownership and eligibility gates. Skip tickets already estimated
-above Medium. Read existing questions and answers; do not repost questions or
-skip an otherwise suitable ticket merely because answers are pending. After the
+Compare the verified issue creator's user ID with the authenticated current
+user's ID. Any other creator may qualify; skip if the creator cannot be verified.
+Apply this exclusion to every selected issue, including direct children; parent
+selection never waives it. Verify the parent's selection and ownership decision
+when selecting its child, then apply the child's own ownership and eligibility
+gates. Skip tickets already estimated above Medium. Read existing questions and
+answers; do not repost questions or skip an otherwise suitable ticket merely
+because answers are pending. After the
 ownership gate is clear, include any linked PR in the candidate evidence. Do
 not create or update an implementation PR during triage.
 
@@ -201,7 +202,8 @@ For each candidate:
    with settled intent may qualify even when its parent needs project framing.
    Triage the newest eligible direct child whose own ownership and routing gates
    are clear. Consider relevant parent discussion and the child’s own activity.
-   The creator filter applies only to the parent. Never move a parent to Todo.
+   The self-created-ticket exclusion applies to the selected child too. Never
+   move a parent to Todo.
 6. Route Medium-or-smaller leaves using [work routing](#work-routing), including
    their complete outcome and objective verification path.
 
@@ -260,7 +262,7 @@ For a bounded outcome needing two PRs, prefer appropriately scoped tickets or
 sub-issues where creation/splitting is already authorized; otherwise propose the
 split. This workflow alone does not authorize ticket creation or splitting. Each
 child must independently pass screening, triage, and build selection under the
-existing ownership, estimate, and creator rules, including the child exception.
+existing ownership, estimate, and self-created-ticket exclusion rules.
 Preserve the 10-screened/10-mutated caps and one-ticket build cap; a selected parent never authorizes building multiple
 children. Preserve existing multi-PR work rather than retroactively splitting it;
 use the build pass’s documented exception when necessary.

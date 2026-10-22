@@ -19,9 +19,9 @@ workflow does not execute projects.
 
 Before loading either detailed pass, read
 `~/.codex/private/linear-ticket-workflows.json`. Require `team` (exact Linear team
-key), `repository` (GitHub `owner/repository`), `triageCreatorEmails` (nonempty exact
-creator allowlist), `maxEstimate` (numeric upper bound), and `mediumEstimateLabel`
-(the scale label used as Medium). Keep these values private. Verify the intended
+key), `repository` (GitHub `owner/repository`), `maxEstimate` (numeric upper bound),
+and `mediumEstimateLabel` (the scale label used as Medium). Keep these values
+private. Verify the intended
 authenticated Linear workspace, team, statuses, and estimate scale against the
 settings. Resolve the current Linear user through the authenticated connector's
 current-user lookup (`get_user` with `query: "me"`, or equivalent), or reuse an
@@ -46,8 +46,10 @@ as metadata yields a possible candidate, proceed to the detailed passes with the
 fetched metadata and remaining cursors; do not exhaust listings first.
 Do not filter by recent activity, unchanged `updatedAt`, or presumed provenance:
 pending unapplied replies, elapsed 48-hour deadlines, and interrupted builds can
-remain actionable without an issue metadata change. Defer creator exceptions,
-parent/leaf checks, and other detailed eligibility gates to triage.
+remain actionable without an issue metadata change. Exclude tickets created by
+the verified current user; any other verified creator may qualify. Do not require
+or filter by `triageCreatorEmails`, even if legacy settings contain that field.
+Defer parent/leaf checks and other detailed eligibility gates to triage.
 
 Only after exhausting both listing sets without possible candidates, report that
 no action is due and stop. Do not load pass references, full issues, comments,
