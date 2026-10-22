@@ -71,7 +71,7 @@ def validate():
             front = yaml_mapping(text.split('---', 2)[1], name)
             check(front.get('name') == path.parent.name and bool(front.get('description')),
                   name + ': missing or mismatched skill identity')
-            if front.get('disable-model-invocation') is True:
+            if front.get('disable-model-invocation') is True and name.startswith('.codex/'):
                 metadata = yaml_mapping((path.parent / 'agents/openai.yaml').read_text(), name)
                 check(metadata.get('policy', {}).get('allow_implicit_invocation') is False,
                       name + ': explicit-only skill needs matching native invocation policy')
@@ -84,6 +84,17 @@ def validate():
                                for choice in group[1].split(',')] if group else [reference])
                 for candidate in references:
                     check((ROOT / '.codex' / candidate.removeprefix('~/.codex/')).exists(),
+                          name + ': broken installed reference: ' + candidate)
+        if path.suffix in ('.md', '.toml', '.sh'):
+            for reference in re.findall(r"~/.claude/(?:agents|agent-guides|skills|bin)/[^\s`\x27\x22]+", text):
+                reference = reference.rstrip('.,;)')
+                if '<' in reference or '*' in reference:
+                    continue  # Placeholder or glob.
+                group = re.search(r'\{([^{}]+)\}', reference)
+                references = ([reference[:group.start()] + choice + reference[group.end():]
+                               for choice in group[1].split(',')] if group else [reference])
+                for candidate in references:
+                    check((ROOT / '.claude' / candidate.removeprefix('~/.claude/')).exists(),
                           name + ': broken installed reference: ' + candidate)
         if path.suffix == '.md':
             for target in re.findall(r'\[[^\]]*\]\(([^)]+)\)', text):

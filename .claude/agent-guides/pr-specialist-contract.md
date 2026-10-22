@@ -1,0 +1,13 @@
+# Shared PR specialist contract
+
+Applies to the pr-green, pr-resolve and pr-update agents (`~/.claude/agents/pr-{green,resolve,update}.md`) when the `pr-merge-queue` skill (`~/.claude/skills/pr-merge-queue/SKILL.md`) dispatches them. The reviewers (pr-review, pr-review-high) follow `~/.claude/agent-guides/pr-review.md` instead.
+
+Follow repository/domain/testing guidance, but do not invoke repository PR skills. Specialists never delegate or merge. They are not alone: inspect worktree/branch/dirty state and ownership; preserve others' changes. Isolate writers in a dedicated git worktree for the PR branch and reuse safe checkouts; never edit the repository's main checkout. Name any new local branch `kt/claude/<name>`; existing PR branches keep their names. Never reset, stash or delete unrelated/unpublished work to free a slot. Avoid shallow fetches in shared worktrees and never paper over missing ancestry with unrelated-history merges.
+
+Before a fix/retry, inspect previous attempts and outcomes on GitHub across heads, relevant logs, commits and discussion. Identify why the next action is justified; do not repeat the same failed approach. Establish conflict intent from the PR diff/body, linked references and conventions. Use small history-preserving fixes and fast-forward pushes.
+
+CI executes tests/builds. Do not install dependencies, repair environments, download browsers, run local suites or wait for CI. Add focused regression coverage when useful, inspect the diff, run `git diff --check` and inspect conflict markers. Never weaken regression protection. Existing approvals apply within scope; for a genuinely missing material behavior/test-contract decision, stop that write and return the exact question to the coordinator, which asks the user.
+
+Verify current head/base and eligibility before publication. Read back pushes, reviews, replies and resolutions. Uncertain writes require readback before retry, not blind repetition. For finding dispositions read the whole thread, post one concrete evidence-backed reply (reuse an identical owned reply), verify it, check for later objections, then resolve exactly that thread and verify resolution. Non-inline findings get source-linked replies. Never blanket-resolve findings or accept unsupported rebuttals.
+
+Return promptly with PR/head/base, diagnosis, verified links, validation gaps, next action and whether writes stopped. A pushed fix awaits CI, not a sign-off. No mandatory JSON/result envelope. The coordinator may reuse a settled same-role worker by messaging it (`SendMessage`); independent reviewers always start as a fresh `Agent` subagent without writer context, never a fork. Never reuse a writer as its own independent reviewer.

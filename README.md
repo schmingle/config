@@ -6,6 +6,7 @@ public; follow [AGENTS.md](AGENTS.md) before adding or publishing content.
 - [Global instructions](.codex/AGENTS.md): reusable working agreements for every Codex task.
 - [Agents](.codex/agents/): role definitions, shared instructions, and Claude execution helpers.
 - [Skills](.codex/skills/): custom skills and supporting files.
+- [Claude Code](.claude/): the Claude Code counterparts, mirroring `~/.claude/`: delegate and PR agents (`agents/`), their shared guides (`agent-guides/`), skills (`skills/`), and the Codex delegation helper (`bin/`).
 
 The `.codex/` directory mirrors the corresponding directories in `~/.codex/`.
 Instruction references use that default installation path; adapt them if your Codex
@@ -13,6 +14,11 @@ home differs. Symlink the installed `AGENTS.md` file and the `agents` and `skill
 folders to these tracked paths to edit the same files from either location. Back up
 existing files and folders before linking.
 Other local Codex settings are not included.
+
+`.claude/` follows the same rules for `~/.claude/`: symlink or copy the `agents`,
+`agent-guides`, `skills`, and `bin` folders from the tracked paths after backing up
+existing files. Its definitions reference `~/.claude/` paths. Claude Code settings,
+credentials, history, and runtime state are not included.
 
 Keep reusable defaults in the tracked instructions. Customize them through the
 local `.codex/AGENTS-PRIVATE.md`, the canonical home for private preferences,
