@@ -14,8 +14,10 @@ ownership or approval holds, blocked/interrupted work, oversized or project-shap
 work awaiting a next owner or decision, and decomposition parents and children.
 Include this run's screened tickets with an unresolved next step even if no
 mutation occurred. Unrelated metadata candidates and conclusively excluded
-self-created or other-owned tickets are not a permanent watchlist. A previously
-tracked ticket does not disappear merely because it changes assignee, status,
+self-created or other-owned tickets are not a permanent watchlist. Report tickets
+determined to belong to someone else in the final ownership list below, rather
+than the main table. A previously tracked ticket does not disappear merely
+because it changes assignee, status,
 estimate, creator eligibility, or falls outside this run's screening budget.
 
 Reconcile the union of this run's dispositions and prior tracked IDs with live
@@ -55,11 +57,12 @@ is not verified closure. Do not drop unresolved records to make the report clean
 
 ## Closure and handoff retention
 
-Keep every unresolved tracked ticket in **Still in play**, including unchanged
+Keep every unresolved tracked ticket visible in **Still in play** or the final
+**Owned by others** list, as appropriate, including unchanged
 holds, Draft PRs, ready PRs awaiting the queue, and merged PRs whose tickets remain
 open. Identify the actual next owner; assignment alone is not delivery ownership.
 An explicit handoff transfers execution to the destination owner but keeps the
-open ticket in Still in play with that owner and next action. Only a verified
+open ticket visible in Owned by others with that owner. Only a verified
 explicit release from this workflow’s tracking, distinct from reassignment or
 handoff alone, removes an open ticket: show the release once under work completed
 with evidence, then omit it from future outstanding rows. An unanswered ownership
@@ -93,21 +96,37 @@ with ticket-level accounting:
    Separate this run's actions from outcomes observed from the merge queue or
    other people. Say explicitly when no changes were made. Never call a proposed
    read-only action completed.
-4. **Still in play:** One row per unresolved tracked ticket, intervention first,
-   then actionable work, then waits. Use columns
-   `Ticket | Status / estimate | This run | PRs | Next owner / blocker / action`.
-   Link ticket IDs and all owning PRs; show Draft/ready/merged state. Include
-   unchanged tickets and tickets not screened this run. Give concrete next steps
-   and useful question/review deadlines. Preserve distinct parent/child rows and
-   relationships. Use `unknown` for missing evidence and `—` only for verified none.
+4. **Still in play:** One row per unresolved tracked ticket that remains for the
+   current user or has unresolved ownership, intervention first, then actionable
+   work, then waits. Use exactly these columns, in this order:
+   `Ticket | Status | Estimate | PRs | Update/notes`.
+   Link ticket IDs and all owning PRs; show Draft/ready/merged state in PRs. Include
+   unchanged tickets and tickets not screened this run. Put this run’s changes,
+   blockers, next owner/action, useful deadlines, and parent/child relationships
+   in Update/notes. Use `unknown` for missing evidence and `—` only for verified none.
+   Tickets determined to belong to someone else appear in the final ownership
+   list instead of duplicating them in this table. Uncertain ownership stays here
+   with the uncertainty explained; never invent an owner.
 5. **Closed in the last 24 hours:** Linked ticket, terminal outcome and time,
    owning PRs, and any material delivery limitation. Do not duplicate these rows
-   in Still in play. Omit the section when empty.
+   in Still in play or Owned by others. If presented as a table, use the same five
+   columns, with closure time and delivery limitations in Update/notes. Omit the
+   section when empty.
+6. **Owned by others:** End the report with a bullet list, one linked ticket per
+   item, using exactly `<ticket> - owned by <owner>`. Include tickets excluded this
+   run because verified assignment, directed responsibility, or active ownership
+   places them with someone else, plus previously tracked open tickets with a
+   verified other owner. Retain those tracked tickets across runs until closure
+   or explicit release from tracking; newly excluded unrelated tickets need not
+   become a permanent watchlist. Use the verified owner’s readable name, linking
+   it when a source URL is known. Self-created exclusion alone is not evidence of
+   another owner. Omit the section when empty; put any closing caveats before it.
 
-Reconcile inventory counts with the tables; intervention callouts supplement,
-not replace, their rows. Summarize unrelated discovery exclusions by reason
+Reconcile inventory counts with the tables and tracked entries in the final list;
+intervention callouts supplement, not replace, those entries. Summarize unrelated discovery exclusions by reason
 instead of listing an entire team backlog. A complete, empty inventory with no
-action needs only a concise summary explicitly stating that fact. When relevant,
+action needs only a concise summary explicitly stating that fact, plus the final
+ownership list if this run excluded tickets belonging to others. When relevant,
 close with unfinished worker/unpublished work or validation gaps and the next
 invocation needed; do not promise a scheduled follow-up. Keep the own-chat report
 readable without applying the external Linear comment word cap to its inventory.
