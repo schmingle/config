@@ -33,8 +33,8 @@ permissions to the owner (`chmod 600 .codex/AGENTS-PRIVATE.md`), and symlink
 The global instructions explicitly direct agents to load this file if present at
 the start of each task and apply its relevant preferences and account context.
 The general defaults work without private settings. Operational workflows may
-require additional private configuration: [Linear ticket triage](.codex/skills/linear-ticket/references/triage.md#private-workflow-settings)
-requires the documented team, repository, creator allowlist, and estimate settings
+require additional private configuration: [Linear ticket workflow](.codex/skills/linear-ticket/SKILL.md#scope-and-setup)
+requires the documented team, repository, and estimate settings
 in `~/.codex/private/linear-ticket-workflows.json`; it stops if they are missing or
 cannot be verified. An account map alone does not configure that workflow.
 
