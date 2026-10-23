@@ -4,8 +4,10 @@ Use this for `pr-review-high` and explicitly assigned Claude trials, together wi
 [the shared review contract](pr-review.md) and [shared Claude execution contract](claude.md). The default `pr-review` runs natively.
 Agent descriptions define routing; the shared contract defines review standards and handoff requirements.
 The wrapper prepares, verifies, and performs any authorized publication; one Claude
-session at a time supplies the independent analysis. The shared execution contract
-owns profile selection, authentication, privacy, process settlement, and verification.
+session at a time supplies the independent analysis. [The launcher contract](../../scripts/agent-launch.md)
+owns common privacy, lifecycle, and verification; [Claude specifics](claude.md) own
+the profile, authentication, and session persistence. The common contract is included
+in the prepared, hashed guidance snapshot.
 Use the helper manifest's exact reviewer attribution after those checks pass.
 
 Claude is trusted on this machine. The runner permits ordinary shell commands and

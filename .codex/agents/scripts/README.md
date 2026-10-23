@@ -12,9 +12,10 @@
 
 The review helper runs the Claude-backed `pr-review-high`; the default reviewer runs
 natively. Review definitions and the posted template remain in
-[the shared review contract](../pr-review.md). Profile selection, authentication,
-session persistence, process settlement, and execution verification are defined
-once in [the shared Claude contract](../claude.md).
+[the shared review contract](../pr-review.md). Common privacy, process settlement,
+and verification belong to [the launcher contract](../../../scripts/agent-launch.md);
+profile, authentication, and persistence belong to [Claude specifics](../claude.md).
+Prepared reviews include the common contract in their hashed guidance snapshot.
 Native signoffs come from `reviewer_attribution.py pr-review` or
 `reviewer_attribution.py pr-risk`, which reads
 the native agent's `model` and `model_reasoning_effort` fields.

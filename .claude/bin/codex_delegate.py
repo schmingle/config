@@ -11,29 +11,6 @@ sys.path.insert(0, str(ROOT / '.codex/agents/scripts'))
 from claude_runtime import ensure_runtime
 if __name__ == '__main__':
     ensure_runtime()
-sys.path.insert(0, str(ROOT / 'scripts'))
-from agent_launcher import (NATIVE_ROLES, READ_ONLY_ROLES, executor_rules, git_state,
-                            main as shared_main, role_settings)
-from agent_codex import execution
-
-
-def role_instructions(settings):
-    return settings['developer_instructions'] + executor_rules(settings['name'])
-
-
-def executor_attribution(settings):
-    return execution(settings)['attribution']
-
-
-def launch_args(cli, checkout, output, settings, sandbox):
-    from agent_codex import launch_args as command
-    return command(cli, checkout, output, '', 120, execution(settings), sandbox,
-                   {'head': 'pinned'}, role_instructions(settings), {})
-
-
-def main():
-    return shared_main(legacy_brief=True)
-
-
-if __name__ == '__main__':
-    raise SystemExit(main())
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    from agent_launcher import main
+    raise SystemExit(main(legacy_brief=True))

@@ -4,11 +4,15 @@ Use [agent-launch](agent-launch) from either Codex or Claude to execute one scop
 role. The caller does not select a direction or replace execution settings. Native
 Codex roles read their model, effort, and instructions from the canonical Codex
 agent TOML; Claude-backed roles use the shared Claude profile. Wrapper settings are
-not executor identity. Configuration adaptation remains one-way Codex to Claude.
+not executor identity. Configuration adaptation remains one-way Codex to Claude. This document owns
+the common assignment, permission, lifecycle, and verification rules. Provider
+guides add their actual differences; role guides own task-specific evidence and
+acceptance. Specialized workflows retain their own entrypoints and recovery rules.
 
 ## Assignment and execution
 
-Save a private JSON assignment outside the checkout and configuration repository:
+Save a JSON assignment with restrictive permissions outside the checkout and
+configuration repository:
 
 - `objective`, `scope`, and `expected_result`: nonempty strings.
 - `owned_paths`: string array of files/modules the task may edit; empty for analysis.
@@ -18,7 +22,10 @@ Save a private JSON assignment outside the checkout and configuration repository
   shorten it, never extend it. Preserve the original deadline on follow-up work.
 
 Provide a compact factual brief. Let the executor gather authorized relevant
-context; do not send credentials or unrelated private material. The same assignment
+context; do not send credentials or unrelated private material. Include useful prior
+findings and remaining questions when available. Pass the assignment unchanged
+through wrappers; do not infer approval. Standing role instructions come from the
+executor definition, not another copy in the assignment. The same assignment
 format works with both providers:
 
 ```sh
@@ -69,12 +76,17 @@ Claude's own permission and tool
 mechanics still apply; do not assume a Codex filesystem sandbox applies to Claude.
 The launcher never creates worktrees, commits, pushes, or publishes on its own.
 
+Follow applicable global and repository guidance, including protected behavior,
+commit attribution, hooks, account selection, and external communication approvals.
+Available tools and trusted handoff destinations do not expand task authorization.
+
 Verify the assigned checkout, repository, branch, HEAD, and local changes. Preserve
 intentional dirty work and other writers. Prepare a fresh pinned review checkout
 when the role requires it. Keep output private and fresh; never reuse a bundle to
 hide a previous attempt or blindly retry after partial work. `--dry-run` prepares
 settings without invoking a model. `--timeout` and `--max-turns` bound execution
-where supported; the absolute deadline remains authoritative.
+where supported; the absolute deadline remains authoritative. If no deadline is
+supplied, use the assigned time budget; ask if both are absent.
 
 ## Verification and boundaries
 
@@ -83,8 +95,20 @@ informed. The launcher checks provider availability/authentication, records actu
 execution settings, role capability ceilings, selected sandbox, and launch arguments,
 and settles owned processes. Provider
 adapters handle their own CLI arguments, authentication, and output formats.
-Recursive launcher calls are rejected; executors perform their assigned work
-directly instead of handing it back to the other provider.
+Neither wrappers nor executors spawn further agents. Recursive launcher calls are
+rejected; executors perform their assigned work directly. Never substitute a
+provider, model, effort, or native replacement for the assigned executor.
+
+Use one owned session at a time and reserve cleanup time. Verify its process group
+is settled before another session or checkout release. SIGTERM follows the same
+cleanup path; after SIGKILL or a crash, reconcile the saved process/session identity
+before claiming it stopped. Continuation or replacement must follow the owning
+role’s recovery rules, with verified prior evidence, settled processes, and the
+original deadline. Never hide a failed attempt by reusing or recreating its bundle.
+Read the actual UTC clock before budget claims. Continue required accessible work
+while time remains; report a genuine blocker or reached deadline with the exact
+missing scope. Any permitted continuation addresses only that missing work, carrying
+the prior result; do not restart the whole task or retry without progress.
 
 Read the report, execution record, logs, and final checkout state. Verify material
 claims against source, checks, and any published artifacts. Exit success and valid
@@ -92,6 +116,11 @@ output are not proof of task completion. Preserve partial work and disclose gaps
 denials, unsettled processes, and actual unblock actions. Required connectors must
 be verified inside the actual executor; a connection in the caller is insufficient.
 Attribute source work to recorded executor settings rather than wrapper frontmatter.
+Verify the actual model, requested effort, persistence when required by the provider,
+and role-specific completion gates. Distinguish finished assessment from operational
+readiness; a valid report or declared capability is not proof of either. Return the
+outcome, relevant file/PR links, verification, remaining risks, permission denials,
+and concrete unblock actions. Missing access must not become a completion claim.
 
 The existing Codex/Claude handoff commands remain compatibility entry points. Legacy `--brief-file` input is read-only; writable tasks require the structured JSON assignment with explicit owned paths. The
 specialized [Claude PR review workflow](../.codex/agents/pr-review-claude.md) retains

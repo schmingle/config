@@ -75,13 +75,17 @@ class EntrypointRuntimeTests(unittest.TestCase):
                  'commit', '-q', '--allow-empty', '-m', 'Fixture')
         head = self.git('rev-parse', 'HEAD')
         self.output.mkdir()
-        (self.output / 'guidance.md').write_text('Fixture guidance')
+        common = (Path(self.env.get('AGENT_LAUNCH_ROOT', SCRIPTS.parents[2])).expanduser().resolve()
+                  / 'scripts/agent-launch.md')
+        (self.output / 'guidance.md').write_text('Fixture guidance\n\n## ' + str(common) + '\n\n'
+                                                + common.read_text())
         profile = runner.execution_profile()
         profile['attribution'] = 'Reviewed by ' + profile['label'] + ' ' + profile['effort'] + '.'
         runner.dump(self.output / 'manifest.json', {
             'bundle_format': 3, 'checkout': str(self.checkout), 'head': head,
             'risk_report': {'rating': 'Low', 'body': 'Fixture', 'head': head, 'base': head, 'merge_base': head},
-            'raw_evidence': [], 'guidance_sha256': runner.digest(self.output / 'guidance.md'),
+            'raw_evidence': [], 'guidance': [str(common)],
+            'guidance_sha256': runner.digest(self.output / 'guidance.md'),
             'reviewer': profile})
         report = {key: 'Fixture' for key in ('correctness', 'approach', 'summary', 'validation')}
         report.update(risk='Low', reviewer_attribution=profile['attribution'], findings=[], gaps=[],

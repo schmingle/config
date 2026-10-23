@@ -196,6 +196,132 @@ class FixtureTests(unittest.TestCase):
         saved = review.load(self.bundle / 'manifest.json')
         self.assertEqual(saved['raw_evidence'][0]['sha256'], review.digest(self.evidence))
 
+    def test_common_execution_contract_is_snapshotted_once_with_additional_guidance(self):
+        common = review.COMMON_GUIDE.resolve()
+        topical = self.root / 'topical.md'
+        topical.write_text('Additional review guidance')
+        for index, additional in enumerate(([], [str(topical), str(common)])):
+            with self.subTest(additional=additional):
+                self.bundle = self.root / ('bundle-' + str(index))
+                spec = review.load(self.spec)
+                spec['guidance'] = additional
+                review.dump(self.spec, spec)
+                self.prepare()
+                manifest = review.load(self.bundle / 'manifest.json')
+                snapshot = (self.bundle / 'guidance.md').read_text()
+                self.assertEqual(manifest['guidance'].count(str(common)), 1)
+                self.assertEqual(snapshot.count('## ' + str(common) + '\n\n'), 1)
+                self.assertIn(common.read_text(), snapshot)
+                self.assertEqual(manifest['guidance_sha256'], review.digest(self.bundle / 'guidance.md'))
+                if additional:
+                    self.assertIn(topical.read_text(), snapshot)
+
+    def test_missing_common_contract_blocks_preparation_before_bundle_creation(self):
+        with patch.object(review, 'COMMON_GUIDE', self.root / 'missing-common.md'), \
+                self.assertRaisesRegex(ValueError, 'Additional guidance file is unavailable'):
+            self.prepare()
+        self.assertFalse(self.bundle.exists())
+
+    def test_configured_root_common_contract_is_snapshotted(self):
+        config = self.root / 'configured-root'
+        common = config / 'scripts/agent-launch.md'
+        common.parent.mkdir(parents=True)
+        common.write_text('Common contract from the configured installation root')
+        isolated_spec = importlib.util.spec_from_file_location('review_with_root', MODULE)
+        isolated = importlib.util.module_from_spec(isolated_spec)
+        with patch.dict(os.environ, {'AGENT_LAUNCH_ROOT': str(config)}):
+            isolated_spec.loader.exec_module(isolated)
+            with contextlib.redirect_stdout(io.StringIO()):
+                isolated.prepare(SimpleNamespace(spec=str(self.spec), checkout=str(self.checkout),
+                                                 output=str(self.bundle)))
+        manifest = review.load(self.bundle / 'manifest.json')
+        self.assertIn(str(common), manifest['guidance'])
+        self.assertIn(common.read_text(), (self.bundle / 'guidance.md').read_text())
+
+    def test_prepared_common_contract_survives_source_changes_and_resume(self):
+        common = self.root / 'common.md'
+        common.write_text('Original common execution rules')
+        with patch.object(review, 'COMMON_GUIDE', common):
+            self.prepare()
+            original = (self.bundle / 'guidance.md').read_bytes()
+            original_hash = review.load(self.bundle / 'manifest.json')['guidance_sha256']
+            common.write_text('Changed source rules after preparation')
+            self.run_with_result(self.valid_report())
+            focused = self.root / 'focused.txt'
+            focused.write_text('Inspect the remaining interface.')
+            self.run_with_result(self.valid_report(), resume=True, prompt_file=str(focused))
+        self.assertEqual((self.bundle / 'guidance.md').read_bytes(), original)
+        self.assertIn(b'Original common execution rules', original)
+        self.assertNotIn(b'Changed source rules', original)
+        self.assertEqual(review.load(self.bundle / 'manifest.json')['guidance_sha256'], original_hash)
+        self.assertIn('guidance.md', (self.bundle / 'prompt-continuation-1.txt').read_text())
+
+    def test_unstarted_legacy_bundle_missing_common_contract_is_rejected_without_mutation(self):
+        self.prepare()
+        snapshot = self.bundle / 'guidance.md'
+        snapshot.write_text('Legacy repository guidance without common execution rules')
+        manifest = review.load(self.bundle / 'manifest.json')
+        manifest['guidance'] = []
+        manifest['guidance_sha256'] = review.digest(snapshot)
+        review.dump(self.bundle / 'manifest.json', manifest)
+        original_manifest = (self.bundle / 'manifest.json').read_bytes()
+        original_snapshot = snapshot.read_bytes()
+        args = SimpleNamespace(bundle=str(self.bundle), finish_by=None, timeout=60,
+                               resume=False, max_turns=80, prompt_file=None)
+        with patch.object(review, 'run_process') as launch, \
+                patch.object(review, 'persistence_preflight') as preflight, \
+                self.assertRaisesRegex(ValueError, 'Unstarted review bundle lacks the shared execution contract'):
+            review.run(args)
+        launch.assert_not_called()
+        preflight.assert_not_called()
+        self.assertEqual((self.bundle / 'manifest.json').read_bytes(), original_manifest)
+        self.assertEqual(snapshot.read_bytes(), original_snapshot)
+        self.assertFalse((self.bundle / 'assignment.json').exists())
+        self.assertFalse((self.bundle / 'launch.json').exists())
+
+    def test_started_legacy_continuation_preserves_embedded_rules_deadline_and_history(self):
+        self.run_with_result(self.valid_report())
+        snapshot = self.bundle / 'guidance.md'
+        snapshot.write_text('Legacy repository guidance')
+        manifest = review.load(self.bundle / 'manifest.json')
+        manifest['guidance'] = []
+        manifest['guidance_sha256'] = review.digest(snapshot)
+        review.dump(self.bundle / 'manifest.json', manifest)
+        system = self.bundle / 'review-system.md'
+        system.write_text('Original common execution rules embedded before consolidation')
+        originals = {name: (self.bundle / name).read_bytes() for name in
+                     ('review-system.md', 'assignment.json', 'launch.json', 'process.json')}
+        focused = self.root / 'focused.txt'
+        focused.write_text('Inspect the remaining interface.')
+        self.run_with_result(self.valid_report(), resume=True, prompt_file=str(focused))
+        for name, contents in originals.items():
+            self.assertEqual((self.bundle / name).read_bytes(), contents)
+        self.assertTrue((self.bundle / 'launch-continuation-1.json').exists())
+
+    def test_changed_common_snapshot_blocks_initial_run_and_resume_before_launch(self):
+        common = self.root / 'common.md'
+        common.write_text('Required common execution rules')
+        focused = self.root / 'focused.txt'
+        focused.write_text('Inspect the remaining interface.')
+        with patch.object(review, 'COMMON_GUIDE', common):
+            for resume in (False, True):
+                with self.subTest(resume=resume):
+                    self.bundle = self.root / ('bundle-' + str(resume))
+                    self.prepare()
+                    if resume:
+                        self.run_with_result(self.valid_report())
+                    snapshot = self.bundle / 'guidance.md'
+                    snapshot.write_text(snapshot.read_text().replace(common.read_text(), 'Altered common rules'))
+                    args = SimpleNamespace(bundle=str(self.bundle), finish_by=None, timeout=60,
+                                           resume=resume, max_turns=80, prompt_file=str(focused))
+                    with patch.object(review, 'run_process') as launch, \
+                            patch.object(review, 'persistence_preflight') as preflight, \
+                            self.assertRaisesRegex(ValueError, 'Saved guidance changed after preparation'):
+                        review.run(args)
+                    launch.assert_not_called()
+                    preflight.assert_not_called()
+                    self.assertFalse((self.bundle / 'launch-continuation-1.json').exists())
+
     def test_output_inside_checkout_or_public_repo_is_rejected_before_any_write(self):
         config_repo = self.root / 'public-config'
         config_repo.mkdir()

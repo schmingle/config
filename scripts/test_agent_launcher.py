@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -44,6 +45,8 @@ if mode == 'nested':
     (root / 'nested.json').write_text(json.dumps({'code': nested.returncode, 'stderr': nested.stderr}))
 if mode == 'error':
     sys.exit(7)
+if mode == 'edit':
+    Path('source.txt').write_text('Scoped change\\n')
 report = {'summary': 'Fixture report', 'complete': mode != 'incomplete', 'changes': [],
           'verification': ['Fixture evidence'], 'gaps': ['Pending decision'] if mode == 'incomplete' else []}
 if mode == 'invalid':
@@ -64,6 +67,44 @@ else:
         result['structured_output'] = report
     print(json.dumps(result))
 '''
+
+
+class RoleSettingsTests(unittest.TestCase):
+    def test_public_counterparts_preserve_wrapper_and_executor_settings(self):
+        roles = {path.stem for path in launcher.AGENTS.glob('*.toml')}
+        counterparts = {path.stem for path in (ROOT / '.claude/agents').glob('*.md')}
+        self.assertEqual(roles, counterparts)
+        profile = launcher.shared.execution_profile()
+        for role in roles:
+            with self.subTest(role=role):
+                text = (ROOT / '.claude/agents' / (role + '.md')).read_text()
+                fields = dict(re.findall(r'^(model|effort): (.+)$', text, re.MULTILINE))
+                settings = launcher.role_settings(launcher.AGENTS, role)
+                if role in launcher.NATIVE_ROLES:
+                    self.assertEqual(fields, {'model': 'haiku', 'effort': 'low'})
+                    self.assertIn('--role ' + role, text)
+                    execution = agent_codex.execution(settings)
+                    instructions = agent_codex.instructions(settings, role, launcher.executor_rules(role))
+                    command = agent_codex.launch_args('codex', Path('/checkout'), Path('/private-output'),
+                                                     '', 120, execution, 'read-only',
+                                                     {'head': 'pinned'}, instructions, {})
+                    self.assertEqual(command[command.index('--model') + 1], settings['model'])
+                    self.assertIn('model_reasoning_effort=' + json.dumps(settings['model_reasoning_effort']), command)
+                    self.assertNotIn('claude_delegate.py', instructions)
+                    self.assertNotIn('claude_review.py', instructions)
+                    self.assertIn('Never spawn agents', instructions)
+                else:
+                    self.assertEqual(fields, {'model': profile['model'], 'effort': profile['effort']})
+
+    def test_native_executor_preserves_canonical_guide_paths_and_role(self):
+        def instructions(role):
+            settings = launcher.role_settings(launcher.AGENTS, role)
+            return agent_codex.instructions(settings, role, launcher.executor_rules(role))
+        text = instructions('pr-update')
+        self.assertIn('~/.codex/skills/pr-merge-queue/SKILL.md', text)
+        self.assertIn('~/.codex/agents/pr-review.md', text)
+        self.assertIn('Never silently ignore P3', text)
+        self.assertIn('~/.codex/agents/writer.md', instructions('writer'))
 
 
 class SharedLauncherTests(unittest.TestCase):
@@ -166,6 +207,60 @@ class SharedLauncherTests(unittest.TestCase):
             self.assertFalse(metrics['task_complete_claimed'])
             self.assertFalse(launcher.shared.load(self.output / 'report.json')['complete'])
 
+    def test_owned_edits_preserve_dirty_checkout_and_record_actual_changes(self):
+        subprocess.run(['git', '-C', str(self.checkout), '-c', 'core.hooksPath=/dev/null',
+                        '-c', 'commit.gpgsign=false', '-c', 'user.name=Developer',
+                        '-c', 'user.email=developer@example.invalid', 'commit', '-q',
+                        '--allow-empty', '-m', 'Fixture base'], check=True)
+        self.env['MODE'] = 'edit'
+        self.data['owned_paths'] = ['source.txt']
+        self.data['scope'] = 'Edit source.txt; preserve existing.txt'
+        self.write_task()
+        for role in ('delegate-low', 'delegate-xhigh'):
+            with self.subTest(role=role):
+                self.output = self.root / role
+                source = self.checkout / 'source.txt'
+                if source.exists():
+                    source.unlink()
+                result = self.run_role(role, extra=('--sandbox', 'workspace-write'))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                manifest = launcher.shared.load(self.output / 'manifest.json')
+                self.assertIsNotNone(manifest['initial_state']['head'])
+                self.assertEqual(manifest['initial_state']['head'], manifest['final_state']['head'])
+                self.assertIn('existing.txt', manifest['initial_state']['status'])
+                self.assertNotIn('source.txt', manifest['initial_state']['status'])
+                self.assertIn('source.txt', manifest['final_state']['status'])
+                self.assertEqual(source.read_text(), 'Scoped change\n')
+                self.assertEqual((self.checkout / 'existing.txt').read_text(), 'Preserved local work\n')
+                self.assertEqual(launcher.shared.load(self.output / 'assignment.json'), self.data)
+
+    def test_both_providers_can_use_a_directory_without_a_git_repository(self):
+        self.checkout = self.root / 'research'
+        self.checkout.mkdir()
+        for role in ('delegate-low', 'delegate-xhigh'):
+            with self.subTest(role=role):
+                self.output = self.root / role
+                result = self.run_role(role)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                manifest = launcher.shared.load(self.output / 'manifest.json')
+                self.assertEqual(manifest['initial_state'], {'git': False})
+                self.assertEqual(manifest['final_state'], {'git': False})
+                if role == 'delegate-low':
+                    self.assertIn('--skip-git-repo-check', launcher.shared.load(self.output / 'launch.json'))
+
+    def test_claude_adapter_preserves_profile_tools_and_disables_nested_agents(self):
+        profile = agent_claude.execution({})
+        command = agent_claude.launch_args('claude', self.checkout, self.output, 'session', 12,
+                                          profile, 'read-only', {}, '', launcher.schema())
+        self.assertEqual(command[command.index('--model') + 1], profile['model'])
+        self.assertEqual(command[command.index('--effort') + 1], profile['effort'])
+        self.assertEqual(command[command.index('--allowedTools') + 1:command.index('--disallowedTools')],
+                         profile['allowed_tools'])
+        self.assertEqual(command[command.index('--disallowedTools') + 1:], ['Agent'])
+        self.assertNotIn('--strict-mcp-config', command)
+        self.assertNotIn('--settings', command)
+        self.assertIn('task-system.md', command[command.index('--append-system-prompt-file') + 1])
+
     def test_provider_failures_and_missing_or_invalid_reports_fail_closed(self):
         for role in ('delegate-low', 'delegate-xhigh'):
             modes = ['error', 'missing-report', 'invalid']
@@ -236,16 +331,39 @@ class SharedLauncherTests(unittest.TestCase):
         self.assertEqual(self.calls(), [])
 
     def test_private_sources_bundles_and_assignment_shape_are_validated(self):
-        self.output = self.checkout / 'bundle'
-        self.assertNotEqual(self.run_role().returncode, 0)
+        for root in (self.checkout, ROOT):
+            self.output = root / 'forbidden-bundle'
+            self.assertNotEqual(self.run_role().returncode, 0)
         self.output = self.root / 'bundle'
         self.task = self.checkout / 'assignment.json'
         self.write_task()
+        self.assertNotEqual(self.run_role().returncode, 0)
+        self.task = ROOT / 'README.md'
         self.assertNotEqual(self.run_role().returncode, 0)
         self.task = self.root / 'invalid.json'
         del self.data['owned_paths']
         self.write_task()
         self.assertNotEqual(self.run_role().returncode, 0)
+        self.assertEqual(self.calls(), [])
+
+    def test_expired_deadline_and_existing_bundle_prevent_launch(self):
+        self.assertNotEqual(self.run_role(seconds=-1).returncode, 0)
+        self.assertFalse(self.output.exists())
+        self.output.mkdir()
+        result = self.run_role()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('already exists', result.stderr)
+        self.assertEqual(self.calls(), [])
+
+    def test_both_provider_dry_runs_prepare_without_cli_calls(self):
+        for role in ('delegate-low', 'delegate-xhigh'):
+            with self.subTest(role=role):
+                self.output = self.root / role
+                result = self.run_role(role, extra=('--dry-run',))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertTrue(json.loads(result.stdout)['dry_run'])
+                self.assertEqual(launcher.shared.load(self.output / 'metrics.json')['status'], 'prepared')
+                self.assertFalse((self.output / 'process.json').exists())
         self.assertEqual(self.calls(), [])
 
     def test_no_write_sandbox_without_owned_paths_and_review_roles_remain_read_only(self):

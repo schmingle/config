@@ -20,6 +20,8 @@ from claude_runner import (assignment_deadline, bounded_timeout, digest, dump,
                            saved_transcript, stop_process)
 
 AGENTS = Path(__file__).resolve().parents[1]
+COMMON_GUIDE = (Path(os.environ.get('AGENT_LAUNCH_ROOT', AGENTS.parents[1])).expanduser().resolve()
+                / 'scripts/agent-launch.md')
 REPORT_FIELDS = {'correctness', 'approach', 'risk', 'summary', 'findings', 'coverage',
                  'gaps', 'validation', 'reviewer_attribution', 'risk_discrepancies', 'prior_findings', 'open_questions'}
 
@@ -133,7 +135,9 @@ def prepare(args):
     paths = subprocess.check_output(['git', '-C', str(checkout), 'diff', '--name-only', '-z',
                                      spec['merge_base'], spec['head'], '--']).decode().split('\0')
     paths = [path for path in paths if path]
-    guides = collect_guides(checkout, paths, spec.get('guidance', []))
+    # The embedded Claude guide delegates common rules here; preserve their body
+    # in the hashed snapshot even when the caller supplies additional guidance.
+    guides = collect_guides(checkout, paths, [COMMON_GUIDE, *spec.get('guidance', [])])
     output.mkdir(parents=True, exist_ok=False)
     rawdir = output / 'raw'
     rawdir.mkdir()
@@ -192,6 +196,9 @@ def run(args):
     manifest = load(bundle / 'manifest.json')
     if manifest.get('bundle_format') != 3:
         raise ValueError('Reprepare this bundle with the current helper before running it')
+    if not (bundle / 'launch.json').exists() and str(COMMON_GUIDE) not in manifest.get('guidance', []):
+        raise ValueError('Unstarted review bundle lacks the shared execution contract; reprepare it '
+                         'before launch without extending the original assignment deadline')
     validate_risk_report(manifest.get('risk_report'))
     requested_deadline = args.finish_by or (manifest.get('finish_by')
                                             if not (bundle / 'assignment.json').exists() else None)
