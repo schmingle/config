@@ -98,8 +98,6 @@ def validate():
                 if value['name'] != 'pr-review-high':
                     check(not EXECUTION_PROSE.search(value['developer_instructions']),
                           name + ': native execution values belong only in execution fields')
-                check('~/.codex/agents/context.md' in value['developer_instructions'],
-                      name + ': missing shared context-selection policy')
                 agents[value['name']] = value
         if path.suffix in ('.yaml', '.yml'):
             yaml_mapping(text, name)

@@ -1,6 +1,6 @@
 ---
 name: review-skill
-description: "Review Codex skills for actionable quality, routing, authorization, and workflow defects. Use for independent skill assessment; use skill-creator to create or revise skills and code reviewers for general implementation review."
+description: "Review Codex skills for clarity, reliability, simplicity, and appropriate scope and authorization boundaries."
 model: haiku
 effort: low
 disallowedTools: Agent, Edit, Write, NotebookEdit
