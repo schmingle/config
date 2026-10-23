@@ -1,301 +1,244 @@
 ---
 name: linear-ticket
 description: >-
-    Triage the configured Linear queue for current relevance, ownership, clarity,
-    and bounded scope. Advance the right follow-up for unready work or implement
-    one ready Medium-or-smaller ticket, then report outstanding work and resolve
-    user decisions one ticket at a time. Explicit invocation only; no merging or
-    deployment.
+    Triage Linear tickets for readiness, advance specific follow-ups, and implement
+    one ready Medium-or-smaller ticket. Report outstanding work and resolve user
+    decisions one ticket at a time. Explicit invocation only; no merging or deployment.
 disable-model-invocation: true
 ---
 
 # Linear Ticket
 
-Turn the queue into delivered small work or clear next actions. Triage asks
-**is this ready for work?** Priority chooses which ready ticket to implement;
-readiness and permission to act are separate decisions.
+**Triage readiness → follow up or implement → report → resolve user decisions.**
+Priority selects among ready tickets; readiness does not itself authorize an action.
 
-## Scope and setup
+## Setup and limits
 
-Run only on an explicit user request or an existing authorized automation.
-Honor read-only, report-only, and explicitly scoped requests. Normal runs may
-assess and update Linear tickets and implement one eligible ticket, including
-branches, commits, pushes, Draft PRs, and the ready-for-review handoff. They do
-not authorize merging, auto-merge, deployment, production writes, project
-creation/reorganization, or email/SMS/Slack messages. Follow applicable approval
-rules; silence never grants ownership, scope, test-contract, or production approval.
-Do not create/edit automations, wait in the background, or promise a scheduled
-follow-up. A user reply continues the interview in this chat.
+Honor read-only, report-only, and ticket-scoped requests. Normal runs authorize
+Linear assessment/updates and one ticket's implementation, commits, pushes, Draft
+PRs, and ready handoff. They exclude merging, auto-merge, deployment, production
+writes, project creation/reorganization, email/SMS/Slack messages, and automation
+changes. Follow applicable approvals; silence never grants permission. Don't wait
+in the background or promise automatic follow-up.
 
-Read `~/.codex/private/linear-ticket-workflows.json`. Require the configured
-`team`, `repository`, numeric `maxEstimate`, and `mediumEstimateLabel`.
-Verify the intended authenticated Linear user/workspace, team statuses, and
-live estimate scale; verify the repository remote before accessing code.
-Use authenticated current-user lookup or an explicitly confirmed Linear identity,
-not OS/Git identity. The execution ceiling is **M**, or a lower configured maximum.
-A legacy higher `maxEstimate` never permits L execution. Missing or unverifiable
-settings/access are specific blockers, not an empty queue. Keep settings private.
+Read `~/.codex/private/linear-ticket-workflows.json`: require `team`, `repository`,
+numeric `maxEstimate`, and `mediumEstimateLabel`. Verify authenticated Linear
+user/workspace, statuses, and live estimate scale; verify the repository remote
+before code access. Use current-user lookup or an explicitly confirmed Linear
+identity, not OS/Git identity. The ceiling is **M or a lower configured maximum**,
+even if legacy settings permit more. Keep settings private; unavailable or ambiguous
+configuration/access is a blocker, not an empty queue.
 
-For repository work, follow its applicable guidance, isolation, testing, and PR
-conventions. Reuse authenticated identity and source evidence within the run;
-refresh affected issues, discussions, ownership, prerequisites, and PRs before
-mutations. Don't redo unrelated checks or broaden an uncertain target.
+Follow repository guidance for isolation, testing, and PRs. Reuse verified context,
+but refresh affected tickets, ownership, discussion, prerequisites, and PRs before
+mutations. Don't broaden an uncertain target.
 
-## 1. Discover and choose what to assess
+## 1. Discover and select
 
-List metadata for the configured team's Triage/Backlog and Todo/In Progress/In
-Review tickets, unassigned or assigned to the current user. Use supported filters,
-independent pagination, and deduplication. Collect IDs/URLs, creator, assignee,
-status, priority, estimate, parent, creation time, and update time. Resume discovery
-as needed; an unfinished listing never proves the queue is empty.
+List configured-team Triage/Backlog and Todo/In Progress/In Review metadata,
+unassigned or assigned to the current user: IDs/URLs, creator, assignee, status,
+priority, estimate, parent, creation/update times. Use supported filters,
+independent pagination, and deduplication; unfinished listings don't prove emptiness.
+Recover tracked work from prior reports/run history, private checkpoints, and native
+ticket/PR evidence, including tickets whose status or assignee changed.
 
-Also recover previously tracked work from prior reports, authorized run history,
-private checkpoints, and native ticket/PR evidence. Don't lose open tracked tickets
-because their status or assignee changed. Metadata inventory can exceed the screen
-budget; unrelated listing results are not a permanent watchlist.
+Exclude current-user-created tickets except verified, authorized workflow children;
+parent links or caches alone aren't proof. Unverified creator eligibility blocks
+mutation. Ignore legacy `triageCreatorEmails` filters.
 
-Exclude current-user-created tickets except verified workflow children whose
-creation was authorized. Assignment, parent links, and a checkpoint alone do not
-prove that exception. If creator eligibility cannot be verified, hold the affected mutation. Don't use
-legacy `triageCreatorEmails` filters.
+Rank by human direction and native priority, then impact, urgency, dependencies,
+readiness, and meaningful activity. Actionable replies, due feedback windows, and
+interrupted work matter; workflow history or newest `updatedAt` alone gives no
+priority. Recommend recorded priority changes rather than applying them silently.
 
-Respect human direction and native priority, then current impact, urgency,
-dependencies, readiness, and meaningful activity. Actionable replies, due feedback
-windows, or interrupted work may deserve attention; prior workflow involvement
-or newest `updatedAt` alone gives no priority. Recommend priority changes rather
-than silently changing the recorded field.
+**Per run: at most 10 fully assessed tickets, 10 mutated tickets, and one
+implementation ticket.** Detailed parent reads and held/unready assessments count.
+Metadata inventory may exceed 10; it isn't full assessment. Check unchanged holds
+lightly so they don't crowd out new work. Delegate briefs must request readiness,
+relevance evidence, and the next disposition.
 
-Fully assess at most **10 distinct tickets**, and mutate at most **10 distinct
-tickets** per run. Reading a parent's detailed discussion counts too. A held or
-unready ticket still counts when fully assessed. Use lightweight inventory checks
-for unchanged holds so they don't repeatedly crowd out new candidates. Never
-claim a full assessment based only on metadata. Delegate briefs must request
-readiness, relevance evidence, and a next disposition, not just buildability.
+## 2. Assess readiness
 
-## 2. Triage readiness
-
-Read the selected ticket's relevant description, full discussion, attachments,
-relations, and existing PR evidence. Resolve these questions:
+Read the ticket's relevant description, full discussion, attachments, relations,
+and PR evidence. Human-prepared work can qualify without prior workflow triage.
 
 | Check | Ready means |
 | --- | --- |
-| Relevance | The problem still exists or the requested outcome is still valid. |
-| Ownership and fit | Work is available to the current user, without conflicting ownership, and required context/access are available. |
-| Clarity | Desired behavior, essential scope, and consequential decisions are clear enough to proceed; safe technical defaults are acceptable. |
-| Scope | Independently sized at most M, with a complete outcome deliverable in one or two coherent PRs. |
-| Prerequisites and permission | Required dependencies and authorizations are satisfied. |
-| Validation | Concrete acceptance criteria and a practical way to verify success exist. |
+| Relevance | The problem persists or the request remains valid. |
+| Ownership/fit | Work is available to the current user, with needed context/access. |
+| Clarity | Outcome, essential scope, and consequential decisions are clear; safe technical defaults are acceptable. |
+| Scope | Independently sized at most M and deliverable in one or two coherent PRs. |
+| Prerequisites/permission | Dependencies and required authorizations are satisfied. |
+| Validation | Concrete acceptance criteria and practical verification exist. |
 
-Assess the complete outcome, not just its code diff. Work needing an unresolved
-multi-phase, multi-owner rollout or acceptance plan needs project framing even
-when its code is M-sized. Project membership alone does not exclude an independently
-bounded leaf under an approved plan; don't take over the broader initiative.
-
-Urgency and importance determine selection, not whether these conditions hold.
-A human-prepared ticket can be ready: prior preparation by this workflow is not
-required. Establish readiness from current evidence, and adopt an existing plan
-when it is sufficient. Reuse existing branches/PRs; never duplicate work.
+Judge the complete outcome, not just the diff. Unresolved multi-phase, multi-owner
+rollout/acceptance needs project framing even with M-sized code. An independently
+bounded leaf under an approved project can qualify without taking over the initiative.
 
 ### Ownership
 
-Before claiming or changing a candidate, check Linear discussion, linked PR work,
-and relevant Slack threads found by ticket ID/URL in the intended workspace.
-If required ownership evidence is unavailable, hold the affected action.
-Directed responsibility or explicit handoff outweighs the assignee field; a ticket
-assigned to someone else remains excluded. An incidental mention is not ownership.
-Don't take over another engineer's active work or interpret old age as permission.
+Before claiming/changing work, check Linear, linked PR activity, and relevant Slack
+threads found by ticket ID/URL in the intended workspace. Missing required ownership
+evidence blocks the action. Respect directed responsibility and explicit handoffs;
+exclude tickets assigned to others. Incidental mentions and age aren't permission.
 
-If no other engineer has substantively participated, continue normal triage.
-When another engineer participated but no explicit direction settles ownership,
-preserve the seven-day activity check across issue, Slack, and PR activity,
-including bots. Recent activity means skip; if all activity is older, a single
-takeover question may be appropriate. Ordinary review feedback on the current
-user's already-owned PR does not trigger this new-work participation veto. Only explicit affirmative handoff clears that ownership hold;
-reuse an existing ask, and never repeat it. Across a run, post at most one new
-ownership or exceptional authorization/risk ask; report other such needs privately.
-This conservative activity check is separate from relevance below.
+If no other engineer substantively participated, proceed. Otherwise, when no
+explicit direction settles ownership, skip if any issue/Slack/PR activity (including
+bots) occurred within seven days. If all activity is older, one takeover ask may
+be appropriate; only explicit affirmative handoff clears it. Ordinary reviews on
+the current user's own PR don't trigger this new-work veto. Reuse unanswered asks.
+Post at most one new ownership or exceptional authorization/risk ask per run;
+report additional needs in the user chat.
 
-### Relevance, especially old work
+### Relevance
 
-Consider creation age, last meaningful activity, and what that activity says.
-Run a quick proportional check against current code, related fixes/tickets, and
-recent evidence before detailed planning. Bot changes and this workflow's own
-updates do not by themselves renew relevance. Age alone never proves obsolescence.
+Consider creation age, last meaningful activity, and its substance. Quickly check
+current code, related fixes/tickets, and recent evidence before detailed planning.
+Bots and this workflow's updates alone don't renew relevance; age alone doesn't
+prove obsolescence. Keep this separate from the ownership activity rule.
 
-- **Still relevant:** Record the current signal and continue normal triage.
-- **Suspected stale:** Evidence is inconclusive. Ask once on the ticket whether
-  the problem persists or the request is still needed, stating what was checked.
-  Reuse existing questions and answers; if unanswered, don't send repeated pings.
-  Bring an evidence-backed keep/park/close decision to the user when useful.
-- **Likely stale:** Evidence suggests resolved, duplicate, obsolete, or superseded
-  work. Propose the terminal disposition and reason to the user. Close only after
-  explicit confirmation for that ticket, rechecking live evidence before writing.
+- **Still relevant:** Record the current signal and continue.
+- **Suspected stale:** Ask once on the ticket whether the issue/request persists,
+  stating what was checked. Reuse questions/answers without repeated pings; bring
+  a keep/park/close recommendation to the user when useful.
+- **Likely stale:** Propose closure and its reason for explicit user confirmation;
+  recheck evidence before closing. Never close solely for age or silence.
 
-Put the relevance finding, evidence or exact access gap, and next action in the
-report. "No implementation plan" and "not buildable" are not relevance findings.
-An unresolved relevance question blocks implementation; the Draft feedback timer
-below never supplies proof of relevance or closure approval.
+Report the finding, evidence/access gap, and next action. Missing implementation
+plans aren't relevance findings. Unresolved relevance blocks implementation;
+feedback timeouts don't establish relevance or authorize closure.
 
-### Independent approach and size
+### Approach and sizing
 
-For bugs, extract the problem, observed/expected behavior, reproduction facts,
-and real constraints. Investigate independently before comparing suggested
-implementations or estimates. For specific nonbug requests, preserve the requested
-outcome while choosing implementation and size independently. Respect approved
-behavior, compatibility, permissions, and test contracts; don't discard essential
-work to fit the ceiling. Update the native estimate when the evidence warrants it,
-but don't claim oversized work or remove its assignee automatically.
+For bugs, extract observed/expected behavior, reproduction facts, and constraints;
+investigate independently before comparing suggested implementations or estimates.
+For nonbug requests, preserve the outcome while choosing implementation and size.
+Respect approved behavior, compatibility, permissions, and test contracts; don't
+omit essential work to fit. Update the estimate from evidence without claiming
+oversized work or automatically removing its assignee.
 
-**L or larger is triage-only.** Recommend a clean split into independently useful
-S/M outcomes or finite project framing; don't automatically create children,
-execute the parent, or hide a large change in two PRs. Ticket creation/splitting
-and project changes require their own applicable approval. Existing approved
-children can qualify individually after their own readiness checks.
+**L+ is triage-only:** recommend independently useful S/M pieces or finite project
+framing. No automatic children, parent execution, or large changes squeezed into
+two PRs. Creation/splitting/project changes need applicable approval; approved
+children qualify only after their own readiness checks.
 
-## 3. Choose the next action
+## 3. Act on the disposition
 
-| Result | Follow-up |
+| Result | Next action |
 | --- | --- |
-| Ready and selected | Prepare native fields/concise plan, assign if appropriate, move new work to Todo or resume its existing lifecycle, and implement. |
-| Ready but not selected | Keep ready in the queue; don't invent a blocker or claim delivery. |
-| Facts the agent can obtain are missing | Investigate directly within the assessment budget. |
-| Consequential decision or relevance is unclear | Ask the right person one focused question; use the user interview for decisions the current user can settle. |
-| Likely stale | Review the proposed closure with the user. |
-| Ownership belongs elsewhere | Respect it and report the verified owner; obtain explicit handoff when appropriate. |
-| Scope is too large | Explain the sizing and recommend a split/project; seek required approval. |
-| Dependency, access, or permission is missing | Park with the exact blocker, responsible person, and condition for resuming. |
+| Ready, selected | Confirm fields/plan and assignment; new work enters Todo, existing work resumes its lifecycle. Implement. |
+| Ready, unselected | Keep queued without inventing a blocker. |
+| Missing obtainable facts | Investigate within the assessment budget. |
+| Consequential uncertainty | Ask the right person; use the interview for user decisions. |
+| Likely stale | Review closure with the user. |
+| Other-owned | Respect/report ownership; obtain handoff if appropriate. |
+| Too large | Recommend a split/project and seek approval. |
+| Dependency/access/permission blocked | Park with the exact blocker, owner, and resumption condition. |
 
-Choose and perform the smallest authorized follow-up, not necessarily a comment.
-Do not claim/assign a ticket merely to leave it blocked by an already-known gate.
-Reuse answered questions and safe defaults. Ask only current consequential gaps;
-do not impose a lifetime question count that prevents a later relevance check.
-Never repeat unanswered asks or post reminders on unchanged runs. A parked ticket
-remains visible, with a next owner/action; recheck it when evidence changes or a
-recorded follow-up becomes actionable. If no useful next step can be performed,
-state exactly why, rather than carrying forward a generic hold.
+Perform the smallest authorized follow-up; it needn't be a comment. Don't claim
+work merely to leave a known hold. Reuse answers/defaults; ask current consequential
+gaps without a lifetime question cap. Don't repeat unanswered asks or unchanged
+reminders. Keep parked work visible, rechecking on new evidence or actionable
+follow-up. If nothing useful can be done, explain the specific reason.
 
-## 4. Implement one selected ready ticket
+## 4. Implement and hand off
 
-Implement or substantively update at most **one ticket** per run, with one or two
-PRs only when the complete bounded outcome requires them. A newly discovered
-blocker on that selected work doesn't authorize starting a second build. Preserve
-partial work and report the gap. Multiple PRs share the same acceptance criteria
-and feedback window; completion requires their combined result.
+Work on one selected ticket; a newly discovered blocker doesn't authorize a second
+build. Preserve partial work. Reuse owning branches/PRs; necessary two-PR outcomes
+share acceptance criteria and the feedback window, and require combined validation.
 
-Follow repository guidance for investigation, regression coverage, checks,
-branches, commits, and PR descriptions. Keep changes focused. Reuse the owning
-branch/PR. Move to In Progress when implementing, and In Review on the ready
-handoff; don't round-trip existing work through Todo. Keep native PR links current
-and post one brief delivery comment with all owning PRs, verification, and remaining
-delivery steps. Create new PRs Draft while authoring; link the ticket and summarize
-its intended behavior, approach, acceptance criteria, and validation. Honor
-protected-test approvals; a recommended default cannot replace one.
+Follow repository investigation, regression, checks, commit, and PR conventions.
+Move implementing work to In Progress, then In Review on ready handoff; don't
+round-trip resumed work through Todo. Keep PR links current. Create PRs Draft,
+link the ticket, and explain intended behavior, approach, acceptance, and validation.
+Honor protected-test approvals. Post one brief delivery comment linking all owning
+PRs, verification, and remaining delivery steps.
 
-Safe technical defaults may proceed while ordinary feedback is pending. Explain
-material departures from a suggested approach once, with the reason and Draft PR
-link. Changed intended behavior/scope or unsafe unknowns require authorization
-before affected implementation, not merely a Draft label.
+Safe technical defaults can proceed during ordinary feedback. Explain a material
+approach departure once with its reason and Draft PR link. Changed intended
+behavior/scope or unsafe unknowns require approval before affected work.
 
-**Draft feedback rule:** Initial clarification questions or a material approach
-review notice start one 48-hour window from the original server publication time.
-Keep affected PRs Draft until substantive feedback is incorporated or the window
-elapses and recorded safe defaults are applied. Edits, another PR, and later runs
-never reset the clock. Recheck all answers and verification before marking ready.
-Never fabricate original timestamps or defaults, promote a human-held Draft, or
-let elapsed time override relevance, ownership, prerequisites, permission, or tests.
-No ordinary feedback needed means ready after implementation and verification.
+**Feedback window:** Initial clarification questions or a material approach-review
+notice start one 48-hour window from original server publication. Keep affected
+PRs Draft until substantive feedback is incorporated or the window expires and
+recorded safe defaults are applied. Edits, other PRs, and reruns don't reset it.
+Recheck answers and verification before readying; never invent timestamps/defaults,
+override human Draft holds, or let time bypass relevance, ownership, dependencies,
+authorization, or tests. Without a feedback wait, verified complete work can be ready.
 
-Before handoff, re-fetch feedback and apply or explicitly resolve in-scope replies;
-reading a reply is not implementing it. Mark verified, complete PRs ready and
-follow the repository's review-request policy. **Ready PRs belong to the merge
-queue:** observe/report their outcome, don't push competing changes, return them
-to Draft, or take over review/CI/merge work. Route later findings to the owning
-workflow through an authorized channel; a direct user request can override this
-boundary. PR merge, deployment, and operational acceptance are distinct outcomes.
+Before handoff, apply or explicitly resolve in-scope feedback; reading isn't applying.
+Ready verified PRs and follow repository review-request policy. **The merge queue
+owns ready PRs:** observe/report, without competing pushes, Draft reversions, or
+review/CI/merge work. Route later findings through authorized channels; explicit
+user direction can override. Merge, deployment, and operational acceptance differ.
 
-## 5. Communicate and retain continuity
+## 5. Communicate and retain state
 
-Write as the current user speaking naturally to a teammate. Resolve the canonical
-writing guide through [the writer guide-location rules](../../agents/writer.md#guide-location).
-Ticket comments should lead with the outcome or needed response and next action,
-usually a few sentences and at most **100 words**. No interview references,
-option numbers as decision provenance, UUIDs, workflow receipts, or hidden state.
+Use the current user's voice and [canonical writing guide](../../agents/writer.md#guide-location).
+Comments lead with the outcome/needed response and next action, at most 100 words.
+No interview provenance, workflow receipts, UUIDs, or hidden bookkeeping.
 
-When necessary decisions are settled, publish one cohesive plan: what I'll do,
-why, what I need from the requester, and how we'll verify the result. Prefer
-updating an existing plan when appropriate; preserve useful discussion/approval
-evidence. Don't publish partial interview answers as a barrage of comments.
-A necessary relevance/clarification question, material blocker change, or actual
-delivery result can merit a separate comment. Put technical detail in the ticket
-specification or required PR description, not repeated status comments.
+Once necessary decisions are settled, publish one cohesive plan: what I'll do,
+why, what I need, and how we'll verify it. Update an existing plan where appropriate,
+preserving useful discussion/approval evidence. Don't post each partial answer.
+Necessary questions, material blocker changes, and delivery results may merit
+separate comments; technical detail belongs in specifications/PR descriptions.
 
-Use existing private checkpoints at
-`~/.codex/private/linear-ticket-workflow-state/<verified-issue-uuid>.json` only as
-caches (directory 0700, files 0600). Preserve existing fields; retain minimal source
-references, pending asks/decisions, original feedback timestamps, next action, and
-inventory/closure evidence. Keep assessed feedback separate from applied feedback.
-Never copy private state into Linear, PRs, or repository tracking files. Recover
-from live sources when missing/stale; a cache never grants authority. If a write
-needs approval or fails, respect that boundary and continue independent discussion
-or investigation. Cache synchronization is not a prerequisite for the interview.
+Private checkpoints at
+`~/.codex/private/linear-ticket-workflow-state/<verified-issue-uuid>.json` are caches,
+not authority (directory 0700, files 0600). Preserve fields and minimal source,
+ask/decision, original feedback-time, next-action, and inventory/closure evidence;
+keep assessed and applied feedback distinct. Recover stale/missing caches from
+live sources. No private state in tickets/PRs/repo tracking files. Respect rejected
+or approval-gated writes while continuing independent work; cache sync never
+blocks the interview.
 
-## 6. Report, then continue the decision interview
+## 6. Report and interview
 
-Every run, including unchanged/blocked runs, reports verified results concisely:
+Every run, including unchanged/blocked runs, gives:
 
-- One outcome sentence with screened/changed/build counts, known open/recent-closed
-  counts, and any partial coverage. Timing once when useful.
-- Up to three short bullets for actual results or needed intervention, without
-  repeating table details. Omit empty sections and routine tool/checkpoint narration.
-- **Still in play:** All tracked open work needing the current user or unresolved
-  ownership, including unchanged holds and inventory-only rows.
-- **Closed in the last 24 hours:** Verified native terminal transitions, retained
-  for 24 elapsed hours after the actual closure, not PR merge or `updatedAt`.
-  Unknown closure time stays separately labeled unverified until resolved;
-  reopened tickets immediately return to open inventory.
-- **Owned by others:** One linked `<ticket> - owned by <owner>` per item. Include
-  current exclusions and tracked open handoffs; don't duplicate them in the tables.
+- One outcome sentence with screened/changed/build, open/recent-closed counts,
+  and coverage limits; timing once when useful.
+- Up to three result/intervention bullets, without repeating table notes.
+- **Still in play:** Every tracked open ticket for the user or unresolved ownership,
+  including unchanged holds and inventory-only rows.
+- **Closed in the last 24 hours:** Native terminal transitions, retained from actual
+  closure time, not PR merge/`updatedAt`. Keep unknown times separately unverified;
+  reopened work returns to open inventory.
+- **Owned by others:** Linked `<ticket> - owned by <owner>` entries for current
+  exclusions and tracked open handoffs, without duplicating table rows.
 
-Both open and closed tables use exactly:
-`Ticket | Status | Estimate | PRs | Action | Update/notes`.
-Sort Action alphabetically with Skipped last, then native workflow status order,
-then oldest ticket creation first (unknown times last; ticket ID breaks ties).
-Link ticket IDs and owning PRs/states. Action describes this run's actual work
-(e.g., Assessed, Asked, Triaged, PR started, PR updated, Marked ready, Skipped);
-observing another person's merge/closure is Assessed. Inventory-only is Not assessed.
-Notes give a short disposition, evidence, and next owner/action; put closure time
-there for terminal rows. Use unknown for unverified facts and — for verified none.
+Both tables: `Ticket | Status | Estimate | PRs | Action | Update/notes`.
+Sort Action alphabetically (Skipped last), native status order, oldest creation
+(unknown last; ID breaks ties). Link ticket IDs and PRs/states. Action is this run's
+actual work; observed merges/closures are Assessed, inventory-only is Not assessed.
+Notes give a brief disposition/evidence/next owner/action, or closure time. Use
+unknown for unverified facts and — for verified none.
 
-Reconcile tracked inventory with live metadata/PR states without deeply reassessing
-all tickets outside the 10-screen budget. Keep unresolved tracked tickets visible
-until verified closure or explicit release from tracking; reassignment alone
-isn't release. Label carried-forward findings and incomplete recovery honestly.
-No required inventory row may be removed merely to shorten the report.
+Reconcile live metadata/PR states without exceeding deep-assessment limits.
+Keep tracked open work until verified closure or explicit tracking release;
+reassignment alone isn't release. Label carried-forward findings and incomplete
+recovery. Shorten prose, not required inventory; omit empty sections and routine
+operational narration. Unrelated discovered candidates aren't a permanent watchlist.
 
-### Interview loop, including replies after the run
+### Continuing interview
 
-After the report, pick the most valuable unresolved user decision or stale-ticket
-closure review. Investigate available facts first. Ask **one question per turn**,
-followed by numbered choices; put **(Recommended)** on the first choice and give
-each a brief consequence/tradeoff. Use this format for the opening and every
-follow-up. A factual question with no meaningful alternatives can be direct.
-These workflow-specific rules apply even without invoking grill-me; invoke that
-skill only when its invocation policy permits or the user explicitly requests it.
-A report-only request suppresses the interview. If no question can help, briefly
-explain the evidence-backed reason; "no build," "already interviewed," or a
-historical hold alone is insufficient.
+Unless report-only, choose the most useful unresolved user decision/closure review
+and investigate available facts first. Ask **one question per turn**, with numbered
+choices, **(Recommended)** on choice 1, and brief tradeoffs. Apply to every question;
+factual questions without meaningful alternatives can be direct. Use this contract
+without invoking grill-me unless its policy permits or the user explicitly asks.
+If no interview can help, give the evidence-backed reason; "no build," "already
+interviewed," or a historical hold alone isn't sufficient.
 
-**After every answer:** incorporate the decision, perform specifically authorized
-follow-up actions, and reassess the same ticket's remaining readiness gaps. Then
-ask its next consequential question. Completing an approved ticket write does
-not end the interview. Don't repeat settled decisions or jump among unfinished
-tickets. When settled or genuinely parked, summarize the resulting plan and any
-exact external dependency, publish the cohesive plan if authorized, and offer a
-numbered checkpoint to review the next ticket or finish. Recommend finishing when
-no useful decisions remain; don't invent questions to extend the conversation.
+**After every answer:** incorporate it, perform specifically authorized actions,
+reassess the same ticket, and ask its next consequential question. An approved
+write doesn't end the interview. Don't repeat decisions or jump between unfinished
+tickets. When settled/parked, summarize the plan/exact dependency, publish the
+cohesive comment if authorized, and offer numbered choices to review the next
+ticket or finish. Recommend finishing when useful questions are exhausted.
 
-Interview replies continue this decision process, not a new automatic queue/build
-run or a reset of execution budgets. Tracking-only approval doesn't authorize
-implementation. If the ticket becomes ready, execute only when the current
-invocation still has that authority and budget, or the user explicitly requests
-implementation; otherwise retain it ready for the next authorized run.
+Replies don't restart queue/build runs or reset budgets. Tracking approval isn't
+implementation approval. Execute newly ready work only with remaining invocation
+authority/budget or an explicit implementation request; otherwise keep it ready
+for the next authorized run. Never invent questions to prolong the interview.
