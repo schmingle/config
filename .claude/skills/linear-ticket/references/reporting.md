@@ -170,9 +170,14 @@ but no ticket writes.
 
 Select the highest-value ticket needing a human decision. Investigate available
 evidence first: verify facts yourself, resolve routine implementation choices,
-and ask only consequential questions the user must answer. Give a recommendation
-and credible alternatives, one question per turn. Keep the opening question short
-and avoid repeating the report. Before finishing, choose either the first useful
+and ask only consequential questions the user must answer. Ask one question per
+turn, followed by numbered choices. Put the recommended choice first and label it
+"(Recommended)"; give each choice a brief explanation of its consequence or
+tradeoff. Apply this format to the opening question after the report and every
+subsequent interview question, including interviews conducted without invoking
+grill-me. Offer only credible choices; when a question needs a factual answer and
+has no meaningful alternatives, ask it directly rather than inventing options.
+Keep the opening question short and avoid repeating the report. Before finishing, choose either the first useful
 question or a brief, evidence-backed reason no interview can advance the remaining
 work (for example, all decisions settled and only a named external response is
 pending). "No eligible build," "already interviewed," and a generic hold are not
