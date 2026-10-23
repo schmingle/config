@@ -190,7 +190,7 @@ class SharedLauncherTests(unittest.TestCase):
                 self.assertFalse(manifest['process']['running'])
         launches = [call for call in self.calls() if call['args'] not in
                     (['--version'], ['auth', 'status'], ['login', 'status'])]
-        self.assertEqual(len(launches), 12)
+        self.assertEqual(len(launches), len(launcher.ROLE_CAPABILITIES))
         self.assertTrue(all(call['active'] == '1' for call in launches))
         self.assertTrue(all(call['cwd'] == str(self.checkout) for call in launches))
         self.assertEqual((self.checkout / 'existing.txt').read_text(), 'Preserved local work\n')
@@ -392,7 +392,7 @@ class SharedLauncherTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('owned_paths', result.stderr)
             self.assertFalse(self.output.exists())
-        for role in ('pr-risk', 'pr-review-high', 'port-to-claude'):
+        for role in ('pr-risk', 'pr-review-high', 'port-to-claude', 'review-skill'):
             limits = launcher.capabilities(role)
             self.assertFalse(limits['source_writes'])
             self.assertEqual(limits['external_actions'], 'none')
@@ -449,6 +449,24 @@ class SharedLauncherTests(unittest.TestCase):
                                              'read-only', {}, '', {})
         self.assertIn('approval_policy="never"', command)
         self.assertIn('approvals_reviewer="user"', command)
+
+    def test_skill_review_uses_native_analysis_without_approval_or_write_authority(self):
+        limits = launcher.capabilities('review-skill')
+        self.assertEqual(limits, {
+            'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
+            'requires_network_reads': False, 'approval_policy': 'never',
+            'external_actions': 'none', 'approvals_reviewer': 'user',
+        })
+        settings = launcher.role_settings(launcher.AGENTS, 'review-skill')
+        profile = agent_codex.execution(settings)
+        command = agent_codex.launch_args('codex', self.checkout, self.output, '', 120, profile,
+                                         'read-only', {}, '', {})
+        self.assertEqual(command[command.index('--model') + 1], settings['model'])
+        self.assertIn('model_reasoning_effort=' + json.dumps(settings['model_reasoning_effort']), command)
+        self.assertIn('approval_policy="never"', command)
+        self.assertIn('approvals_reviewer="user"', command)
+        with self.assertRaisesRegex(ValueError, 'read-only filesystem sandbox'):
+            launcher.filesystem_sandbox('review-skill', 'workspace-write', {'owned_paths': ['source.txt']})
 
     def test_owned_edits_keep_task_approvals_and_have_approval_path_for_authorized_pushes(self):
         self.data['owned_paths'] = ['existing.txt']

@@ -49,7 +49,7 @@ network research by generic delegates.
 - `pr-resolve` and `pr-update` default to `workspace-write` and require nonempty
   `owned_paths`. Generic delegates and `writer` default to `read-only`; select
   `--sandbox workspace-write` for explicitly assigned edits with owned paths.
-- `pr-risk`, `port-to-claude`, and the generic `pr-review-high` launch are analysis
+- `review-skill`, `pr-risk`, `port-to-claude`, and the generic `pr-review-high` launch are analysis
   only. They reject writable filesystem requests and permit no external writes.
   `pr-risk` requires live evidence and can request approval for scoped network
   reads. The specialized high-review workflow owns its publication path.
