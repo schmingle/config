@@ -43,7 +43,7 @@ List issue metadata in the configured team for **both** sets:
 
 Use supported server-side team, status, and assignee filters, separate queries
 when needed, and request only IDs/identifiers/URLs, status, assignee, creator,
-estimate, parent ID, and `updatedAt` where field selection is supported. If a
+estimate, priority, parent ID, `createdAt`, and `updatedAt` where field selection is supported. If a
 filter is unsupported, filter the metadata locally without narrowing coverage.
 Keep each listing's pagination independent and deduplicate by issue ID. As soon
 as metadata yields a possible candidate, proceed to the detailed passes with the
@@ -97,12 +97,14 @@ Run both passes in order after discovery finds possible candidates:
    PR for the same bounded outcome does not consume another ticket. The two passes
    may act on different tickets.
 
-In each pass, prefer verified existing workflow work with actionable new
-information, a due follow-up, or an interrupted In Progress build; among those,
-choose newest `updatedAt`. Then
-triage chooses the newest eligible Triage/Backlog candidate and build chooses
-the newest buildable Todo candidate. Only the 10 screened issues receive full
-issue/comment/PR assessment; rank their needed dispositions before mutation.
+In each pass, respect explicit human direction and native Linear priority, then
+consider current impact, urgency, dependencies, readiness, and meaningful activity.
+Favor actionable prior work or interrupted builds when that advances delivery;
+prior workflow involvement or newest `updatedAt` alone gives no priority. Recheck
+potentially stale work under [ticket relevance](references/triage.md#ticket-relevance)
+before detailed planning. Recommend recorded priority changes, never silently
+apply them. Only the 10 screened issues receive full assessment; rank their
+needed dispositions before mutation.
 Each screened issue counts once toward the 10 even if triage makes no change or
 changes several fields. Listing pages alone do not count as full screening.
 Explicit ticket selection applies to a pass only when the user scopes that pass
@@ -142,4 +144,7 @@ writes, or email, SMS, or Slack messages. Do not create or edit automations or
 promise an automatic follow-up. Future replies and deadlines require another
 explicit user or authorized automation invocation. Finish with one consolidated
 user-facing report under the [reporting contract](references/reporting.md),
-including actions, all outstanding workflow tickets, and recent closures.
+including actions, all outstanding workflow tickets, and recent closures. Then
+begin the [focused interview](references/reporting.md#focused-interview) when
+human input can unblock work. A pending question ends the run; the user's reply
+continues the same chat, without scheduling or expanding execution authority.

@@ -78,9 +78,10 @@ implemented or consumes build's applied-reply watermark.
 
 ## Candidates
 
-Use the discovery metadata and optional checkpoint hints to rank likely actionable
-or due prior workflow work first, newest `updatedAt` first within that tier; then
-rank new candidates by newest `updatedAt`. Continue the independent discovery
+Rank candidates with discovery metadata and optional checkpoint hints,
+using the entrypoint's value-based selection order. Use age and meaningful activity
+as relevance signals, not automatic exclusions or a newest-first rule.
+Continue the independent discovery
 listings as needed, including both new and possible prior work. Stop after fully
 screening 10 candidate issues or exhausting both listings and their collected
 candidates. An unfinished listing cannot establish that no candidates remain.
@@ -354,12 +355,51 @@ of Todo and the buildable list. The build cap remains one selected eligible leaf
 never the parent batch; splitting adds no merge, deployment, or broader execution
 authority.
 
+## Ticket relevance
+
+After ownership checks and before detailed planning, assess potentially stale
+work using creation age, last meaningful activity, and what the activity says.
+Run a quick, proportional validation against current implementation, related
+issues/PRs, and available recent evidence. Age triggers scrutiny, never closure
+or lower priority by itself. Bot updates, metadata edits, and this workflow's own
+comments do not by themselves renew relevance. This relevance assessment is
+separate from the conservative seven-day ownership activity rule.
+
+- **Likely stale:** Evidence indicates obsolete, resolved, or superseded work.
+  Present the evidence and proposed terminal disposition in the focused interview;
+  close only after the user explicitly confirms that ticket and reason. Re-fetch
+  before closing. Never close merely because it is old or unanswered.
+- **Suspected stale:** Relevance remains uncertain. Post one short Linear question
+  stating what was checked and asking whether the problem persists or the request
+  is still needed. Reuse existing questions/answers; no repeated pings or clock
+  resets. Hold detailed planning/build pending relevance evidence, and retain the
+  ticket in the report. An unanswered question may later be reviewed with the user.
+- **Still relevant:** Proceed through normal sizing, routing, and execution gates.
+
+These checks and writes count within the existing screening/mutation limits.
+A relevance question shares the ticket's initial external product-question set
+and lifetime three-question budget; it is not a new question round. If that set
+already exists, reuse it and surface uncertainty in the user interview instead.
+Relevance questions are an exception to waiting for a settled plan, not to
+ownership exclusions, read-only requests, or existing permission gates.
+
 ## Comment style
 
 This is the shared output contract for both passes. Write naturally as the current
 user and follow applicable writing guidance. Post ticket comments directly in
 Linear. Lead with the outcome, decision or blocker, and next action. Make the main
 point clear in a five-second scan and the full update readable within 30 seconds.
+Once necessary decisions are settled, publish one cohesive plan: what I'll do,
+why, what I need from the requester, and how we'll verify the outcome. During a
+user interview, keep partial decisions in the chat until a coherent plan is ready,
+unless the user explicitly requests an interim update. Prefer updating an existing
+plan comment when appropriate; preserve useful discussion and approval evidence.
+Do not post acknowledgements or decision receipts after each answer. Necessary
+relevance/clarification questions, material blocker changes, and delivery results
+may warrant separate comments. Omit interview references, option numbers,
+"decision source," "approval source," and administrative process language.
+Keep required approval evidence retrievable privately or in required PR disclosures.
+
 Use a few short sentences or at most three top-level items; number questions with
 compact choices. Mention issues by their actual ticket IDs so Linear can autolink
 them; never substitute titles, vague references, or invented IDs.
@@ -486,6 +526,11 @@ threads, ticket dumps, credentials, or secrets. Update only the current pass's
 assessment/applied state and necessary shared decisions; preserve the other state.
 Settled product choices do not mean code was applied. Triage never advances
 `buildApplied`; build advances it only after applying or resolving the feedback.
+
+If a checkpoint write is unavailable or requires approval, respect the boundary
+and disclose it as needed; continue independently authorized investigation and
+discussion. Cache synchronization is not a prerequisite for a substantive question.
+Do not bypass a rejected write or treat missing cache as a cleared gate.
 
 Always re-fetch source issues, questions/replies, ownership decisions, blockers,
 and PRs. A checkpoint is a cache, never authorization or evidence that a hold

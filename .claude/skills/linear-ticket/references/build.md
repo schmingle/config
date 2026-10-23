@@ -37,10 +37,10 @@ Slack messages. Draft status and elapsed time never bypass these gates.
 ## Candidates
 
 Use only the triage-produced buildable list; do not independently scan assigned
-issues. Prefer actionable new feedback/edits, a due deadline, or a verified
-interrupted In Progress build, newest `updatedAt` first within that tier. Then
-prefer the newest
-eligible prepared Todo ticket. Re-fetch the selected candidate and paginate its
+issues. Apply the entrypoint's value-based selection order. Favor actionable
+feedback, due deadlines, or verified interrupted builds when that advances
+delivery; newest `updatedAt` alone gives no priority. Re-fetch the selected
+candidate and paginate its
 comments, relations, and PR feedback before deciding readiness or whether
 feedback is new. Recheck these underlying filters:
 
@@ -161,6 +161,11 @@ Follow the shared comment limits: lead with user impact and next action, and
 include only a material decision/default, question, or blocker. Put technical
 rationale and validation detail in the repository-required PR description, linked
 from the ticket. Never repeat the ticket or append a workflow/metadata inventory.
+
+During a user interview, follow the [focused interview](reporting.md#focused-interview)
+and shared cohesive-plan rules before publishing a settled plan. Relevance holds
+remain build exclusions until resolved. A user answer alone does not start another
+build or reset invocation limits.
 
 Reuse a triage plan or existing question set; otherwise post one concise initial
 plan and any questions, then implement immediately.

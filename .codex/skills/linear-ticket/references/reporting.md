@@ -123,7 +123,7 @@ with ticket-level accounting:
    in Still in play or Owned by others. If presented as a table, use the same six
    columns and sorting, with closure time and delivery limitations in Update/notes. Omit the
    section when empty.
-6. **Owned by others:** End the report with a bullet list, one linked ticket per
+6. **Owned by others:** End the inventory with a bullet list, one linked ticket per
    item, using exactly `<ticket> - owned by <owner>`. Include tickets excluded this
    run because verified assignment, directed responsibility, or active ownership
    places them with someone else, plus previously tracked open tickets with a
@@ -131,7 +131,7 @@ with ticket-level accounting:
    or explicit release from tracking; newly excluded unrelated tickets need not
    become a permanent watchlist. Use the verified owner’s readable name, linking
    it when a source URL is known. Self-created exclusion alone is not evidence of
-   another owner. Omit the section when empty; put any closing caveats before it.
+   another owner. Omit the section when empty; put any inventory caveats before it. The focused interview follows the report.
 
 Reconcile inventory counts with the tables and tracked entries in the final list;
 intervention callouts supplement, not replace, those entries. Summarize unrelated discovery exclusions by reason
@@ -141,3 +141,44 @@ ownership list if this run excluded tickets belonging to others. When relevant,
 close with unfinished worker/unpublished work or validation gaps and the next
 invocation needed; do not promise a scheduled follow-up. Keep the own-chat report
 readable without applying the external Linear comment word cap to its inventory.
+
+## Concise output
+
+Lead with one outcome sentence and compact counts; include timing once when useful.
+Keep completed work to at most three short bullets and table notes to one short
+sentence per ticket. Do not repeat table details in intervention or results prose.
+Omit empty sections and routine tool, identity, policy, and checkpoint narration.
+Preserve every required inventory row, ownership entry, important link, material
+blocker, and coverage limitation; shorten prose rather than omit work. Put stale
+relevance dispositions and the next action in Update/notes; Action remains what
+this run actually did (for example, Assessed or Asked), not a proposed closure.
+
+## Focused interview
+
+After the report, begin a grill-me session when user input can materially unblock
+or clarify eligible work, including a proposed stale-ticket closure. Follow the
+interview contract below. Use the available grill-me skill when explicitly requested
+or permitted by its invocation policy; otherwise conduct this workflow-owned
+interview directly without invoking a prohibited skill. Explicit
+report-only requests suppress the interview. Read-only requests allow discussion
+but no ticket writes.
+
+Select the highest-value ticket needing a human decision. Investigate available
+evidence first: verify facts yourself, resolve routine implementation choices,
+and ask only consequential questions the user must answer. Give a recommendation
+and credible alternatives, one question per turn. Keep the opening question short
+and avoid repeating the report. If no useful decision remains, end without an
+invented interview. Do not wait in the background for an answer or schedule work.
+
+Stay on that ticket until its necessary decisions form a coherent plan or it is
+explicitly parked with the exact external dependency. Reuse prior answers and
+approvals. Before switching, summarize the settled plan and remaining execution
+prerequisites, then publish a cohesive ticket comment under the shared comment
+rules when authorized. A settled plan does not authorize production execution.
+
+Interactive questions to the user are distinct from external requester-question
+limits. They never reset external deadlines/budgets or bypass ownership, approval,
+and project-scope gates. A reply continues clarification in the same chat; it does
+not automatically rerun discovery/build or replenish execution budgets. Perform
+only the approved follow-up writes; new implementation needs an explicit request
+or the next authorized workflow invocation.
