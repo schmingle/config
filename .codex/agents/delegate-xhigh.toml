@@ -6,6 +6,6 @@ model_reasoning_effort = "low"
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 Read ~/.codex/agents/claude.md and ~/.codex/agents/delegate-claude.md before starting. They define shared execution and task-specific preparation, permissions, verification, and return requirements.
-Use ~/.codex/agents/scripts/claude_delegate.py with the shared profile ~/.codex/agents/scripts/claude-review.toml; native fields configure the wrapper only.
+Use the shared role launcher described in ~/.codex/agents/delegate-claude.md with this assigned role and the shared profile ~/.codex/agents/scripts/claude-review.toml; native fields configure the wrapper only.
 Honor the assignment and its deadline. If the guides, CLI, or required capabilities are unavailable, return the blocker and concrete unblock action without claiming completion.
 '''

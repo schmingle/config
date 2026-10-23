@@ -186,6 +186,8 @@ def run_process(argv, checkout, prompt, timeout, artifact, session):
 
 
 def run(args):
+    if os.environ.get('_SHARED_AGENT_EXECUTOR_ACTIVE'):
+        raise ValueError('Nested agent launch refused: execute the assigned review directly')
     bundle = Path(args.bundle).resolve()
     manifest = load(bundle / 'manifest.json')
     if manifest.get('bundle_format') != 3:

@@ -85,19 +85,109 @@ When the private account map identifies a GitHub account used for both work and 
 
 For email, SMS, and Slack, show the user the exact final message and recipients or destination, then obtain explicit confirmation immediately before sending or posting. If the message or destination changes afterward, show the revised preview and confirm again. This gate applies across conversations and delegated agents. For other channels, follow the authorization and publication rules of the task and its owning workflow; this section does not impose a separate preview-and-confirmation gate.
 
-For substantial writing (messages, documents, proposals, posts), read the private canonical writing guide at `~/.codex/writing/style-guide.md` if present, and revise with the smallest diff rather than rewriting. Do not duplicate style preferences here.
+For substantial writing tasks, prefer delegating to the `writer` agent with a fresh, compact assignment under [its workflow](agent-guides/writer.md). Include relevant facts and sources, audience, channel, requested length, selected or approved copy, latest corrections, and the resolved canonical guide path. Reuse the same writer for revisions when practical, and check the result against the brief. Code-facing prose, daily standups, and writing-guide maintenance retain their owning workflows; involve the writer when compatible.
+
+For delegated and direct writing, resolve the private canonical guide using [the guide-location rules](agent-guides/writer.md#guide-location). Briefly disclose a fallback when the writer would otherwise have been used. Do not duplicate style preferences here.
+
+## Work management
+
+Use Linear as the durable home for work so the user can switch priorities and resume without reconstructing agent conversations.
+
+**Build a rounded picture of priorities.** Use enough current context to understand
+what matters and what needs the user's involvement. Signals may include Linear
+settings, **available chat/session activity and conversations**, other recent work,
+communications, ownership, commitments, dependencies, and human direction. These
+are examples, not a mandatory checklist. Investigate gaps that could materially
+change the answer, then stop.
+
+Separate **actively driving or needing attention** from **important but not
+actively involved**. Judge involvement from ongoing behavior and commitments,
+including decisions, supervision, and follow-through—not just ownership or
+unanswered blockers. Delegating implementation does not delegate the user's
+attention. Keep work active while the user remains in the driver's seat, even
+between decisions. For active work, state their current role and next action when
+one exists; for monitored work, identify the execution owner.
+
+Explain the ranking's main basis. Surface conflicting or stale signals and solicit
+targeted input, offering a provisional ranking when useful. Don't silently
+disregard evidence or change recorded priorities without approval.
+
+1. **Projects track big rocks.** Propose creating or reusing a project when work involves roughly 10 tickets or at least one week of elapsed delivery time, including coordination, rollout, and acceptance. These are signals, not hard cutoffs; smaller efforts may qualify when they have a distinct outcome or significant coordination. Obtain approval before creating a project or reorganizing existing work.
+2. **Keep projects finite.** Each project needs a clear outcome, scope boundary, and completion criteria. Chunk larger programs into bounded versions or phases, such as v0, v1, and v2. Avoid continually expanding a project to absorb every related improvement; capture follow-ups separately.
+3. **Labels track ongoing workstreams.** Use labels such as Foundation, Recruiting, Security, and Ops for continuing categories of work. Tickets can carry these labels without belonging to a project. Use a project when a finite initiative emerges within a workstream.
+4. **Pins reflect current focus.** The user generally focuses on one or two big rocks at a time. When the available client supports pins, keep roughly two or three major priorities pinned; use Linear to track the rest. Do not change pins without a request.
+5. **Make switching easy.** Keep each project's current state, next action, blockers, consequential decisions, and important links easy to find. A fresh agent session should be able to recover the project contract and work evidence from Linear; workflow runtime state may live in native sessions and available automation records. Verify any required chat or scheduling capability before using it; a Claude subagent is not a separate durable chat.
+6. **Maintain state; preserve the approved plan.** Follow the shared [plan and state permissions](skills/project-init/references/project-contract.md#plan-and-state-permissions): agents may reconcile verified statuses, PR links, evidence, and observed blockers; changes to the approved project contract or ticket specifications require human approval. Reuse concrete approvals already given. Prefer native fields and integrations, reserving comments for significant outcomes, exceptions, or decisions needing attention. Distinguish implementation, deployment, and operational acceptance; never infer human acceptance from implementation progress. Unchanged records need no writes. Project posts follow the [status update policy](#project-status-updates).
+7. **Keep shared status updates quick to read.** Follow the project status update policy below for project posts. For other external status updates, aim for a five-second scan and at most 30 seconds to read, leading with the outcome, blocker, or next action and linking supporting detail. These limits do not apply to useful supervisor own-chat replies or worker own-chat execution reports, which may be detailed when useful, or to project contracts, ticket specifications, and PR descriptions requiring sufficient context.
+8. **Reference tickets by ID.** Include the actual ticket identifier whenever mentioning a ticket, optionally followed by its short title, so Linear can link it automatically. In chat and other formats, link the identifier to the known ticket URL when available; never invent identifiers or links.
+9. **Prefer a one-to-one mapping between implementation tickets and PRs.** Split work into scoped tickets or sub-issues as needed, with a clear outcome and validation for each implementation ticket. Parent tickets may track the combined outcome. Preserve coherent, atomic changes and existing work; explain necessary exceptions. Follow the owning workflow's authorization and limits; creating, splitting, or reorganizing tickets in an approved project plan requires approval for that change.
+
+Keep project management in Linear and maintained technical documentation beside the code.
+
+### PR delivery ownership in project workflows
+
+1. **Project workers own draft authoring.** Within the owning workflow's approved scope, the worker authors its PR as a draft with ticket and dependency links, implements and updates it, runs meaningful local validation, and quickly checks it against the ticket and project plan, fixing drift in the draft. Only the worker then marks it ready for review. That ready transition hands the PR to the merge queue. Within a supervisor–worker pair, only the worker creates, edits, pushes, or readies PRs. Do not return existing ready or queued PRs to draft to adopt this flow. Continue eligible project work.
+2. **The PR merge queue owns ready PRs.** The authorized PR merge queue handles risk assessment, review, finding resolution, CI and conflict repair, final review, and merging under its policy, including its draft and `noautomerge` exclusions. After the ready transition, the pair reports downstream issues instead of pushing competing changes. Other workflows consume its outcomes and may nudge the existing automation through a supported trigger when needed, rather than execute the pipeline themselves. Explicit direct user requests remain normal overrides.
+3. **The project supervisor owns progress and alignment.** Read worker progress and ticket/PR evidence to assess useful outcomes and adherence to the approved ticket/plan, then steer the worker or raise blockers within scope; never change PRs. This is not another PR review or deployment/acceptance assignment. Distinguish authored PRs from queue, deployment, and operational acceptance still needed; follow the owning workflow's wait/pause policy and authorization boundaries.
+
+### Project status updates
+
+1. **Batch meaningful changes.** Publish routine project status updates at most once every two hours, measured from the last published project update, including exceptions. Count a later edit timestamp only when it represents a meaningful published revision. Post only meaningful accumulated changes to project progress, outlook, or next action; unchanged runs skip posting even after two hours. Do not bypass this cadence by editing an existing status update or substituting project comments.
+2. **Keep exceptions narrow.** Only a genuinely urgent project risk or verified project completion may justify an immediate post. Do not repeat unchanged exceptions. Routine blockers, questions, pauses, stops, resumes, handoffs, worker dispatches, checkpoints, or individual PR/CI changes do not bypass the cadence. Surface needed human input immediately in the owning supervisor chat and, when the owning workflow permits, the relevant ticket without an extra project post.
+3. **Use a short summary and bullets.** Write one summary sentence and two to four useful bullets, usually under 100 words total. Cover the material outcome, blocker or decision, and next action as applicable. Link key tickets by actual ID, PRs, and evidence directly using verified URLs. Omit control metadata, exhaustive activity lists, and details already available in linked records.
+4. **Keep current state durable separately.** Update native tickets, fields, and links promptly as permitted by the owning workflow; these writes do not require a project status post or reset its publication window. Supervision runtime state belongs in native chat history/automation records, not Linear progress records.
+
+### Project descriptions
+
+Use this structure when creating or materially updating a Linear project. The description is the project's current contract: clear enough for the user to assess the direction and for an agent to execute without reconstructing prior conversations.
+
+```markdown
+## Summary
+[What this project is, why it matters, and the boundary of this version.]
+
+## Key Decisions
+- **Decided — [Choice]:** [Brief rationale and consequential constraints.]
+- **Starting assumption — [Choice]:** [What must be validated and when.]
+- **Open — [Decision needed]:** [How and when it will be resolved.]
+
+## Goal State
+
+### Key Results
+- [ ] [Observable outcome, capability, or measurable result.]
+
+### Completion Validation
+- **[Corresponding KR]:** [Scenario or check, expected result, and evidence
+  needed to demonstrate completion.]
+
+## Plan
+1. **[Phase name]** — [Core intention and resulting capability.]
+   Exit: [Condition that proves this phase achieved its purpose.]
+   Tracking: [Linked native Linear milestone.]
+
+## Context and Guardrails
+[Consequential dependencies, exclusions, constraints, unresolved questions,
+and source links that are not already covered above.]
+```
+
+Apply these directions:
+
+1. **Keep it concise and specific.** Capture the intended outcome and approach; keep implementation details in tickets. Do not invent metrics or targets to fill the template.
+2. **Always include Key Decisions.** State explicitly if none have been identified. Treat decided choices as constraints and propose changes before departing from them. Keep assumptions and open decisions visibly distinct from commitments.
+3. **Separate results from proof.** KRs describe what must become true. Completion validation explains how to demonstrate it. Use user stories for capabilities and appropriate operational, recovery, reconciliation, or performance checks for other outcomes.
+4. **Make phases govern execution.** Represent each phase with a native Linear milestone, named for its intended end state or specific initiative. Preserve its core intention and exit condition so assigned tickets can be checked for alignment. Parent tickets group scoped initiatives needing subtasks; do not use them as phase containers. Identify meaningful dependencies and parallel work.
+5. **Maintain one current contract.** Refresh the description when approved goals, decisions, or approach change. Use native milestones and tickets for detailed tracking. Keep current progress, next actions, blockers, and requests for the user in the records permitted by the owning workflow. The latest published project update is a concise summary under the reporting policy, with supporting evidence in linked records.
 
 ## Delegation
 
 Prefer delegating substantial tasks to a suitable predefined subagent. Substantial work includes tasks that may take more than 30 seconds or involve more than 10 steps, such as creating PRs, running GitHub workflows or deployment skills, and performing bulk repeated actions. These are signals, not limits. Respect explicit instructions to work directly, such as "don't delegate" or "do it yourself."
 
-Delegation is authorized within the task's existing scope and approval boundaries. Choose the predefined agent whose `description` fits the work (`delegate-low`, `delegate-medium`, `delegate-high`, `pr-review`, `pr-review-high`, `pr-green`, `pr-resolve`, `pr-update`); if none fits, use a general-purpose subagent when useful or do the work directly. The coordinating session remains responsible for integration, verification, and final delivery.
+Delegation is authorized within the task's existing scope and approval boundaries. Choose the predefined agent whose `description` fits the work (`delegate-low`, `delegate-medium`, `delegate-high`, `delegate-xhigh`, `writer`, `port-to-claude`, `pr-risk`, `pr-review`, `pr-review-high`, `pr-green`, `pr-resolve`, `pr-update`); if none fits, use a general-purpose subagent when useful or do the work directly. The coordinating session remains responsible for integration, verification, and final delivery. Follow the shared [context-selection policy](agent-guides/context.md). Codex-backed agents call Codex CLI with their corresponding Codex role’s model and effort; Claude-backed roles use the shared Claude execution settings. Wrapper settings describe orchestration, not the executor. Do not substitute providers or tiers silently.
 
 Start subagents fresh rather than as forks of the conversation unless the user asks for full-context inheritance. Assign a distinct outcome and pass a compact, self-contained brief containing the objective, scope and file ownership, constraints and applicable approvals, known findings, relevant paths and evidence, the remaining question, and the expected deliverable and verification. Reuse the same subagent for related follow-ups when practical. While it works, advance independent work; verify its conclusions and integration risks without repeating its investigation.
 
 ## Commit attribution
 
-Add the commit and PR attribution lines the session specifies exactly once. For work authored by Codex through a `delegate-*` agent, also append `Co-authored-by: Codex <codex@openai.com>` exactly once. Preserve the human author and existing co-author trailers. Reviewing or merging alone does not establish co-authorship.
+Add the commit and PR attribution lines the session specifies exactly once. For any work authored by Codex, regardless of role or transport, also append `Co-authored-by: Codex <codex@openai.com>` exactly once. Preserve the human author and existing co-author trailers. Reviewing or merging alone does not establish co-authorship.
 
 ## PR independence and dependency stacking
 

@@ -10,6 +10,7 @@ import unittest
 from unittest.mock import patch
 
 import claude_delegate as delegate
+import agent_claude
 import claude_runner as runner
 
 
@@ -57,7 +58,7 @@ class DelegateTests(unittest.TestCase):
             artifact('events.jsonl').write_text(json.dumps(result) + '\n')
             return {'exit_code': 0, 'timed_out': timed_out, 'running': False}
 
-        with patch.object(delegate.shutil, 'which', return_value='fake-claude'), \
+        with patch.object(agent_claude.shutil, 'which', return_value='fake-claude'), \
                 patch.object(runner, 'persistence_preflight', return_value={
                     'config_directory': str(self.root), 'projects_directory': str(self.projects)}), \
                 patch.object(runner, 'run_process', side_effect=finish), \
@@ -71,7 +72,7 @@ class DelegateTests(unittest.TestCase):
         self.assertIn('existing.txt', manifest['before']['status'])
         self.assertIn('source.txt', metrics['after']['status'])
         self.assertEqual((self.checkout / 'existing.txt').read_text(), 'Unrelated local work\n')
-        self.assertEqual(manifest['execution'], runner.execution_profile())
+        self.assertEqual(manifest['execution'], agent_claude.execution({}))
         self.assertEqual(runner.load(self.output / 'assignment.json'), runner.load(self.task))
         self.assertTrue(metrics['transcript_persisted'])
 

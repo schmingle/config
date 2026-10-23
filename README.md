@@ -6,7 +6,7 @@ public; follow [AGENTS.md](AGENTS.md) before adding or publishing content.
 - [Global instructions](.codex/AGENTS.md): reusable working agreements for every Codex task.
 - [Agents](.codex/agents/): role definitions, shared instructions, and Claude execution helpers.
 - [Skills](.codex/skills/): custom skills and supporting files.
-- [Claude Code](.claude/): the Claude Code counterparts, mirroring `~/.claude/`: delegate and PR agents (`agents/`), their shared guides (`agent-guides/`), skills (`skills/`), and the Codex delegation helper (`bin/`).
+- [Claude Code](.claude/): the Claude Code counterparts, mirroring `~/.claude/`: delegate and PR agents (`agents/`), their shared guides (`agent-guides/`), skills (`skills/`), and compatibility handoff entry points (`bin/`).
 
 The `.codex/` directory mirrors the corresponding directories in `~/.codex/`.
 Instruction references use that default installation path; adapt them if your Codex
@@ -44,6 +44,25 @@ also excluded. Supply your own private writing guide outside this repo; the
 path or `<codex-home>/writing/style-guide.md`.
 This repository does not include writing samples, credentials, or session history.
 
+## Agent execution
+
+Both providers can call the same [role launcher](scripts/agent-launch.md):
+
+```sh
+./scripts/agent-launch --role delegate-low --assignment /private/task.json --checkout /absolute/checkout --output /new/private/bundle --finish-by 2030-01-01T12:00:00Z
+```
+
+Use real paths and a current deadline. Roles select the canonical executor settings;
+there is no direction or caller-specific model override. The launcher shares task
+validation, deadlines, checkout records, logging, and process settlement, with small
+Codex and Claude adapters. Existing provider entry points remain compatibility
+wrappers. Follow the linked contract for assignment fields and verification.
+
+Resolve installed symlinks back to this checkout. For copied provider folders,
+set `AGENT_LAUNCH_ROOT` to this configuration checkout so both providers can find
+the shared launcher and helpers. Recursive handoffs are rejected. Configuration
+porting remains Codex to Claude.
+
 ## Validate changes
 
 Use Python 3.12 or newer. Activate the versioned local hooks for this checkout:
@@ -69,6 +88,7 @@ python -S scripts/check_privacy.py --staged
 python scripts/check_config.py
 PYTHONDONTWRITEBYTECODE=1 python -S -m unittest discover -s scripts -p 'test_*.py'
 PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s .codex/agents/scripts -p 'test_*.py'
+PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s .claude/bin -p 'test_*.py'
 ```
 
 The full configuration validator uses the dependencies in `requirements-dev.txt`;

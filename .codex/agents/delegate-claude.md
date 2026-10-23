@@ -7,7 +7,7 @@ Read [the shared execution contract](claude.md) for profile ownership, authentic
 sessions, privacy, process settlement, and verification. Apply repository guidance
 and the user's existing approvals.
 
-The [task runner](scripts/claude_delegate.py) does not apply the review-only
+The [shared launcher](../../scripts/agent-launch.md) selects the executor by role. The legacy [task entry point](scripts/claude_delegate.py) forwards to it. General task execution does not apply the review-only
 clean-checkout, risk-report, or required Linear rules.
 
 ## Prepare and run
@@ -29,8 +29,10 @@ Save a JSON assignment outside the checkout and public configuration repository:
 - Optional `finish_by`: an ISO 8601 absolute deadline with timezone.
 
 ```sh
-python3 ~/.codex/agents/scripts/claude_delegate.py --assignment /absolute/task.json --checkout /absolute/checkout --output /new/private/bundle --timeout 1800
+<config-root>/scripts/agent-launch --role delegate-xhigh --assignment /absolute/task.json --checkout /absolute/checkout --output /new/private/bundle --timeout 1800
 ```
+
+Resolve `<config-root>` from the installed agent path or `AGENT_LAUNCH_ROOT` under [the shared launcher contract](../../scripts/agent-launch.md). Use the actual assigned role, such as `port-to-claude`, rather than changing the executor by caller or direction.
 
 Output must be new and satisfy the shared contract's privacy boundary.
 The timeout bounds this one fresh session; `--finish-by` may shorten it.

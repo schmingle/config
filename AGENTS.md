@@ -23,6 +23,32 @@ small, sufficient starting brief with known decisions and approvals; let them se
 applicable instructions and gather more evidence without waiting for the coordinator
 to supply everything. Required guidance and role-specific coverage still apply.
 
+## Port Codex changes to Claude
+
+After completing a batch of changes under `.codex/`, call
+[port-to-claude](.codex/agents/port-to-claude.toml) before final delivery or
+committing. Supply the config repository root; Claude inspects the current
+folders and determines whether any porting changes are needed. The agent may
+also be called independently. No diff is required, and Codex must not pre-exclude
+files or prepare a separate diff bundle.
+
+Have Claude assess the current Codex configuration as a whole and recommend
+the coherent collection of Claude changes needed to preserve its intended
+behavior. Every public custom Codex agent and skill needs a Claude counterpart;
+Codex-managed `.system` skills and provider-only runtime internals are excluded.
+Match actual execution settings: Luna/Sol roles call Codex CLI with their source
+model and effort, while Claude-backed roles use the shared Claude profile directly.
+Preserve provider-specific permissions and tools, and distinguish wrappers from
+executors. This remains one-way Codex-to-Claude adaptation. Its source inspection and
+any diff inspection must be scoped to `.codex/`; it may read relevant existing Claude
+files as target context, but must not inspect diffs outside `.codex/`.
+
+Review and apply recommendations within the authorized scope; surface unresolved
+questions. If no Claude changes are needed, report why. Run once per completed
+batch, not per file; reassess later Codex changes, but applying Claude-only
+recommendations does not trigger another port. Porting does not authorize staging
+or committing, and explicit user instructions to defer either still apply.
+
 ## What belongs here
 
 Track reusable development configuration, agent definitions, skills, scripts, and

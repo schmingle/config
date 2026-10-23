@@ -22,6 +22,13 @@ spec.loader.exec_module(review)
 
 
 class EvidenceTests(unittest.TestCase):
+    def test_inherited_executor_cannot_reenter_specialized_review(self):
+        with patch.dict(os.environ, {'_SHARED_AGENT_EXECUTOR_ACTIVE': '1'}), \
+                patch.object(review, 'run_process') as launch, \
+                self.assertRaisesRegex(ValueError, 'Nested agent launch refused'):
+            review.run(SimpleNamespace())
+        launch.assert_not_called()
+
     def test_api_errors_are_not_empty_discussion(self):
         for value in ({'errors': [{'message': 'Unavailable'}], 'data': None},
                       {'data': {'errors': [{'message': 'Partial failure'}]}},

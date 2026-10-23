@@ -36,11 +36,11 @@ def git(checkout, *args):
     return subprocess.check_output(['git', '-C', str(checkout), *args], text=True).strip()
 
 
-def persistence_preflight(cli, checkout):
+def persistence_preflight(cli, checkout, timeout=15):
     """Probe the real authenticated config directory under these launch permissions."""
     if os.environ.get('CLAUDE_CODE_SKIP_PROMPT_HISTORY', '').lower() in ('1', 'true', 'yes'):
         raise ValueError('Claude session persistence is disabled by CLAUDE_CODE_SKIP_PROMPT_HISTORY')
-    status = subprocess.run([cli, 'auth', 'status'], cwd=checkout, capture_output=True, text=True, timeout=15)
+    status = subprocess.run([cli, 'auth', 'status'], cwd=checkout, capture_output=True, text=True, timeout=timeout)
     try:
         identity = json.loads(status.stdout)
     except ValueError:
@@ -176,6 +176,7 @@ def run_process(argv, checkout, prompt, timeout, artifact, session, cleanup=None
         try:
             env = os.environ.copy()
             env['ENABLE_TOOL_SEARCH'] = 'true'
+            env['_SHARED_AGENT_EXECUTOR_ACTIVE'] = '1'
             proc = subprocess.Popen(argv, cwd=checkout, env=env, stdin=stdin,
                                     stdout=stdout, stderr=stderr, start_new_session=True)
             state.update(pid=proc.pid, running=True)

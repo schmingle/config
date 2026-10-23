@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+"""Provider-neutral role launcher; symlink this entry point when installing."""
+import os
+from pathlib import Path
+import sys
+
+root = Path(os.environ.get('AGENT_LAUNCH_ROOT', Path(__file__).resolve().parents[1])).expanduser().resolve()
+if not (root / 'scripts/agent_launcher.py').is_file() or not (root / '.codex/agents/scripts/claude_runtime.py').is_file():
+    raise SystemExit('Shared launcher unavailable; set AGENT_LAUNCH_ROOT to the configuration checkout containing scripts/agent-launch and both provider folders.')
+sys.path.insert(0, str(root / '.codex/agents/scripts'))
+from claude_runtime import ensure_runtime
+ensure_runtime()
+sys.path.insert(0, str(root / 'scripts'))
+from agent_launcher import main
+raise SystemExit(main())

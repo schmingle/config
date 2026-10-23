@@ -9,8 +9,7 @@ permissions, evidence, and acceptance criteria:
 [The execution profile](scripts/claude-review.toml) is the shared source of Claude's
 model, effort, display name, and tool permissions. Its historical filename remains
 compatible with existing review bundles. Native TOML fields configure wrappers.
-[The shared runner](scripts/claude_runner.py) owns launch arguments, authentication,
-session persistence, deadlines, and process settlement. Role runners select their
+[The provider-neutral launcher](../../scripts/agent-launch.md) owns general role dispatch, assignments, deadlines, and execution records. Its provider adapters retain CLI-specific behavior. [The shared runtime](scripts/claude_runner.py) supplies Claude launch/authentication/persistence helpers and process settlement, also used by specialized reviews. Role runners select their
 own prompts, output schema, task evidence, and acceptance checks. Never silently
 substitute another model or effort or perform a native replacement for Claude's work.
 

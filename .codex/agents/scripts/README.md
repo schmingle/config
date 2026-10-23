@@ -1,10 +1,8 @@
-# Claude execution helpers
+# Execution helpers
 
-[The shared execution layer](claude_runner.py) supplies launch arguments,
-authentication, session persistence, deadlines, and process settlement to both role
-runners. [The common handoff](../claude.md) defines their execution contract.
+[The shared role launcher](../../../scripts/agent-launch.md) is the provider-neutral entry point for general assignments from either provider. It owns assignment handling, role dispatch, deadlines, execution records, and provider adapters. [The existing runtime](claude_runner.py) supplies process settlement and Claude-specific helpers to it and to specialized reviews. [The Claude handoff](../claude.md) defines provider-specific requirements.
 
-- General tasks: [claude_delegate.py](claude_delegate.py), following
+- General tasks: use the shared launcher with the assigned role. [claude_delegate.py](claude_delegate.py) remains a compatibility entry point, following
   [the task handoff](../delegate-claude.md). It permits assigned source changes and
   verification in the existing checkout, saves initial/final state, and has no
   PR/risk/Linear requirement.

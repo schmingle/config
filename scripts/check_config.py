@@ -35,6 +35,8 @@ def validate():
     paths = subprocess.check_output(['git', '-C', str(ROOT), 'ls-files', '--cached', '--others',
                                      '--exclude-standard', '-z']).decode().split('\0')
     agents = {}
+    claude_agents = {}
+    skills = {}
     skill_count = 0
     for name in sorted(set(paths) - {''}):
         path = ROOT / name
@@ -66,6 +68,16 @@ def validate():
                 agents[value['name']] = value
         if path.suffix in ('.yaml', '.yml'):
             yaml_mapping(text, name)
+        if path.parent == ROOT / '.claude/agents' and path.suffix == '.md':
+            check(text.startswith('---\n'), name + ': missing agent frontmatter')
+            front = yaml_mapping(text.split('---', 2)[1], name)
+            check(front.get('name') == path.stem and bool(front.get('description')),
+                  name + ': missing or mismatched agent identity')
+            check(bool(front.get('model')) and front.get('effort') in EFFORTS,
+                  name + ': missing model or invalid effort')
+            check(not EXECUTION_PROSE.search(front['description']),
+                  name + ': keep routing descriptions free of model/effort settings')
+            claude_agents[path.stem] = front
         if path.name == 'SKILL.md':
             check(text.startswith('---\n'), name + ': missing frontmatter')
             front = yaml_mapping(text.split('---', 2)[1], name)
@@ -75,6 +87,7 @@ def validate():
                 metadata = yaml_mapping((path.parent / 'agents/openai.yaml').read_text(), name)
                 check(metadata.get('policy', {}).get('allow_implicit_invocation') is False,
                       name + ': explicit-only skill needs matching native invocation policy')
+            skills[name] = front
             skill_count += 1
         if path.suffix in ('.md', '.toml'):
             for reference in re.findall(r"~/.codex/(?:agents|skills)/[^\s`\x27\x22]+", text):
@@ -102,6 +115,15 @@ def validate():
                     continue  # Placeholder, fragment, or external reference.
                 destination = (path.parent / target.split('#')[0]).resolve()
                 check(destination.exists(), name + ': broken local link: ' + target)
+    check(agents.keys() <= claude_agents.keys(),
+          'Missing Claude agent counterparts: ' + ', '.join(sorted(agents.keys() - claude_agents.keys())))
+    for source, front in skills.items():
+        if not source.startswith('.codex/skills/'):
+            continue
+        target = source.replace('.codex/skills/', '.claude/skills/', 1)
+        check(target in skills, source + ': missing Claude skill counterpart')
+        check(skills[target].get('disable-model-invocation') == front.get('disable-model-invocation'),
+              source + ': Claude invocation policy differs')
     for name in ('pr-review', 'pr-risk'):
         check('reviewer_attribution.py' in agents[name]['developer_instructions'],
               name + ': derive signoff from execution fields')
@@ -117,7 +139,7 @@ def validate():
     for name in ('pr-review-high', 'delegate-xhigh'):
         check('claude-review.toml' in agents[name]['developer_instructions'],
               name + ': Claude wrapper must reference the shared execution profile')
-    print(f'Validated {len(agents)} agents, {skill_count} skills, YAML/TOML, Python, local links, and public-file checks.')
+    print(f'Validated {len(agents)} Codex agents, {len(claude_agents)} Claude agents, {skill_count} skills, YAML/TOML, Python, local links, and public-file checks.')
 
 
 if __name__ == '__main__':
