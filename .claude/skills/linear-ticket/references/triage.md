@@ -376,6 +376,15 @@ separate from the conservative seven-day ownership activity rule.
   ticket in the report. An unanswered question may later be reviewed with the user.
 - **Still relevant:** Proceed through normal sizing, routing, and execution gates.
 
+For each screened potentially stale ticket, record the relevance finding, quick
+validation evidence (or exact access limitation), and next disposition in the
+report's Update/notes. "Not buildable," an old estimate, project membership, or
+an unsettled implementation plan does not establish current relevance. A missing
+plan is not a substitute for checking whether the work is still needed. Delegate
+assignments must request relevance/disposition findings as well as build readiness.
+If quick validation remains inconclusive, use Suspected stale and the bounded
+feedback route above; do not silently carry forward an implementation hold.
+
 These checks and writes count within the existing screening/mutation limits.
 A relevance question shares the ticket's initial external product-question set
 and lifetime three-question budget; it is not a new question round. If that set

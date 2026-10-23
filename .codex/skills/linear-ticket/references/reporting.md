@@ -120,9 +120,14 @@ with ticket-level accounting:
    with the uncertainty explained; never invent an owner.
 5. **Closed in the last 24 hours:** Linked ticket, terminal outcome and time,
    owning PRs, and any material delivery limitation. Do not duplicate these rows
-   in Still in play or Owned by others. If presented as a table, use the same six
-   columns and sorting, with closure time and delivery limitations in Update/notes. Omit the
-   section when empty.
+   in Still in play or Owned by others. Use a table with exactly
+   `Ticket | Status | Estimate | PRs | Action | Update/notes`, in that order,
+   and the same sorting as Still in play. Put the terminal status in Status,
+   native estimate (or unknown) in Estimate, owning PR links/states in PRs,
+   this run's actual action in Action, and closure time plus material delivery
+   limitations in Update/notes. Observing someone else's closure is Assessed,
+   not Closed by this run. Do not substitute a Ticket/Closed/PRs table.
+   Omit the section when empty.
 6. **Owned by others:** End the inventory with a bullet list, one linked ticket per
    item, using exactly `<ticket> - owned by <owner>`. Include tickets excluded this
    run because verified assignment, directed responsibility, or active ownership
@@ -167,8 +172,12 @@ Select the highest-value ticket needing a human decision. Investigate available
 evidence first: verify facts yourself, resolve routine implementation choices,
 and ask only consequential questions the user must answer. Give a recommendation
 and credible alternatives, one question per turn. Keep the opening question short
-and avoid repeating the report. If no useful decision remains, end without an
-invented interview. Do not wait in the background for an answer or schedule work.
+and avoid repeating the report. Before finishing, choose either the first useful
+question or a brief, evidence-backed reason no interview can advance the remaining
+work (for example, all decisions settled and only a named external response is
+pending). "No eligible build," "already interviewed," and a generic hold are not
+sufficient reasons. Reuse answers and ask only the next unresolved decision;
+never repeat settled questions. Do not wait in the background or schedule work.
 
 Stay on that ticket until its necessary decisions form a coherent plan or it is
 explicitly parked with the exact external dependency. Reuse prior answers and
@@ -182,3 +191,14 @@ and project-scope gates. A reply continues clarification in the same chat; it do
 not automatically rerun discovery/build or replenish execution budgets. Perform
 only the approved follow-up writes; new implementation needs an explicit request
 or the next authorized workflow invocation.
+
+## Completion check
+
+Before sending the report, check that every screened potentially stale ticket has
+a relevance disposition and next action, including any feedback or closure review
+needed; both open and closed tables use the exact six-column format; and the reply
+ends with one focused question or the evidence-backed reason no useful interview
+remains, unless the user explicitly requested report-only output. "Not buildable" ends build selection, not triage. Do the permitted quick
+validation and choose the next disposition within existing limits; if evidence or
+budget is missing, state what remains unassessed rather than inventing a result.
+Do not spend extra screening or build capacity merely to satisfy this check.
