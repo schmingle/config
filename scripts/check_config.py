@@ -9,6 +9,7 @@ import tomllib
 import yaml
 
 from check_privacy import inspect_blob
+from agent_launcher import ROLE_CAPABILITIES, capabilities
 
 ROOT = Path(__file__).resolve().parents[1]
 EFFORTS = {'none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'}
@@ -28,6 +29,40 @@ def yaml_mapping(text, label):
         raise ValueError(label + ': invalid YAML; source content omitted') from None
     check(isinstance(value, dict), label + ': expected a YAML mapping')
     return value
+
+
+def validate_capabilities(agents):
+    check(set(agents) == set(ROLE_CAPABILITIES), 'Launcher capabilities must cover exactly the public roles')
+    for role in agents:
+        limits = capabilities(role)
+        check(set(limits) == {'provider', 'default_sandbox', 'source_writes', 'approval_policy',
+                             'approvals_reviewer', 'external_actions', 'requires_network_reads'},
+              role + ': invalid capability fields')
+        check(limits['provider'] in {'codex', 'claude'}, role + ': invalid executor provider')
+        check(isinstance(limits['source_writes'], bool), role + ': source_writes must be boolean')
+        check(isinstance(limits['requires_network_reads'], bool), role + ': requires_network_reads must be boolean')
+        check(limits['default_sandbox'] in {'read-only', 'workspace-write'}, role + ': invalid default sandbox')
+        check(limits['source_writes'] or limits['default_sandbox'] == 'read-only',
+              role + ': analysis roles must default to read-only')
+        check(limits['external_actions'] in {'none', 'task-authorized', 'comment-review', 'ci-rerun'},
+              role + ': invalid external action ceiling')
+        if limits['provider'] == 'codex':
+            needs_approval = (limits['requires_network_reads'] or limits['source_writes']
+                              or limits['external_actions'] != 'none')
+            expected = 'on-request' if needs_approval else 'never'
+            check(limits['approval_policy'] == expected, role + ': missing or excessive approval path')
+            check(limits['approvals_reviewer'] == ('auto_review' if expected == 'on-request' else 'user'),
+                  role + ': invalid approval reviewer')
+        else:
+            check(limits['approval_policy'] == limits['approvals_reviewer'] == 'provider-native',
+                  role + ': preserve native provider permissions')
+    for role in ('pr-risk', 'pr-review-high', 'port-to-claude'):
+        check(not capabilities(role)['source_writes'] and capabilities(role)['external_actions'] == 'none',
+              role + ': generic analysis must not write or publish')
+    check(capabilities('pr-risk')['requires_network_reads'], 'pr-risk: live evidence requires network reads')
+    for role, action in (('pr-review', 'comment-review'), ('pr-green', 'ci-rerun')):
+        check(not capabilities(role)['source_writes'] and capabilities(role)['external_actions'] == action,
+              role + ': preserve read-only source and narrowly scoped external action ceiling')
 
 
 def validate():
@@ -115,6 +150,7 @@ def validate():
                     continue  # Placeholder, fragment, or external reference.
                 destination = (path.parent / target.split('#')[0]).resolve()
                 check(destination.exists(), name + ': broken local link: ' + target)
+    validate_capabilities(agents)
     check(agents.keys() <= claude_agents.keys(),
           'Missing Claude agent counterparts: ' + ', '.join(sorted(agents.keys() - claude_agents.keys())))
     for source, front in skills.items():

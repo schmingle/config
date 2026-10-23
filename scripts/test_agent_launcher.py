@@ -7,9 +7,11 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import agent_launcher as launcher
 import agent_claude
+import agent_codex
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTRY = ROOT / 'scripts/agent-launch'
@@ -109,11 +111,17 @@ class SharedLauncherTests(unittest.TestCase):
         for role in launcher.NATIVE_ROLES + launcher.CLAUDE_ROLES:
             with self.subTest(role=role):
                 self.output = self.root / role
+                limits = launcher.capabilities(role)
+                self.data['owned_paths'] = (['existing.txt']
+                                            if limits['default_sandbox'] == 'workspace-write' else [])
+                self.write_task()
                 result = self.run_role(role)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 manifest = launcher.shared.load(self.output / 'manifest.json')
                 metrics = launcher.shared.load(self.output / 'metrics.json')
                 self.assertEqual(metrics['status'], 'complete')
+                self.assertEqual(manifest['capabilities'], limits)
+                self.assertEqual(manifest['sandbox'], limits['default_sandbox'])
                 settings = launcher.role_settings(launcher.AGENTS, role)
                 if role in launcher.NATIVE_ROLES:
                     self.assertEqual(manifest['provider'], 'codex')
@@ -121,6 +129,12 @@ class SharedLauncherTests(unittest.TestCase):
                     self.assertEqual(manifest['effort'], settings['model_reasoning_effort'])
                     command = launcher.shared.load(self.output / 'launch.json')
                     self.assertIn('features.multi_agent=false', command)
+                    self.assertIn('--strict-config', command)
+                    self.assertEqual(command[command.index('--sandbox') + 1], manifest['sandbox'])
+                    self.assertIn('approval_policy=' + json.dumps(limits['approval_policy']), command)
+                    self.assertIn('approvals_reviewer=' + json.dumps(limits['approvals_reviewer']), command)
+                    self.assertNotIn('--approve-for-me', command)
+                    self.assertFalse(any('dangerously-bypass' in part for part in command))
                 else:
                     self.assertEqual(manifest['provider'], 'claude')
                     self.assertEqual(manifest['execution'], agent_claude.execution(settings))
@@ -241,6 +255,107 @@ class SharedLauncherTests(unittest.TestCase):
         for role in launcher.READ_ONLY_ROLES:
             self.assertNotEqual(self.run_role(role, extra=('--sandbox', 'workspace-write')).returncode, 0)
         self.assertEqual(self.calls(), [])
+
+    def test_role_defaults_and_action_ceilings_are_explicit(self):
+        for role in ('delegate-low', 'delegate-medium', 'delegate-high', 'writer', 'delegate-xhigh'):
+            with self.subTest(role=role):
+                limits = launcher.capabilities(role)
+                self.assertEqual(limits['default_sandbox'], 'read-only')
+                self.assertTrue(limits['source_writes'])
+                self.assertFalse(limits['requires_network_reads'])
+                self.assertEqual(limits['external_actions'], 'task-authorized')
+                self.assertIn('Optional network reads remain allowed', launcher.executor_rules(role))
+                if limits['provider'] == 'codex':
+                    self.assertEqual(limits['approval_policy'], 'on-request')
+                    self.assertEqual(limits['approvals_reviewer'], 'auto_review')
+        for role in ('pr-resolve', 'pr-update'):
+            self.assertEqual(launcher.capabilities(role)['default_sandbox'], 'workspace-write')
+            result = self.run_role(role)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('owned_paths', result.stderr)
+            self.assertFalse(self.output.exists())
+        for role in ('pr-risk', 'pr-review-high', 'port-to-claude'):
+            limits = launcher.capabilities(role)
+            self.assertFalse(limits['source_writes'])
+            self.assertEqual(limits['external_actions'], 'none')
+            self.assertIn('do not commit, push, publish, rerun CI', launcher.executor_rules(role))
+        self.assertEqual(self.calls(), [])
+
+    def test_review_and_ci_have_approval_paths_without_source_write_permission(self):
+        for role, action in (('pr-review', 'COMMENT review'), ('pr-green', 'CI rerun')):
+            with self.subTest(role=role):
+                self.output = self.root / role
+                self.data['approvals'] = ['Explicit authorization for one assigned ' + action]
+                self.write_task()
+                result = self.run_role(role)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                command = launcher.shared.load(self.output / 'launch.json')
+                self.assertEqual(command[command.index('--sandbox') + 1], 'read-only')
+                self.assertIn('approval_policy="on-request"', command)
+                self.assertIn('approvals_reviewer="auto_review"', command)
+                self.assertEqual(launcher.shared.load(self.output / 'assignment.json'), self.data)
+                instructions = (self.output / 'task-system.md').read_text()
+                self.assertIn('The only permitted external write', instructions)
+                self.assertIn('explicitly authorized', instructions)
+                self.assertIn('Do not edit source files', instructions)
+
+    def test_risk_analysis_has_read_network_approval_path_without_write_authority(self):
+        self.data['approvals'] = ['Read the assigned live GitHub and Linear evidence']
+        self.data['constraints'] = ['No source edits or external writes']
+        self.write_task()
+        result = self.run_role('pr-risk')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        command = launcher.shared.load(self.output / 'launch.json')
+        self.assertEqual(command[command.index('--sandbox') + 1], 'read-only')
+        self.assertIn('approval_policy="on-request"', command)
+        self.assertIn('approvals_reviewer="auto_review"', command)
+        limits = launcher.shared.load(self.output / 'manifest.json')['capabilities']
+        self.assertTrue(limits['requires_network_reads'])
+        self.assertFalse(limits['source_writes'])
+        self.assertEqual(limits['external_actions'], 'none')
+        self.assertEqual(launcher.shared.load(self.output / 'assignment.json'), self.data)
+        instructions = (self.output / 'task-system.md').read_text()
+        self.assertIn('scoped read-only network access', instructions)
+        self.assertIn('a read approval does not authorize an external write', instructions)
+        self.assertIn('require_escalated command runs outside the default sandbox', instructions)
+        self.assertIn('Do not edit source files', instructions)
+        self.assertIn('do not commit, push, publish, rerun CI', instructions)
+
+    def test_offline_native_analysis_can_keep_never_approval_policy(self):
+        limits = {**launcher.ROLE_CAPABILITIES['pr-risk'],
+                  'requires_network_reads': False, 'approval_policy': 'never'}
+        with patch.dict(launcher.ROLE_CAPABILITIES, {'offline-analysis': limits}):
+            profile = agent_codex.execution({'name': 'offline-analysis', 'model': 'fixture-model',
+                                             'model_reasoning_effort': 'low'})
+            command = agent_codex.launch_args('codex', self.checkout, self.output, '', 120, profile,
+                                             'read-only', {}, '', {})
+        self.assertIn('approval_policy="never"', command)
+        self.assertIn('approvals_reviewer="user"', command)
+
+    def test_owned_edits_keep_task_approvals_and_have_approval_path_for_authorized_pushes(self):
+        self.data['owned_paths'] = ['existing.txt']
+        self.data['scope'] = 'Only the assigned source change'
+        self.data['approvals'] = ['Commit and push the verified assigned change']
+        self.data['constraints'] = ['No merge or deploy']
+        self.write_task()
+        for role in ('delegate-low', 'delegate-medium', 'delegate-high', 'pr-resolve', 'pr-update', 'writer'):
+            with self.subTest(role=role):
+                self.output = self.root / role
+                result = self.run_role(role, extra=('--sandbox', 'workspace-write'))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                command = launcher.shared.load(self.output / 'launch.json')
+                self.assertEqual(command[command.index('--sandbox') + 1], 'workspace-write')
+                self.assertIn('approval_policy="on-request"', command)
+                self.assertIn('approvals_reviewer="auto_review"', command)
+                self.assertEqual(launcher.shared.load(self.output / 'assignment.json'), self.data)
+                self.assertIn('Commits, pushes, publication, and other external writes require explicit task authorization',
+                              (self.output / 'task-system.md').read_text())
+
+    def test_adapter_rejects_writable_review_even_when_called_without_launcher(self):
+        profile = agent_codex.execution(launcher.role_settings(launcher.AGENTS, 'pr-review'))
+        with self.assertRaisesRegex(ValueError, 'read-only'):
+            agent_codex.launch_args('codex', self.checkout, self.output, '', 120, profile,
+                                    'workspace-write', {}, '', {})
 
     def test_both_provider_timeouts_settle_descendants(self):
         self.env['MODE'] = 'timeout'

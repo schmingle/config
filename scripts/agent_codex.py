@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 import subprocess
 
-from agent_launcher import shared
+from agent_launcher import capabilities, shared
 
 PROVIDER = 'codex'
 
@@ -17,7 +17,8 @@ def execution(settings):
         _, version, *family = model.split('-')
         label = 'GPT-' + version + (' ' + ' '.join(part.title() for part in family) if family else '')
     return {'model': model, 'effort': settings['model_reasoning_effort'],
-            'attribution': 'Reviewed by ' + label + ' ' + settings['model_reasoning_effort'] + '.'}
+            'attribution': 'Reviewed by ' + label + ' ' + settings['model_reasoning_effort'] + '.',
+            'capabilities': capabilities(settings['name'])}
 
 
 def executable():
@@ -33,11 +34,16 @@ def instructions(settings, role, rules):
 
 
 def launch_args(cli, checkout, output, session, max_turns, profile, sandbox, before, system, schema):
-    argv = [cli, 'exec', '--cd', str(checkout), '--sandbox', sandbox,
+    limits = profile['capabilities']
+    if sandbox == 'workspace-write' and not limits['source_writes']:
+        raise ValueError('This role requires a read-only filesystem sandbox')
+    argv = [cli, 'exec', '--strict-config', '--cd', str(checkout), '--sandbox', sandbox,
             '--model', profile['model'],
             '--config', 'model_reasoning_effort=' + json.dumps(profile['effort']),
             '--config', 'developer_instructions=' + json.dumps(system),
-            '--config', 'approval_policy="never"', '--config', 'features.multi_agent=false',
+            '--config', 'approval_policy=' + json.dumps(limits['approval_policy']),
+            '--config', 'approvals_reviewer=' + json.dumps(limits['approvals_reviewer']),
+            '--config', 'features.multi_agent=false',
             '--json', '--output-schema', str(output / 'report-schema.json'),
             '--output-last-message', str(output / 'report.md'), '-']
     if before.get('git') is False or before.get('head') is None:

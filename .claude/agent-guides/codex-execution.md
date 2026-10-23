@@ -24,11 +24,36 @@ directly and must not launch another copy of their role. Keep both public provid
    restrictive permissions. Choose a new private output directory alongside it.
    Preserve the original deadline. A missing deadline may be set once from the
    assignment's stated time budget; ask the coordinator if neither is supplied.
-4. Select `read-only` for analysis and review. `pr-green`, `pr-review`, and `pr-risk`
-   enforce that filesystem sandbox. Select `workspace-write` only for explicitly
-   assigned edits to owned files, including an explicitly assigned writer draft
-   artifact. Filesystem permissions do not authorize GitHub or other external
-   writes: the brief must preserve those exact permissions and restrictions.
+4. Follow the [role capability table](../../scripts/agent_launcher.py).
+   `pr-green`, `pr-review`, and `pr-risk` use a `read-only` default filesystem
+   sandbox and reject writable default sandbox requests.
+   `pr-resolve` and `pr-update` default to `workspace-write` and require explicit
+   `owned_paths`. Generic delegates and `writer` default to `read-only`; select
+   `workspace-write` only for explicitly assigned edits to owned files, including
+   an explicitly assigned writer draft artifact.
+
+   Filesystem permission and external actions are separate. `pr-review` has an
+   approval path for an explicitly authorized GitHub COMMENT review, and
+   `pr-green` has one for a justified, authorized CI rerun. Write-capable native
+   roles have an approval path for task-authorized operations, including pushes.
+   `pr-risk` has an approval path for required live network reads while remaining
+   analysis only, with no source edits or external writes. These roles use
+   `on-request` and `auto_review`; the selected default sandbox remains unchanged.
+   The table's `requires_network_reads` field records a role requirement;
+   `false` does not forbid optional, task-authorized generic research.
+   The generic `pr-review-high`
+   and `port-to-claude` launches permit no publication; the specialized high-review
+   workflow owns its publication path.
+
+   An approved `require_escalated` command runs outside the default sandbox.
+   A read-only default does not provide hard filesystem enforcement for that
+   command: source boundaries rely on the default sandbox for ordinary commands,
+   role instructions, and approval review of each escalation.
+
+   These are capability ceilings. Preserve exact assignment approvals and
+   restrictions. A network-read approval does not authorize source edits or
+   external writes; escalation does not expand source ownership or the role's
+   permitted actions. Denials or unavailable capabilities are blockers.
 5. Run in the foreground, replacing the placeholders with the actual inputs:
 
    ```sh

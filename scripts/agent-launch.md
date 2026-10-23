@@ -30,11 +30,44 @@ the installed provider paths back to the configuration checkout. For copied prov
 folders, set `AGENT_LAUNCH_ROOT` to the checkout containing this shared launcher.
 Keep the canonical provider definitions and shared helpers available there.
 
-Use `read-only` for analysis and review. For Codex source edits explicitly assigned
-to owned files, pass `--sandbox workspace-write`. Claude's own permission and tool
+The canonical [role capability table](agent_launcher.py) selects filesystem defaults,
+required network reads, and approval settings separately. `requires_network_reads`
+describes a role requirement; `false` does not prohibit optional, task-authorized
+network research by generic delegates.
+
+- `pr-review` and `pr-green` default to a `read-only` filesystem. Their external action
+  ceilings are a GitHub COMMENT review and a justified CI rerun, respectively,
+  when the assignment explicitly authorizes that action and the role workflow's
+  gates pass.
+- `pr-resolve` and `pr-update` default to `workspace-write` and require nonempty
+  `owned_paths`. Generic delegates and `writer` default to `read-only`; select
+  `--sandbox workspace-write` for explicitly assigned edits with owned paths.
+- `pr-risk`, `port-to-claude`, and the generic `pr-review-high` launch are analysis
+  only. They reject writable filesystem requests and permit no external writes.
+  `pr-risk` requires live evidence and can request approval for scoped network
+  reads. The specialized high-review workflow owns its publication path.
+
+Native roles that require network reads, can edit, or can perform a scoped external action use
+`approval_policy="on-request"` with `approvals_reviewer="auto_review"`. This allows
+normal review of network or external-action escalation requests. An offline native
+analysis role with no write capabilities can keep `approval_policy="never"`.
+The launcher uses the separate
+[documented configuration settings](https://learn.chatgpt.com/docs/config-file/config-reference),
+with strict config validation; it does not use `--approve-for-me`, which also
+selects a writable sandbox. An unsupported setting, managed restriction, denied
+approval, or unavailable reviewer remains a blocker.
+
+Capabilities are ceilings, not authorization. The unchanged assignment approvals
+and constraints still decide which actions may be attempted. The default sandbox
+applies to ordinary commands. An approved `require_escalated` command runs outside
+that sandbox, so a read-only default is not a hard filesystem guarantee for an
+escalated command. Source boundaries rely on the default sandbox for ordinary
+commands, role instructions, and approval review of each escalation. A scoped
+network-read approval grants no authority to edit source or perform external writes.
+Escalation does not expand assigned source ownership or the role's action ceiling.
+Claude's own permission and tool
 mechanics still apply; do not assume a Codex filesystem sandbox applies to Claude.
-Tools and filesystem permissions do not grant external-write authorization. The
-launcher never creates worktrees, commits, pushes, or publishes on its own.
+The launcher never creates worktrees, commits, pushes, or publishes on its own.
 
 Verify the assigned checkout, repository, branch, HEAD, and local changes. Preserve
 intentional dirty work and other writers. Prepare a fresh pinned review checkout
@@ -47,7 +80,8 @@ where supported; the absolute deadline remains authoritative.
 
 Run in the foreground and wait through bounded tool calls, keeping the coordinator
 informed. The launcher checks provider availability/authentication, records actual
-execution settings and launch arguments, and settles owned processes. Provider
+execution settings, role capability ceilings, selected sandbox, and launch arguments,
+and settles owned processes. Provider
 adapters handle their own CLI arguments, authentication, and output formats.
 Recursive launcher calls are rejected; executors perform their assigned work
 directly instead of handing it back to the other provider.

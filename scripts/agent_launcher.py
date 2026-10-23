@@ -15,11 +15,38 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 AGENTS = ROOT / '.codex/agents'
-# These are executor families, not a second model/effort configuration.
-NATIVE_ROLES = ('delegate-low', 'delegate-medium', 'delegate-high', 'pr-green',
-                'pr-resolve', 'pr-update', 'pr-review', 'pr-risk', 'writer')
-CLAUDE_ROLES = ('delegate-xhigh', 'pr-review-high', 'port-to-claude')
-READ_ONLY_ROLES = ('pr-green', 'pr-review', 'pr-risk', 'pr-review-high', 'port-to-claude')
+# Capability ceilings, not task authorization or a second model/effort configuration.
+# Claude's native permission system remains authoritative for Claude executors.
+# requires_network_reads describes a role requirement; False does not forbid optional authorized reads.
+ROLE_CAPABILITIES = {
+    'delegate-low': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': True,
+                     'requires_network_reads': False, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
+    'delegate-medium': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': True,
+                        'requires_network_reads': False, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
+    'delegate-high': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': True,
+                      'requires_network_reads': False, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
+    'pr-green': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
+                 'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'ci-rerun'},
+    'pr-resolve': {'provider': 'codex', 'default_sandbox': 'workspace-write', 'source_writes': True,
+                   'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
+    'pr-update': {'provider': 'codex', 'default_sandbox': 'workspace-write', 'source_writes': True,
+                  'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
+    'pr-review': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
+                  'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'comment-review'},
+    'pr-risk': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
+                'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
+    'writer': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': True,
+               'requires_network_reads': False, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
+    'delegate-xhigh': {'provider': 'claude', 'default_sandbox': 'read-only', 'source_writes': True,
+                       'requires_network_reads': False, 'approval_policy': 'provider-native', 'external_actions': 'task-authorized'},
+    'pr-review-high': {'provider': 'claude', 'default_sandbox': 'read-only', 'source_writes': False,
+                       'requires_network_reads': True, 'approval_policy': 'provider-native', 'external_actions': 'none'},
+    'port-to-claude': {'provider': 'claude', 'default_sandbox': 'read-only', 'source_writes': False,
+                      'requires_network_reads': False, 'approval_policy': 'provider-native', 'external_actions': 'none'},
+}
+NATIVE_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if limits['provider'] == 'codex')
+CLAUDE_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if limits['provider'] == 'claude')
+READ_ONLY_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if not limits['source_writes'])
 ACTIVE = '_SHARED_AGENT_EXECUTOR_ACTIVE'
 FIELDS = ('constraints', 'approvals', 'sources', 'verification', 'owned_paths')
 # Import the existing ownership implementation once. Specialized reviews use it too.
@@ -89,6 +116,28 @@ def role_settings(agents, role):
     return settings
 
 
+def capabilities(role):
+    if role not in ROLE_CAPABILITIES:
+        raise ValueError('Unknown executor role: ' + role)
+    limits = dict(ROLE_CAPABILITIES[role])
+    limits['approvals_reviewer'] = ('auto_review' if limits['approval_policy'] == 'on-request'
+                                  else 'user' if limits['provider'] == 'codex' else 'provider-native')
+    return limits
+
+
+def filesystem_sandbox(role, requested, task, legacy=False):
+    limits = capabilities(role)
+    sandbox = requested or ('read-only' if legacy else limits['default_sandbox'])
+    if sandbox == 'workspace-write':
+        if legacy:
+            raise ValueError('Legacy briefs support read-only execution; use --assignment JSON with owned_paths for writes')
+        if not limits['source_writes']:
+            raise ValueError('This role requires a read-only filesystem sandbox')
+        if not task['owned_paths']:
+            raise ValueError('Writable execution requires explicitly assigned owned_paths')
+    return sandbox
+
+
 def deadline_for(task, requested, timeout):
     original = task.get('finish_by')
     if original is not None and (not isinstance(original, str) or not original.strip()):
@@ -104,6 +153,24 @@ def deadline_for(task, requested, timeout):
 
 
 def executor_rules(role):
+    limits = capabilities(role)
+    filesystem_boundary = (' Do not edit source files; the default filesystem sandbox is read-only.'
+                           if not limits['source_writes'] else
+                           ' Edit only explicitly assigned owned_paths, and only when the selected filesystem sandbox permits writes.')
+    escalation_boundary = (' An approved require_escalated command runs outside the default sandbox. '
+                           'Request only scoped task-authorized operations; escalation does not authorize source edits '
+                           'outside owned_paths or any external action outside this role ceiling.')
+    network_boundary = (' This role requires live network reads when the workflow calls for them. '
+                        'Request normal approval for scoped read-only network access when blocked; '
+                        'a read approval does not authorize an external write.'
+                        if limits['requires_network_reads'] else
+                        ' Optional network reads remain allowed when the assignment authorizes them and provider permissions permit them.')
+    action_boundary = {
+        'none': ' This role is analysis only: do not commit, push, publish, rerun CI, or perform other external writes.',
+        'comment-review': ' The only permitted external write is an explicitly authorized GitHub COMMENT review under the canonical review workflow; never submit APPROVE or REQUEST_CHANGES.',
+        'ci-rerun': ' The only permitted external write is an explicitly authorized, specifically justified CI rerun under the canonical CI workflow; do not publish reviews or change repository files.',
+        'task-authorized': ' Commits, pushes, publication, and other external writes require explicit task authorization and all applicable repository gates.',
+    }[limits['external_actions']]
     review_boundary = (' This generic launch is analysis only: do not publish a PR review or claim review sign-off. '
                        'Use the specialized prepared Claude PR review workflow for its evidence, recovery, and publication gates.'
                        if role == 'pr-review-high' else '')
@@ -114,7 +181,8 @@ def executor_rules(role):
             'The assignment approvals and owned paths bound all actions; available tools grant no additional authority. '
             'Do not commit, push, publish, or send external communications unless explicitly authorized. '
             'Never bypass hooks or sandbox permissions. Verify actual results and return evidence and gaps. '
-            'A supervising agent must verify the report before claiming completion.' + review_boundary + '\n')
+            'A supervising agent must verify the report before claiming completion.'
+            + filesystem_boundary + escalation_boundary + network_boundary + action_boundary + review_boundary + '\n')
 
 
 def checked_paths(args):
@@ -151,14 +219,10 @@ def run(args):
         task = {'objective': brief, 'scope': 'Exactly the supplied coordinator brief',
                 'expected_result': 'A verified report of the assigned work',
                 **{field: [] for field in FIELDS}}
-    if brief is not None and args.sandbox != 'read-only':
-        raise ValueError('Legacy briefs support read-only execution; use --assignment JSON with owned_paths for writes')
+    sandbox = filesystem_sandbox(args.role, args.sandbox, task, legacy=brief is not None)
     deadline = deadline_for(task, args.finish_by, args.timeout)
     settings = role_settings(AGENTS, args.role)
-    if args.role in READ_ONLY_ROLES and args.sandbox != 'read-only':
-        raise ValueError('This role requires a read-only filesystem sandbox')
-    if args.sandbox == 'workspace-write' and args.assignment and not task['owned_paths']:
-        raise ValueError('Writable execution requires explicitly assigned owned_paths')
+    limits = capabilities(args.role)
     adapter = importlib.import_module('agent_codex' if args.role in NATIVE_ROLES else 'agent_claude')
     execution = adapter.execution(settings)
     before = git_state(checkout)
@@ -172,7 +236,7 @@ def run(args):
     session = str(uuid.uuid4())
     manifest = {'role': args.role, 'provider': adapter.PROVIDER, 'checkout': str(checkout),
                 'finish_by': deadline, 'execution': execution, 'before': before,
-                'initial_state': before, 'sandbox': args.sandbox, 'dry_run': args.dry_run,
+                'initial_state': before, 'sandbox': sandbox, 'capabilities': limits, 'dry_run': args.dry_run,
                 'model': execution['model'], 'effort': execution['effort'],
                 'reviewer_attribution': execution['attribution'],
                 'started_at': datetime.now(timezone.utc).isoformat()}
@@ -194,7 +258,7 @@ def run(args):
                      'The following is the unchanged compact assignment from the coordinator:\n\n' + brief))
         (output / 'prompt.txt').write_text(prompt)
         command = adapter.launch_args(cli, checkout, output, session, args.max_turns,
-                                      execution, args.sandbox, before, system, schema())
+                                      execution, sandbox, before, system, schema())
         shared.dump(output / 'launch.json', command)
         if args.dry_run:
             metrics['status'] = 'prepared'
@@ -250,8 +314,8 @@ def main(argv=None, default_role=None, legacy_brief=False):
     parser.add_argument('--checkout', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--finish-by', help='Absolute ISO 8601 deadline with explicit timezone')
-    parser.add_argument('--sandbox', choices=('read-only', 'workspace-write'), default='read-only',
-                        help='Codex filesystem sandbox; workspace-write requires assignment authorization')
+    parser.add_argument('--sandbox', choices=('read-only', 'workspace-write'),
+                        help='Filesystem request; default follows the role. Writes require assigned owned_paths')
     parser.add_argument('--timeout', type=int, default=1800)
     parser.add_argument('--max-turns', type=int, default=120)
     parser.add_argument('--dry-run', action='store_true')
