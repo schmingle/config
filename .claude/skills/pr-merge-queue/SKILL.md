@@ -128,10 +128,7 @@ Use this concise final format:
 1. **Summary:** elapsed time, local start/end/timezone, admitted/discovered/excluded counts, verified merges versus limit, repair/risk/review totals, and stop reason.
 2. **Needs Your Intervention:** linked PR/finding, verified diagnosis versus unknowns, why automation cannot finish within its current scope/capabilities, recommended action, exact user decision/action, and evidence needed to resume. Use “Needs focused investigation” where appropriate. Ordinary CI waits, parent dependencies, untouched work, and cutoffs alone do not qualify. Do not repackage inconclusive attempts as new repairs.
 3. **Merged PRs:** linked bullets, distinguishing this run's merges from concurrent merges.
-4. **Remaining PRs:** one row per PR, intervention cases first:
-
-   | PR | Parent PR | Unresolved Findings | GH Merge Block | Needs Passing Review | Risk Above Ceiling |
-   | --- | --- | --- | --- | --- | --- |
+4. **Remaining PRs:** report one row per PR, with intervention cases first. Columns: PR, Parent PR, Unresolved Findings, GH Merge Block, Needs Passing Review, and Risk Above Ceiling.
 
    Show every applicable blocker with short cells and verified links/counts/ratings, including the final review link for above-ceiling risk. Missing/incomplete or contradictory risk is a review blocker; optional failed checks are not merge blocks. Use `Unknown` for unverified state and `—` only for verified absence. Identify skipped/unreached/base-reconciliation work in the PR cell. Keep intervention PRs here too, referencing their callout. Explain rows with no populated blocker. Merged and remaining counts must reconcile.
 5. **Work Completed:** meaningful repairs, dispositions, and reviews not already clear; avoid duplicate decision callouts.
