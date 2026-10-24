@@ -76,14 +76,12 @@ Give workers a compact, self-contained factual assignment: verified account/host
 
 Choose roles by their descriptions and these overlapping eligibility conditions:
 
-| Role | Condition |
-| --- | --- |
-| pr-green | GitHub explicitly identifies a CI merge block, or a normal merge was definitively rejected for CI. Failed/optional checks alone do not qualify. |
-| pr-resolve | Actual-base conflicts, a diagnosed code fix, or reconciliation after a verified prerequisite lands. |
-| pr-update | Findings need fixes or evidence-backed rebuttals and verified resolutions. |
-| pr-risk | Initial review needs a complete risk report and none is reusable. Return it here without posting. |
-| pr-review | Stable code, no unresolved findings, supplied risk at most Medium, and no explicit deep-review request. |
-| pr-review-high | Stable code, no unresolved findings, and supplied risk Medium high/High or an explicit deep-review request. |
+- **pr-green:** GitHub explicitly identifies a CI merge block, or a normal merge was definitively rejected for CI. Failed/optional checks alone do not qualify.
+- **pr-resolve:** Actual-base conflicts, a diagnosed code fix, or reconciliation after a verified prerequisite lands.
+- **pr-update:** Findings need fixes or evidence-backed rebuttals and verified resolutions.
+- **pr-risk:** Initial review needs a complete risk report and none is reusable. Return it here without posting.
+- **pr-review:** Stable code, no unresolved findings, supplied risk at most Medium, and no explicit deep-review request.
+- **pr-review-high:** Stable code, no unresolved findings, and supplied risk Medium high/High or an explicit deep-review request.
 
 Unknown mergeability requires refresh; policy/approval blocks are not CI repairs. Clear defects can go directly to resolve. Otherwise merge when gated and authorized, or wait/report the blocker.
 
