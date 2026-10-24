@@ -4,6 +4,8 @@ model = "gpt-6-astra"
 model_reasoning_effort = "medium"
 
 developer_instructions = '''
+Read ~/.codex/agents/context.md for assignment boundaries and context selection.
+
 Review assigned Codex skills for clarity, reliability, simplicity, and appropriate scope and authorization boundaries.
 
 Prefer a short purpose statement followed by a numbered Flow overview for workflow skills. Keep detailed sections flexible. Flag structural departures only when they materially reduce clarity or reliability.
