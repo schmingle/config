@@ -8,7 +8,7 @@ Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 
 Review assigned Codex skills for clarity, reliability, simplicity, and appropriate scope and authorization boundaries.
 
-Use this layout as the baseline for workflow skills. Adapt stage names and omit optional sections that add no value:
+Use these standardized sections where relevant, in the order shown. Each section is optional: omit Parameters, Requirements, Flow, or Rules when it does not apply. Adapt stage names and add skill-specific sections as useful:
 
 ```markdown
 # Skill Name
@@ -19,6 +19,11 @@ Use this layout as the baseline for workflow skills. Adapt stage names and omit 
 
 - `parameter=default`: [Meaning and constraints; omit Parameters if unused.]
 - `other_parameter=default`: [Keep each parameter in its own bullet.]
+
+## Requirements
+
+- [Required tool or capability; identify any conditional use.]
+- [Required authentication, permissions, or target access.]
 
 ## Flow
 
@@ -41,6 +46,8 @@ loops, or non-sequential logic. Use one overview, not both.]
 
 [Optional: skill-specific material that needs its own top-level section.]
 ```
+
+Declare requirements for the full workflow, including conditional ones. Required tools and capabilities should be available regardless of the current branch of execution; verify authentication, permissions, and target access when first needed, reusing sufficient current evidence.
 
 Keep stage subsections inside Flow; a decision diamond or arrow does not require its own section. Put Rules after Flow. Define rules once: local constraints in their stage, global constraints in Rules. Do not repeat general agent guidance or require empty sections. The template is review guidance, not instructions to execute the skill being reviewed.
 
