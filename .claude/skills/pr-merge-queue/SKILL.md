@@ -17,6 +17,17 @@ Advance eligible PRs through repairs, independent review, and authorized merges.
 - `timeout=50`: finite positive run limit, in minutes, including discovery and settlement.
 - `timeout_idle=10`: finite positive limit, in minutes, without meaningful progress across the queue.
 
+## Requirements
+
+Keep these dependencies available for the full workflow, including conditional paths. Verify authentication and access when first needed; preserve discovery's lightweight empty-queue exit.
+
+- **GitHub CLI (`gh`):** installed and authenticated in the tool-run shell for the intended account/host, with repository access and permissions for the authorized reads, pushes, reviews, finding dispositions, and merges.
+- **Git:** installed, with sufficient repository history and isolated worktrees for review/repair; repairs require checkout and push access.
+- **Specialists and Coordination:** the six `pr-{green,resolve,update,risk,review,review-high}` agents, their referenced guides, Python 3.11+ for the canonical launcher and configured reviewer-attribution helper, and native `Agent` dispatch, result collection, `SendMessage` reuse, and owned-worker `TaskStop`. Cross-chat ownership inspection remains best effort under Flow.
+- **Codex Specialist Runtime:** the configured Codex CLI runner and its prerequisites for the `pr-{green,resolve,update,risk,review}` wrappers, including authenticated Codex access and writable session storage; verify through their [execution guide](../../agent-guides/codex-execution.md) before the first wrapper runs. `pr-review-high` reviews directly in its native Claude context.
+- **Linked Evidence:** access to ticket systems and other sources required by the applicable review guides, verified in the executor that needs them.
+- **Clock:** `date` or an equivalent clock for deadlines and elapsed/idle time.
+
 ## Flow
 
 ```mermaid

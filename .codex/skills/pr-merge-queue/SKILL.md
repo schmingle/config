@@ -14,6 +14,17 @@ Advance eligible PRs through repairs, independent review, and authorized merges.
 - `timeout=50`: finite positive run limit, in minutes, including discovery and settlement.
 - `timeout_idle=10`: finite positive limit, in minutes, without meaningful progress across the queue.
 
+## Requirements
+
+Keep these dependencies available for the full workflow, including conditional paths. Verify authentication and access when first needed; preserve discovery's lightweight empty-queue exit.
+
+- **GitHub CLI (`gh`):** installed and authenticated in the tool-run shell for the intended account/host, with repository access and permissions for the authorized reads, pushes, reviews, finding dispositions, and merges.
+- **Git:** installed, with sufficient repository history and isolated worktrees for review/repair; repairs require checkout and push access.
+- **Specialists and Coordination:** the six `pr-{green,resolve,update,risk,review,review-high}` roles, their referenced guides, Python 3.11+ with the configured reviewer-attribution helper, and native subagent dispatch, result collection, and owned-worker interruption. Cross-chat ownership inspection remains best effort under Flow.
+- **Claude Review Runtime:** the configured `pr-review-high` CLI runner/profile and its prerequisites, including authenticated Claude access and writable session storage; verify through its handoff guide before that review runs.
+- **Linked Evidence:** access to ticket systems and other sources required by the applicable review guides, verified in the executor that needs them.
+- **Clock:** a clock tool or `date` for deadlines and elapsed/idle time.
+
 ## Flow
 
 ```mermaid
