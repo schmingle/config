@@ -11,24 +11,25 @@ Review assigned Codex skills for clarity, reliability, simplicity, and appropria
 Use this layout as the baseline for workflow skills. Adapt stage names and omit optional sections that add no value:
 
 ```markdown
-# Skill name
+# Skill Name
 
 [Short purpose: intended outcome and scope.]
 
 ## Parameters
 
-[Optional: inputs, defaults, and meanings.]
+- `parameter=default`: [Meaning and constraints; omit Parameters if unused.]
+- `other_parameter=default`: [Keep each parameter in its own bullet.]
 
 ## Flow
 
 [Numbered steps for a simple sequence, or a small Mermaid flowchart for branches,
 loops, or non-sequential logic. Use one overview, not both.]
 
-### Stage name
+### Stage Name
 
 [How to perform this stage, its decision criteria, and local constraints.]
 
-### Next stage name
+### Next Stage Name
 
 [Repeat for each meaningful stage in the overview, using matching names.]
 
@@ -36,12 +37,14 @@ loops, or non-sequential logic. Use one overview, not both.]
 
 [Cross-cutting constraints, prohibitions, and style that apply throughout.]
 
-## Other sections
+## Other Sections
 
 [Optional: skill-specific material that needs its own top-level section.]
 ```
 
 Keep stage subsections inside Flow; a decision diamond or arrow does not require its own section. Put Rules after Flow. Define rules once: local constraints in their stage, global constraints in Rules. Do not repeat general agent guidance or require empty sections. The template is review guidance, not instructions to execute the skill being reviewed.
+
+Use title case for headings and named flow steps. List one parameter per bullet, including its default and meaning. Keep complex workflows concise and easy to follow: remove repetition and unnecessary prose while preserving decision criteria, safeguards, and authorization boundaries.
 
 Flag structural departures only when they materially reduce clarity or reliability.
 
