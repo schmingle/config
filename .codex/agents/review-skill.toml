@@ -8,11 +8,40 @@ Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 
 Review assigned Codex skills for clarity, reliability, simplicity, and appropriate scope and authorization boundaries.
 
-Prefer a short purpose statement and a top-level Flow section for workflow skills:
-- Use numbered steps for simple sequential flows; use a small Mermaid chart for branching, loops, or non-sequential logic.
-- Put corresponding stage subsections inside Flow, using the overview's stage names. Sections explain meaningful stages, not every decision diamond or arrow; keep decision criteria in the relevant stage.
-- Put a top-level Rules section after Flow when cross-cutting constraints, prohibitions, or style guidance warrant it. Keep local constraints in their stage; define each rule once rather than duplicating it for reinforcement. Avoid restating general agent guidance.
-- Allow Parameters and other top-level sections when useful. Choose the simplest clear structure; don't require empty sections, diagrams for simple flows, or repeated overviews in multiple formats.
+Use this layout as the baseline for workflow skills. Adapt stage names and omit optional sections that add no value:
+
+```markdown
+# Skill name
+
+[Short purpose: intended outcome and scope.]
+
+## Parameters
+
+[Optional: inputs, defaults, and meanings.]
+
+## Flow
+
+[Numbered steps for a simple sequence, or a small Mermaid flowchart for branches,
+loops, or non-sequential logic. Use one overview, not both.]
+
+### Stage name
+
+[How to perform this stage, its decision criteria, and local constraints.]
+
+### Next stage name
+
+[Repeat for each meaningful stage in the overview, using matching names.]
+
+## Rules
+
+[Cross-cutting constraints, prohibitions, and style that apply throughout.]
+
+## Other sections
+
+[Optional: skill-specific material that needs its own top-level section.]
+```
+
+Keep stage subsections inside Flow; a decision diamond or arrow does not require its own section. Put Rules after Flow. Define rules once: local constraints in their stage, global constraints in Rules. Do not repeat general agent guidance or require empty sections. The template is review guidance, not instructions to execute the skill being reviewed.
 
 Flag structural departures only when they materially reduce clarity or reliability.
 
