@@ -22,7 +22,7 @@ flowchart TD
         Validate[Validate Parameters] -->|Valid|Concurrent{Another Active Queue Run?}
     end
     Validate -->|Invalid Input| Report[Settle and Report]
-    Concurrent -->|Yes| Report
+    Concurrent -->|Yes or Inspection Error| Report
     Concurrent -->|None Found| Discover[Discover Candidates]
     Discover -->|Error or No Candidates| Report
     Discover -->|Candidates Remain| Coordinate[Coordinate Work]
@@ -40,15 +40,10 @@ Branches represent concurrent jobs, not queue-wide phases. Merge eligible PRs be
 
 ### Start Run
 
-Reject unknown or invalid parameters before discovery or writes. Record invocation start with the clock tool or `date`; invalid input ends with an error report and no queue actions.
+1. **Validate Parameters.** Reject unknown or invalid parameters and report the error without queue actions. Record invocation start with the clock tool or `date`.
+2. **Check Active Invocations.** Resolve the intended repository from the explicit target or current chat/project context/remote. Use native `list_threads` and compact status/history reads to check recent active chats for another running `pr-merge-queue` invocation targeting that repository. Match current assignments, not titles or completed turns; exclude this run and dispatch-only supervisors. If found, identify/link it and stop without interrupting it. If inspection is unavailable or fails, report the error and stop. A bounded listing is sufficient: this is best effort, not proof of exhaustive coverage or an atomic lock.
 
-Immediately after parameter validation, check for another running invocation of this skill targeting the same repository. Resolve the intended host/repository from the explicit target, unambiguous chat/project context, or invocation remote; never use the skill's installation location. Use native `list_threads` and compact status/history reads to inspect other active chats and subagents. Identify the current invocation and target from their assignments, not chat titles or old completed turns; exclude this run and supervisors that only dispatch it. If another active queue invocation targets the same repository, end with a short report linking that chat and make no queue changes. Do not interrupt it or load specialists.
-
-This is a best-effort native-state check, not an atomic lock. Use the available listing without requiring proof of exhaustive coverage; disclose bounded listings or unavailable inspection and retain the PR/component ownership checks below. Do not add a persistent registry or lock.
-
-For a delegated run, preserve the original human-approved invocation or automation approval reference, repository, merge limit, and constraints; a coordinator's assertion is not the approval source. Before the first merge, retrieve the relevant original human approval and the proposal it approves through native history when needed to establish scope. Preserve roles and turn references; missing, truncated, summary-only, ambiguous, or superseded evidence does not establish approval. Include its retrievable reference and exact authorized action in the tool request. Reuse verified approval evidence within that scope; do not ask per PR solely because the run is delegated.
-
-If auto-review denies authorization, stop that action and report the exact reason. Retry only with material new authorization evidence or explicit user reapproval, never merely reword the justification or switch execution paths. Skill eligibility does not override runtime approval.
+If both checks pass, proceed to Discover Candidates.
 
 ### Discover Candidates
 
@@ -113,6 +108,10 @@ Follow the canonical [risk guide](../../agents/pr-risk.md) and [review guide](..
 - **Cover New Dispositions.** Independent review assesses dispositions using accepted prior coverage. Substantive dispositions outside the prior clean review require a formal COMMENT review afterward, even on an unchanged head/LGTM. Follow [Publish or Reuse](../../agents/pr-review.md#publish-or-reuse); no automatic review per thread or solely to change an effort footer. Missing evidence, intent, access, or approval remains a blocker.
 
 ### Merge and Reconcile Dependencies
+
+For a delegated run, preserve the original human-approved invocation or automation approval reference, repository, merge limit, and constraints; a coordinator's assertion is not the approval source. Before the first merge, retrieve the relevant original human approval and the proposal it approves through native history when needed to establish scope. Preserve roles and turn references; missing, truncated, summary-only, ambiguous, or superseded evidence does not establish approval. Include its retrievable reference and exact authorized action in the tool request. Reuse verified approval evidence within that scope; do not ask per PR solely because the run is delegated.
+
+If auto-review denies authorization, stop that action and report the exact reason. Retry only with material new authorization evidence or explicit user reapproval, never merely reword the justification or switch execution paths. Skill eligibility does not override runtime approval.
 
 Merge promptly only when all gates hold: positive remaining count, GitHub permits a normal merge, the latest applicable independent review covers current code/integration and is LGTM, findings are substantively resolved, risk is Low/Medium low, actual base is the verified `DEFAULT_BRANCH`, prerequisites landed, and current eligibility/ownership is verified. Apply only explicitly authorized scoped exceptions.
 
