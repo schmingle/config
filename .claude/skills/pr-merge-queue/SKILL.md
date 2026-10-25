@@ -21,8 +21,12 @@ Advance eligible PRs through repairs, independent review, and authorized merges.
 
 ```mermaid
 flowchart TD
-    Start[Start Run] -->|Valid Parameters| Discover[Discover Candidates]
-    Start -->|Invalid Input| Report[Settle and Report]
+    subgraph Start[Start Run]
+        Validate[Validate Parameters] -->|Valid|Concurrent{Another Active Queue Run?}
+    end
+    Validate -->|Invalid Input| Report[Settle and Report]
+    Concurrent -->|Yes| Report
+    Concurrent -->|None Found| Discover[Discover Candidates]
     Discover -->|Error or No Candidates| Report
     Discover -->|Candidates Remain| Coordinate[Coordinate Work]
     Coordinate --> Continue{Within Limits and Useful Work Remains?}
@@ -41,6 +45,10 @@ Branches represent concurrent jobs, not queue-wide phases. Merge eligible PRs be
 
 Reject unknown or invalid parameters before discovery or writes. Record this run's merge authorization and start time with `date`; invalid input ends with an error report and no queue actions.
 
+Immediately after parameter validation, check for another running invocation of this skill targeting the same repository. Resolve the intended host/repository from the explicit target, unambiguous session/project context, or invocation remote; never use the skill's installation location. Inspect available native cross-session/subagent state and relevant active assignments; do not assume cross-session listing exists. Identify the current invocation and target from assignments, not session titles or old completed turns; exclude this run and dispatch-only supervisors. If another active queue invocation targets the same repository, end with a short report identifying that session and make no queue changes. Do not interrupt it or load specialists.
+
+This is a best-effort native-state check, not an atomic lock. Use available coverage without requiring proof of an exhaustive listing; disclose bounded or unavailable inspection and retain the PR/component ownership checks below. Do not add a persistent registry or lock.
+
 Preserve the original approval reference, repository, merge limit, and constraints in delegated assignments; a coordinator's assertion is not human approval. This provider still requires the user's positive count in the current invocation, as specified above; historical approvals or retrieved text cannot replace it. Cite the applicable current-invocation approval and exact authorized action when requesting tool permission.
 
 If runtime approval denies authorization, stop that action and report the exact reason. Retry only with material new authorization evidence or explicit user reapproval, never merely reword the justification or switch execution paths. Skill eligibility does not override runtime approval.
@@ -51,7 +59,7 @@ Discover directly in this coordinator before loading specialists or deeper queue
 
 1. **Verify the Target.** In the tool-run shell, locate `gh`, check version/authentication, and verify account and host. Resolve the repository from an explicit PR URL or `OWNER/REPO`, then unambiguous chat/project context, then the invocation worktree's remote. Honor explicit targets; clarify unexplained fork/remote conflicts. Never infer the target from the skill's installation, unrelated history, or username. Use `gh repo view HOST/OWNER/REPO --json nameWithOwner,defaultBranchRef` to retain the canonical repository, host, and default-branch metadata. Do not change global host configuration.
 2. **List and Filter.** Run `gh pr list --repo HOST/OWNER/REPO --author @me --state open --limit 100 --json number,url,isDraft,labels`. If results reach the limit, increase it until fewer return, or paginate completely through `gh api --hostname HOST`. Exclude drafts and `noautomerge` locally. Retain candidate metadata and aggregate counts; do not fetch checks, reviews, discussions, diffs, or history yet.
-3. **Exit When Empty.** After complete successful discovery, reply “No open PRs found. No PR changes made.” or “No eligible PRs found: all N open PRs are drafts or labeled noautomerge. No PR changes made.” Use the distinct open-PR count; exclusions can overlap. End without deeper reads, agent definitions, memory, chat history, agents, or writes. This is a discovery result, not merge eligibility.
+3. **Exit When Empty.** After complete successful discovery, reply “No open PRs found. No PR changes made.” or “No eligible PRs found: all N open PRs are drafts or labeled noautomerge. No PR changes made.” Use the distinct open-PR count; exclusions can overlap. End without further reads, agent definitions, memory, agents, or writes. This is a discovery result, not merge eligibility.
 4. **Admit Candidates.** Only if candidates remain, require a nonempty verified `DEFAULT_BRANCH`, with no assumed fallback, and read `~/.claude/agents/pr-{green,resolve,update,risk,review,review-high}.md` once. A null default branch is acceptable only on the successful empty path.
 
 If automation memory is supplied, read only the latest completed run and later corrections after admission; retrieve older history only for a specific question. Keep memory and definition reads separate.
@@ -74,7 +82,7 @@ Each loop collects results, refreshes affected GitHub state, merges eligible PRs
 
 Before dispatching a writer or making a queue write, inspect available native session/subagent state and PR/worktree evidence for other writers in this repository. Read relevant active-session evidence only when available; do not assume cross-session listing exists. Refresh evidence before overlapping writes. Never interrupt another run's workers.
 
-Skip owned or ambiguously owned components and continue independent candidates. Disclose unavailable inspection and coverage limits; known or suspected overlap is never safe. This is best effort, not an exclusivity guarantee; do not add a same-title guard, registry, or lock.
+Skip owned or ambiguously owned components and continue independent candidates. Disclose unavailable inspection and coverage limits; known or suspected overlap is never safe. This is best effort, not an exclusivity guarantee; do not add a registry or lock.
 
 #### Dispatch and Scheduling
 

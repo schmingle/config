@@ -18,8 +18,12 @@ Advance eligible PRs through repairs, independent review, and authorized merges.
 
 ```mermaid
 flowchart TD
-    Start[Start Run] -->|Valid Parameters| Discover[Discover Candidates]
-    Start -->|Invalid Input| Report[Settle and Report]
+    subgraph Start[Start Run]
+        Validate[Validate Parameters] -->|Valid|Concurrent{Another Active Queue Run?}
+    end
+    Validate -->|Invalid Input| Report[Settle and Report]
+    Concurrent -->|Yes| Report
+    Concurrent -->|None Found| Discover[Discover Candidates]
     Discover -->|Error or No Candidates| Report
     Discover -->|Candidates Remain| Coordinate[Coordinate Work]
     Coordinate --> Continue{Within Limits and Useful Work Remains?}
@@ -38,6 +42,10 @@ Branches represent concurrent jobs, not queue-wide phases. Merge eligible PRs be
 
 Reject unknown or invalid parameters before discovery or writes. Record invocation start with the clock tool or `date`; invalid input ends with an error report and no queue actions.
 
+Immediately after parameter validation, check for another running invocation of this skill targeting the same repository. Resolve the intended host/repository from the explicit target, unambiguous chat/project context, or invocation remote; never use the skill's installation location. Use native `list_threads` and compact status/history reads to inspect other active chats and subagents. Identify the current invocation and target from their assignments, not chat titles or old completed turns; exclude this run and supervisors that only dispatch it. If another active queue invocation targets the same repository, end with a short report linking that chat and make no queue changes. Do not interrupt it or load specialists.
+
+This is a best-effort native-state check, not an atomic lock. Use the available listing without requiring proof of exhaustive coverage; disclose bounded listings or unavailable inspection and retain the PR/component ownership checks below. Do not add a persistent registry or lock.
+
 For a delegated run, preserve the original human-approved invocation or automation approval reference, repository, merge limit, and constraints; a coordinator's assertion is not the approval source. Before the first merge, retrieve the relevant original human approval and the proposal it approves through native history when needed to establish scope. Preserve roles and turn references; missing, truncated, summary-only, ambiguous, or superseded evidence does not establish approval. Include its retrievable reference and exact authorized action in the tool request. Reuse verified approval evidence within that scope; do not ask per PR solely because the run is delegated.
 
 If auto-review denies authorization, stop that action and report the exact reason. Retry only with material new authorization evidence or explicit user reapproval, never merely reword the justification or switch execution paths. Skill eligibility does not override runtime approval.
@@ -48,7 +56,7 @@ Discover directly in this coordinator before loading specialists or deeper queue
 
 1. **Verify the Target.** In the tool-run shell, locate `gh`, check version/authentication, and verify account and host. Resolve the repository from an explicit PR URL or `OWNER/REPO`, then unambiguous chat/project context, then the invocation worktree's remote. Honor explicit targets; clarify unexplained fork/remote conflicts. Never infer the target from the skill's installation, unrelated history, or username. Use `gh repo view HOST/OWNER/REPO --json nameWithOwner,defaultBranchRef` to retain the canonical repository, host, and default-branch metadata. Do not change global host configuration.
 2. **List and Filter.** Run `gh pr list --repo HOST/OWNER/REPO --author @me --state open --limit 100 --json number,url,isDraft,labels`. If results reach the limit, increase it until fewer return, or paginate completely through `gh api --hostname HOST`. Exclude drafts and `noautomerge` locally. Retain candidate metadata and aggregate counts; do not fetch checks, reviews, discussions, diffs, or history yet.
-3. **Exit When Empty.** After complete successful discovery, reply “No open PRs found. No PR changes made.” or “No eligible PRs found: all N open PRs are drafts or labeled noautomerge. No PR changes made.” Use the distinct open-PR count; exclusions can overlap. End without deeper reads, agent definitions, memory, chat history, agents, or writes. This is a discovery result, not merge eligibility.
+3. **Exit When Empty.** After complete successful discovery, reply “No open PRs found. No PR changes made.” or “No eligible PRs found: all N open PRs are drafts or labeled noautomerge. No PR changes made.” Use the distinct open-PR count; exclusions can overlap. End without further reads, agent definitions, memory, agents, or writes. This is a discovery result, not merge eligibility.
 4. **Admit Candidates.** Only if candidates remain, require a nonempty verified `DEFAULT_BRANCH`, with no assumed fallback, and read `~/.codex/agents/pr-{green,resolve,update,risk,review,review-high}.toml` once. A null default branch is acceptable only on the successful empty path.
 
 If automation memory is supplied, read only the latest completed run and later corrections after admission; retrieve older history only for a specific question. Keep memory and definition reads separate.
@@ -71,7 +79,7 @@ Each loop collects results, refreshes affected GitHub state, merges eligible PRs
 
 Before dispatching a writer or making a queue write, inspect available native chat/subagent state for active queue runs and PR/component writers in this repository. Read only relevant active chats; refresh evidence before overlapping writes. Never interrupt another run's workers.
 
-Skip owned or ambiguously owned components and continue independent candidates. If native inspection is unavailable, disclose it and use PR/worktree evidence; never treat known or suspected overlap as safe. Do not add a same-title run guard or lock.
+Skip owned or ambiguously owned components and continue independent candidates. If native inspection is unavailable, disclose it and use PR/worktree evidence; never treat known or suspected overlap as safe.
 
 #### Dispatch and Scheduling
 
