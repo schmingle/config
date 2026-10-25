@@ -131,6 +131,14 @@ disregard evidence or change recorded priorities without approval.
 
 Keep project management in Linear and maintained technical documentation beside the code.
 
+Do not apply the `noautomerge` label to a PR, including during creation, without my explicit approval for that PR or a clearly scoped set of PRs. A perceived risk or approval requirement is not approval to add the label.
+
+### PR Queue Activity Nudges
+
+After a batch that creates one of my eligible PRs, marks it ready, pushes commits to it, or removes an eligibility exclusion, nudge the repository's configured PR queue supervisor once through native chat messaging. Eligible means open, non-draft, and without `noautomerge`. These nudges are authorized at any hour; include the repository, PR links, and a brief account of what changed.
+
+Resolve the supervisor from private configuration. Before sending, check its native status and recorded worker status with compact reads; skip if the supervisor or worker is active, awaiting input, or still settling. Exclude queue-owned activity, draft-only updates, reads, comments, and cosmetic edits. If a configured destination cannot be verified or messaging/status tools are unavailable, report the undelivered nudge and rely on the scheduled fallback; do not substitute a CLI session or another destination. An unmapped repository needs no nudge. The supervisor rechecks current eligibility and owns dispatch; a nudge does not authorize a competing PR writer.
+
 ### PR delivery ownership in project workflows
 
 1. **Project workers own draft authoring.** Within the owning workflow's approved scope, the worker authors its PR as a draft with ticket and dependency links, implements and updates it, runs meaningful local validation, and quickly checks it against the ticket and project plan, fixing drift in the draft. Only the worker then marks it ready for review. That ready transition hands the PR to the merge queue. Within a supervisor–worker pair, only the worker creates, edits, pushes, or readies PRs. Do not return existing ready or queued PRs to draft to adopt this flow. Continue eligible project work.

@@ -10,7 +10,7 @@ Advance eligible PRs through repairs, independent review, and authorized merges.
 
 ## Parameters
 
-- `count=0`: nonnegative integer merge limit. Zero authorizes repairs, finding dispositions, risk assessments, and published COMMENT reviews, but no merge or trial merge. A positive value also authorizes eligible squash merges up to that limit.
+- `count=0`: nonnegative integer merge limit. Zero authorizes repairs, finding dispositions, risk assessments, and published COMMENT reviews, but no merge or trial merge. Within a valid user-authorized invocation, a positive value also permits eligible squash merges up to that limit.
 - `timeout=50`: finite positive run limit, in minutes, including discovery and settlement.
 - `timeout_idle=10`: finite positive limit, in minutes, without meaningful progress across the queue.
 
@@ -37,6 +37,10 @@ Branches represent concurrent jobs, not queue-wide phases. Merge eligible PRs be
 ### Start Run
 
 Reject unknown or invalid parameters before discovery or writes. Record invocation start with the clock tool or `date`; invalid input ends with an error report and no queue actions.
+
+For a delegated run, preserve the original human-approved invocation or automation approval reference, repository, merge limit, and constraints; a coordinator's assertion is not the approval source. Before the first merge, retrieve the relevant original human approval and the proposal it approves through native history when needed to establish scope. Preserve roles and turn references; missing, truncated, summary-only, ambiguous, or superseded evidence does not establish approval. Include its retrievable reference and exact authorized action in the tool request. Reuse verified approval evidence within that scope; do not ask per PR solely because the run is delegated.
+
+If auto-review denies authorization, stop that action and report the exact reason. Retry only with material new authorization evidence or explicit user reapproval, never merely reword the justification or switch execution paths. Skill eligibility does not override runtime approval.
 
 ### Discover Candidates
 
