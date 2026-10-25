@@ -54,7 +54,7 @@ Discover directly in this coordinator before loading specialists or deeper queue
 3. **Exit When Empty.** After complete successful discovery, reply “No open PRs found. No PR changes made.” or “No eligible PRs found: all N open PRs are drafts or labeled noautomerge. No PR changes made.” Use the distinct open-PR count; exclusions can overlap. End without further reads, agent definitions, memory, agents, or writes. This is a discovery result, not merge eligibility.
 4. **Admit Candidates.** Only if candidates remain, require a nonempty verified `DEFAULT_BRANCH`, with no assumed fallback, and read `~/.codex/agents/pr-{green,resolve,update,risk,review,review-high}.toml` once. A null default branch is acceptable only on the successful empty path.
 
-If automation memory is supplied, read only the latest completed run and later corrections after admission; retrieve older history only for a specific question. Keep memory and definition reads separate.
+If automation memory is supplied, read only its compact current note after admission. Start from live GitHub state and the current invocation, not old supervisor state or historical approval lookups. Retrieve older history only for a specific unresolved decision; memory cannot create or clear authorization, user stops, findings, or risk. Replace the note after settlement with the latest concise outcome and unresolved holds or decisions rather than appending run history. Keep memory and definition reads separate.
 
 Ambiguous identity/target, CLI/auth/network failure, malformed output, incomplete pagination, or deadline before complete discovery is an error, never an empty queue. Report the exact blocker; follow sandbox escalation guidance for denied harmless checks.
 
@@ -108,8 +108,6 @@ Follow the canonical [risk guide](../../agents/pr-risk.md) and [review guide](..
 - **Cover New Dispositions.** Independent review assesses dispositions using accepted prior coverage. Substantive dispositions outside the prior clean review require a formal COMMENT review afterward, even on an unchanged head/LGTM. Follow [Publish or Reuse](../../agents/pr-review.md#publish-or-reuse); no automatic review per thread or solely to change an effort footer. Missing evidence, intent, access, or approval remains a blocker.
 
 ### Merge and Reconcile Dependencies
-
-For a delegated run, preserve the original human-approved invocation or automation approval reference, repository, merge limit, and constraints; a coordinator's assertion is not the approval source. Before the first merge, retrieve the relevant original human approval and the proposal it approves through native history when needed to establish scope. Preserve roles and turn references; missing, truncated, summary-only, ambiguous, or superseded evidence does not establish approval. Include its retrievable reference and exact authorized action in the tool request. Reuse verified approval evidence within that scope; do not ask per PR solely because the run is delegated.
 
 If auto-review denies authorization, stop that action and report the exact reason. Retry only with material new authorization evidence or explicit user reapproval, never merely reword the justification or switch execution paths. Skill eligibility does not override runtime approval.
 
