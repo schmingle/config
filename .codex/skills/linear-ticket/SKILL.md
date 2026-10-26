@@ -22,8 +22,8 @@ changes. Follow applicable approvals; silence never grants permission. Don't wai
 in the background or promise automatic follow-up.
 
 Read `~/.codex/private/linear-ticket-workflows.json`: require `team`, `repository`,
-numeric `maxEstimate`, and `mediumEstimateLabel`. Verify authenticated Linear
-user/workspace, statuses, and live estimate scale; verify the repository remote
+numeric `maxEstimate`, `mediumEstimateLabel`, and verified `unassignedCreatorIds`.
+Verify authenticated Linear user/workspace, statuses, and live estimate scale; verify the repository remote
 before code access. Use current-user lookup or an explicitly confirmed Linear
 identity, not OS/Git identity. The ceiling is **M or a lower configured maximum**,
 even if legacy settings permit more. Keep settings private; unavailable or ambiguous
@@ -42,9 +42,16 @@ independent pagination, and deduplication; unfinished listings don't prove empti
 Recover tracked work from prior reports/run history, private checkpoints, and native
 ticket/PR evidence, including tickets whose status or assignee changed.
 
-Exclude current-user-created tickets except verified, authorized workflow children;
-parent links or caches alone aren't proof. Unverified creator eligibility blocks
-mutation. Ignore legacy `triageCreatorEmails` filters.
+Admit new candidates only when either:
+
+- Assigned to the current user and created by someone else.
+- Unassigned and created by a user in private `unassignedCreatorIds`.
+
+Use verified user IDs, not display-name matches. Exclude other assignees and
+current-user-created tickets. Missing creator/assignee identity blocks mutation;
+never broaden a failed filter. Ignore legacy `triageCreatorEmails` filters.
+Recover previously tracked work for reporting even if it no longer qualifies;
+this does not make it a new candidate or revoke explicit ticket-scoped approval.
 
 Rank by human direction and native priority, then impact, urgency, dependencies,
 readiness, and meaningful activity. Actionable replies, due feedback windows, and
@@ -92,21 +99,40 @@ report additional needs in the user chat.
 
 ### Relevance
 
-Consider creation age, last meaningful activity, and its substance. Quickly check
-current code, related fixes/tickets, and recent evidence before detailed planning.
-Bots and this workflow's updates alone don't renew relevance; age alone doesn't
-prove obsolescence. Keep this separate from the ownership activity rule.
+Route by creation age: **4 weeks = 28 days; 12 weeks = 84 days**. Before deciding,
+briefly investigate the actual problem/request: description and full discussion,
+relevant Slack context, related fixes/tickets/PRs, and a current-code or reproduction
+check where practical. Consider last meaningful activity, its substance, active
+commitments, and dependencies; bot/workflow updates alone don't renew relevance.
+Age sets the default disposition, not proof that an issue is fixed. Unknown creation
+time blocks age-based cancellation.
 
-- **Still relevant:** Record the current signal and continue.
-- **Suspected stale:** Ask once on the ticket whether the issue/request persists,
-  stating what was checked. Reuse questions/answers without repeated pings; bring
-  a keep/park/close recommendation to the user when useful.
-- **Likely stale:** Propose closure and its reason for explicit user confirmation;
-  recheck evidence before closing. Never close solely for age or silence.
+- **Under 4 weeks:** Normal relevance/readiness triage.
+- **4 to under 12 weeks:** Lean toward cancellation when evidence shows the need
+  is resolved, superseded, abandoned, or no longer prioritized. If a specific
+  uncertainty could change the result, ask once on the ticket with what was checked;
+  reuse existing questions/answers rather than repeated pings.
+- **12 weeks or older:** Default to cancellation after the bounded context check,
+  unless current evidence supports keeping it: a persisting issue with meaningful
+  impact, renewed demand, an active commitment, or a live dependency. Record that
+  reason and continue normal triage. Missing required access or ownership evidence
+  is a blocker, not evidence for cancellation.
 
-Report the finding, evidence/access gap, and next action. Missing implementation
-plans aren't relevance findings. Unresolved relevance blocks implementation;
-feedback timeouts don't establish relevance or authorize closure.
+Normal runs authorize routine stale-ticket cancellation under this policy, within
+candidate eligibility, ownership, and per-run limits; no individual closure approval
+is required. Read-only/report-only requests and explicit keep-open directions still
+apply. Recheck before changing to the native Canceled status. Post one concise
+first-person comment explaining the actual reason and evidence, distinguishing
+stale/unprioritized from fixed, and inviting the creator to reopen with current
+impact or an example. Verify both comment and status; report partial write failures
+and reconcile them before retrying. Include cancellations in the 24-hour closed table.
+
+A reopen or substantive reply renews the relevance assessment; it does not promise
+immediate implementation. Recheck candidate eligibility, ownership, clarity,
+priority, dependencies, validation, and the M ceiling. Implement ready work within
+remaining authority/budget or queue it for the next run. Feedback silence alone
+never proves resolution; do not repeat cancellation after an explicit keep-open or
+renewed-demand response without new evidence.
 
 ### Approach and sizing
 
@@ -130,7 +156,7 @@ children qualify only after their own readiness checks.
 | Ready, unselected | Keep queued without inventing a blocker. |
 | Missing obtainable facts | Investigate within the assessment budget. |
 | Consequential uncertainty | Ask the right person; use the interview for user decisions. |
-| Likely stale | Review closure with the user. |
+| Stale under the age policy | Cancel with a reasoned comment; report the result. |
 | Other-owned | Respect/report ownership; obtain handoff if appropriate. |
 | Too large | Recommend a split/project and seek approval. |
 | Dependency/access/permission blocked | Park with the exact blocker, owner, and resumption condition. |
@@ -223,8 +249,8 @@ operational narration. Unrelated discovered candidates aren't a permanent watchl
 
 ### Continuing interview
 
-Unless report-only, choose the most useful unresolved user decision/closure review
-and investigate available facts first. Ask **one question per turn**, with numbered
+Unless report-only, choose the most useful unresolved user decision or exceptional
+closure review and investigate available facts first. Ask **one question per turn**, with numbered
 choices, **(Recommended)** on choice 1, and brief tradeoffs. Apply to every question;
 factual questions without meaningful alternatives can be direct. Use this contract
 without invoking grill-me unless its policy permits or the user explicitly asks.
