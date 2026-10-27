@@ -35,17 +35,22 @@ flowchart TD
 ### Find Candidates
 
 Reject invalid `count` before discovery. Verify the intended Linear user/account/workspace
-through live lookup or confirmed identity, not OS/Git identity. Read `team` and `repository`
-from `~/.codex/private/linear-ticket-workflows.json`. Before assessment/writes, normalize
+through live lookup or confirmed identity, not OS/Git identity. Read `team`, `repository`, and
+the required nonempty `creatorIds` allowlist from `~/.codex/private/linear-ticket-workflows.json`;
+verify creator identities in the intended workspace, and stop if the allowlist is missing or invalid.
+Before assessment/writes, normalize
 `size` aliases and resolve the live estimate option/order/value; reject unsupported or
 ambiguous mappings. Use numeric Linear values, not hardcoded M=3 or alphabetical comparisons.
 Legacy `maxEstimate`/`mediumEstimateLabel` don't override `size`.
 
 Verify team/statuses; list configured-team Triage/Backlog and Todo/In Progress/In Review tickets assigned to the
 user or unassigned. Collect ID/URL, assignee, status, creator, priority, estimate, parent, and
-creation/update times; paginate independently and deduplicate. Ignore creator filters.
+creation/update times; paginate independently and deduplicate. Retain only tickets whose creator
+is in `creatorIds`, whether assigned to the user or unassigned; filter before deep assessment or writes.
 Recover tracked work from history/checkpoints and live ticket/PR evidence, including
-changed statuses/assignees; recovery doesn't confer eligibility.
+changed statuses/assignees; apply the same creator filter to recovery and reporting.
+Release nonmatching tickets from this workflow's inventory without changing their tickets/PRs.
+Nonmatching parents may supply dependency context, but aren't candidate or write targets.
 
 Order assessment by human direction, native priority, impact, urgency, and meaningful
 activity. Replies, due feedback, and interrupted work matter; `updatedAt` alone doesn't.
@@ -60,7 +65,7 @@ threads before triage writes. Search ticket ID/URL, broadening to issue terms as
 Deep ownership reads use the assessment budget; don't investigate the entire inventory
 or treat unread ownership as clear. Retain:
 
-- **Assigned to the current user:** Creator is irrelevant. Assignment supersedes older
+- **Assigned to the current user:** The creator allowlist still applies. Assignment supersedes older
   routing requests; coordinate genuinely active competing work before writes/building.
 - **Unassigned with no intended assignee:** Named requests, handoffs, or actual investigation/
   implementation establish intended ownership, even before a response. If directed to
@@ -187,14 +192,15 @@ Every run, including blocked/unchanged runs, reports:
   routine follow-up isn't automatically a user question. Keep parked prerequisites and
   speculative product questions in table notes. Repeat unanswered questions only while still
   consequential, labeled already asked with original links; never treat nonresponse as demand.
-- **Still in Play:** Every tracked open ticket for the user or unresolved ownership, including holds.
+- **Still in Play:** Every tracked open ticket passing the creator filter for the user or
+  unresolved ownership, including holds.
 
 Still in Play table: `Ticket | Status | Creator | Estimate | PRs | Action | Update/notes`.
 Sort Action alphabetically with Not assessed last, then native status order and oldest creation
 (unknown last; ID breaks ties). Link tickets/PR states/evidence. Action is this run's work:
 observed merges are Assessed; inventory-only is Not assessed. Notes give disposition
 and next owner/action. Use unknown for unverified facts, — for verified none.
-Keep tracked work until verified closure or explicit tracking release; reassignment isn't
+Keep tracked work until verified closure, creator-filter exclusion, or explicit tracking release; reassignment isn't
 release. Label carried-forward findings/incomplete recovery. Unrelated candidates aren't
 permanent watchlists. Do not collect closed-ticket or other-owner inventories solely for
 reporting; mention material outcomes or ownership blockers in the summary when useful.
