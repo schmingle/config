@@ -16,10 +16,10 @@ Execute the supplied ordered tickets in this standalone chat. It has no automati
 
 Always leave a useful own-chat execution report when the batch ends, including early blocker, deadline, or explicit stop. Include enough detail to inspect:
 
-1. Completed/in-progress tickets and PR/artifact links, plus acceptance/contract alignment and material findings.
-2. Validation results and unverified limits.
-3. Blocked/skipped work, attempted unblocks, and the precise missing decision/input.
-4. Remaining ordered work and next ready step.
+1. All unresolved blockers, including unchanged ones, split into **Needs User Input or Intervention** and **Other Blockers**; write **None** when empty. Give affected ticket/PR links, the exact request or next-action owner and unblock, and attempted routine unblocks. Agent preparation still owed is not a user approval request; mark unverified resolution unknown rather than drop it.
+2. Completed/in-progress tickets and PR/artifact links, plus acceptance/contract alignment and material findings.
+3. Validation results and unverified limits.
+4. Remaining ordered work, skipped paths, and next ready step.
 5. Stop reason/time, original deadline, and actual settlement of owned execution/writes, including unknowns.
 
 A finished batch or ready PR is not full project delivery. Distinguish outstanding queue, deployment, and acceptance work without taking over those responsibilities. Host interruption may prevent a report; never claim otherwise.
