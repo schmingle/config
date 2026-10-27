@@ -79,7 +79,7 @@ class EntrypointRuntimeTests(unittest.TestCase):
                   / 'scripts/agent-launch.md')
         (self.output / 'guidance.md').write_text('Fixture guidance\n\n## ' + str(common) + '\n\n'
                                                 + common.read_text())
-        profile = runner.execution_profile()
+        profile = runner.execution_profile('pr-review-high')
         profile['attribution'] = 'Reviewed by ' + profile['label'] + ' ' + profile['effort'] + '.'
         runner.dump(self.output / 'manifest.json', {
             'bundle_format': 3, 'checkout': str(self.checkout), 'head': head,

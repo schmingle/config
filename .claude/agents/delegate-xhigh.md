@@ -2,7 +2,7 @@
 name: delegate-xhigh
 description: "Use directly for substantial design decisions, ambiguous investigations, independent critiques, or sensitive or critical work. Use delegate-high for difficult engineering, deep investigation, or consequential implementation. No prior attempt at another tier is required. Use the dedicated PR specialists for PR review and queue repair work."
 model: claude-opus-5-5
-effort: medium
+effort: high
 disallowedTools: Agent
 ---
 

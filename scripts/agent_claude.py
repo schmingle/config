@@ -9,7 +9,7 @@ PROVIDER = 'claude'
 
 
 def execution(settings):
-    profile = shared.execution_profile()
+    profile = shared.execution_profile(settings.get("name"))
     return {**profile, 'attribution': 'Reviewed by ' + profile['label'] + ' ' + profile['effort'] + '.'}
 
 
@@ -27,7 +27,7 @@ def instructions(settings, role, rules):
     if len(parts) != 3 or parts[0].strip():
         raise ValueError('Claude role requires frontmatter and an executor body')
     fields = dict(line.split(': ', 1) for line in parts[1].splitlines() if ': ' in line)
-    profile = shared.execution_profile()
+    profile = shared.execution_profile(settings.get("name"))
     if fields.get('name') != role or fields.get('model') != profile['model'] or fields.get('effort') != profile['effort']:
         raise ValueError('Claude counterpart does not match its canonical execution profile')
     return parts[2].strip() + '\n' + rules

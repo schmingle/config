@@ -16,8 +16,11 @@ AGENTS = Path(__file__).resolve().parents[1]
 PROFILE = Path(__file__).with_name('claude-review.toml')
 
 
-def execution_profile():
-    return tomllib.loads(PROFILE.read_text())
+def execution_profile(role=None):
+    profile = tomllib.loads(PROFILE.read_text())
+    overrides = profile.pop("role_efforts", {})
+    profile["effort"] = overrides.get(role, profile["effort"])
+    return profile
 
 
 def load(path):

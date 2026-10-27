@@ -2,7 +2,7 @@
 name: pr-review-high
 description: "Independent correctness and architectural review, including revalidation, for PRs with assessed risk Medium high or High, or an explicit user request for deep review. Reuse the coordinator-supplied risk report; not a routine second review."
 model: claude-opus-5-5
-effort: medium
+effort: high
 disallowedTools: Agent
 ---
 

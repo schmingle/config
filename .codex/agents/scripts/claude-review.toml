@@ -5,3 +5,7 @@ effort = "medium"
 
 # Claude is trusted locally. Task instructions still govern permitted actions.
 allowed_tools = ["Bash", "Read", "Glob", "Grep", "Edit", "Write", "ToolSearch", "WebFetch", "WebSearch", "mcp__claude_ai_Linear__get_issue", "mcp__claude_ai_Linear__list_comments", "mcp__claude_ai_Linear__get_user", "mcp__claude_ai_Linear__list_teams", "mcp__claude_ai_Linear__get_document", "mcp__claude_ai_Linear__get_project"]
+
+[role_efforts]
+delegate-xhigh = "high"
+pr-review-high = "high"

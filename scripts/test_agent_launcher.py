@@ -70,6 +70,13 @@ else:
 
 
 class RoleSettingsTests(unittest.TestCase):
+    def test_claude_role_efforts(self):
+        for role, expected in (("delegate-xhigh", "high"), ("pr-review-high", "high"),
+                               ("port-to-claude", "medium")):
+            with self.subTest(role=role):
+                settings = launcher.role_settings(launcher.AGENTS, role)
+                self.assertEqual(agent_claude.execution(settings)["effort"], expected)
+
     def test_public_counterparts_preserve_wrapper_and_executor_settings(self):
         roles = {path.stem for path in launcher.AGENTS.glob('*.toml')}
         counterparts = {path.stem for path in (ROOT / '.claude/agents').glob('*.md')}
@@ -94,6 +101,7 @@ class RoleSettingsTests(unittest.TestCase):
                     self.assertNotIn('claude_review.py', instructions)
                     self.assertIn('Never spawn agents', instructions)
                 else:
+                    profile = agent_claude.execution(settings)
                     self.assertEqual(fields, {'model': profile['model'], 'effort': profile['effort']})
 
     def test_native_executor_preserves_canonical_guide_paths_and_role(self):

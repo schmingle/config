@@ -27,7 +27,7 @@ REPORT_FIELDS = {'correctness', 'approach', 'risk', 'summary', 'findings', 'cove
 
 
 def reviewer_profile():
-    profile = claude_runner.execution_profile()
+    profile = claude_runner.execution_profile("pr-review-high")
     profile['attribution'] = f"Reviewed by {profile['label']} {profile['effort']}."
     return profile
 

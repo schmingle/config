@@ -395,6 +395,7 @@ class FixtureTests(unittest.TestCase):
             proc.returncode = -15
             with self.subTest(error=type(error).__name__), \
                     patch.object(review.subprocess, 'Popen', return_value=proc), \
+                    patch.object(runner.os, 'waitid', create=True), \
                     patch.object(runner, 'wait_for_exit', side_effect=error), \
                     patch.object(review, 'stop_process', return_value=True) as stop:
                 with self.assertRaises(type(error)):
@@ -406,15 +407,20 @@ class FixtureTests(unittest.TestCase):
                 self.assertTrue(state['interrupted'])
 
     def test_real_timeout_terminates_and_reaps_process(self):
-        self.bundle.mkdir()
-        state = review.run_process([sys.executable, '-c', 'import time; time.sleep(60)'],
-                                   self.checkout, '', 0.1, lambda name: self.bundle / name, 'session')
+        self.prepare()
+        # Exercise runtime selection before real process-group settlement.
+        result = subprocess.run([sys.executable, str(MODULE), 'run', '--bundle', str(self.bundle),
+                                 '--timeout', '1'], env=self.sleeping_cli_environment(),
+                                capture_output=True, text=True, timeout=15)
+        self.assertEqual(result.returncode, 1, result.stderr)
+        state = review.load(self.bundle / 'process.json')
         self.assertTrue(state['timed_out'])
         self.assertFalse(state['running'])
         self.assertIsNotNone(state['exit_code'])
+        with self.assertRaises(ProcessLookupError):
+            os.kill(state['pid'], 0)
 
-    def test_sigterm_to_runner_settles_fake_cli_without_model_usage(self):
-        self.prepare()
+    def sleeping_cli_environment(self):
         binary = self.root / 'bin'
         binary.mkdir()
         fake = binary / 'claude'
@@ -424,9 +430,12 @@ class FixtureTests(unittest.TestCase):
                             'configDirectory': self.storage['config_directory']}) + ')); sys.exit(0)\n'
                         + 'time.sleep(60)\n')
         fake.chmod(0o755)
-        environment = dict(os.environ, PATH=str(binary) + os.pathsep + os.environ['PATH'])
+        return dict(os.environ, PATH=str(binary) + os.pathsep + os.environ['PATH'])
+
+    def test_sigterm_to_runner_settles_fake_cli_without_model_usage(self):
+        self.prepare()
         proc = subprocess.Popen([sys.executable, str(MODULE), 'run', '--bundle', str(self.bundle),
-                                 '--timeout', '30'], env=environment, stdout=subprocess.PIPE,
+                                 '--timeout', '30'], env=self.sleeping_cli_environment(), stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
         try:
             cutoff = time.monotonic() + 5
@@ -632,7 +641,7 @@ class FixtureTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             self.run_with_result('Broken output')
         manifest = review.load(self.bundle / 'manifest.json')
-        manifest['reviewer']['effort'] = 'high'
+        manifest['reviewer']['effort'] = 'low'
         review.dump(self.bundle / 'manifest.json', manifest)
         with self.assertRaisesRegex(ValueError, 'execution profile changed'):
             self.run_with_result(self.valid_report(), replace_failed=True, recovery_reason='invalid-output')

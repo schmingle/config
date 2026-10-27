@@ -65,7 +65,9 @@ porting remains Codex to Claude.
 
 ## Validate changes
 
-Use Python 3.12 or newer. Activate the versioned local hooks for this checkout:
+Use Python 3.12 or newer. On macOS, also install Python 3.14+ with
+`waitid`/`WNOWAIT` support for the real lifecycle tests and Claude entrypoints.
+Activate the versioned local hooks for this checkout:
 
 ```sh
 git config --local core.hooksPath .githooks
