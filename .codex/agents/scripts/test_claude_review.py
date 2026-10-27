@@ -526,6 +526,15 @@ class FixtureTests(unittest.TestCase):
         self.assertNotEqual(saved['base'], saved['risk_report']['base'])
         self.assertTrue(review.load(self.bundle / 'metrics.json')['report_valid'])
 
+    def test_review_prompt_requires_evidenced_stopping(self):
+        self.run_with_result(self.valid_report())
+        prompt = (self.bundle / 'prompt.txt').read_text()
+        self.assertIn('Continue accessible required review work until coverage is complete', prompt)
+        self.assertIn('or the measured deadline is reached', prompt)
+        self.assertIn('are not reasons to stop early', prompt)
+        self.assertIn('stop reason, checked time and deadline', prompt)
+        self.assertIn('Absolute finish-by:', prompt)
+
     def test_silent_risk_rerating_is_rejected(self):
         report = json.loads(self.valid_report())
         report['risk'] = 'Low'

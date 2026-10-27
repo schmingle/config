@@ -112,7 +112,10 @@ the prior result; do not restart the whole task or retry without progress.
 
 Read the report, execution record, logs, and final checkout state. Verify material
 claims against source, checks, and any published artifacts. Exit success and valid
-output are not proof of task completion. Preserve partial work and disclose gaps,
+output are not proof of task completion. For PR reviews, apply the shared
+[completion and stopping rule](../.codex/agents/pr-review.md#completion-and-stopping)
+before accepting or publishing a result; verify the actual stop reason and
+continue premature returns under the original deadline and recovery rules. Preserve partial work and disclose gaps,
 denials, unsettled processes, and actual unblock actions. Required connectors must
 be verified inside the actual executor; a connection in the caller is insufficient.
 Attribute source work to recorded executor settings rather than wrapper frontmatter.
