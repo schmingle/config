@@ -70,6 +70,8 @@ Each loop collects results, refreshes affected GitHub state, merges eligible PRs
 - Check elapsed and idle time at loop boundaries, after waits, and before dispatch/merge. Reserve `min(5 minutes, 10% of timeout)` for settlement. Give each worker an absolute finish-by before that cutoff; normally allow green two minutes, repairs/updates five, risk ten, and full reviews fifteen. Wait at most 30 seconds. These are agent-enforced deadlines, not a process watchdog.
 - Settle at the work cutoff, positive merge limit, idle limit, or exhaustion of permitted work. Polling, repeated failures, and unrelated base movement are not progress. Ready PRs do not keep a `count=0` run alive.
 
+Before stopping for exhaustion, establish from the current inventory that no useful permitted next action fits the remaining time, identifying concrete action blockers where needed and reusing unchanged evidence and completed work. A merge hold or empty worker pool does not establish exhaustion.
+
 #### Writer Ownership
 
 Before dispatching a writer or making a queue write, inspect available native chat/subagent state for active queue runs and PR/component writers in this repository. Read only relevant active chats; refresh evidence before overlapping writes. Never interrupt another run's workers.
@@ -92,6 +94,8 @@ Choose roles by their descriptions and these overlapping eligibility conditions:
 Unknown mergeability requires refresh; policy/approval blocks are not CI repairs. Clear defects can go directly to resolve. Otherwise merge when gated and authorized, or wait/report the blocker.
 
 Favor quick green work, bounded repairs, small finding dispositions, targeted revalidation, then full reviews; complexity matters more than role name. Respect explicit priorities/dependencies, use age for ties, and serve untouched PRs before extending difficult jobs. Fill remaining slots immediately without a phase barrier. Green and review may overlap on a stable head; writers may not overlap other writers or reviewers on the same PR/component. Refresh assignments when heads change.
+
+When capacity opens, reconsider both untouched and deferred admitted candidates under these priorities and dispatch gates; a merge hold, including risk above the ceiling, does not by itself prevent useful permitted repair, disposition, or review work.
 
 #### Repairs
 
@@ -147,6 +151,6 @@ Use this concise final format:
 - Review/repair stacks against their actual base. Merge only into verified `DEFAULT_BRANCH` after prerequisites land. Never enable auto-merge, bypass protections, deploy, or force-push.
 - Follow repository/domain/testing guidance without invoking repository PR skills. Specialists do not merge or delegate, except the bounded review wrapper above.
 - Isolate writers, inspect checkout/branch/dirty state and ownership, and preserve others' work. Never reset/stash/delete unrelated or unpublished changes, shallow-fetch shared worktrees, or merge unrelated histories to conceal missing ancestry.
-- CI executes tests/builds. Do not install dependencies, repair environments, download browsers, run local suites, or wait for CI. Add focused regression coverage when useful; inspect diffs/conflict markers and run `git diff --check`. Never weaken protection; ask here for missing material behavior/test-contract decisions, reusing existing scoped approvals.
+- CI executes tests/builds. Do not install dependencies, repair environments, download browsers, or run local suites. Workers return after pushing; only the coordinator may perform bounded CI waits within the existing time and idle limits. Add focused regression coverage when useful; inspect diffs/conflict markers and run `git diff --check`. Never weaken protection; ask here for missing material behavior/test-contract decisions, reusing existing scoped approvals.
 - Before any write, refresh open/non-draft/non-`noautomerge` eligibility, head/base, and ownership. Read back pushes, reviews, replies, and resolutions; reconcile uncertainty before retry.
 - Workers return promptly with PR/head/base, diagnosis, verified links, validation gaps, next action, and whether writes stopped. A pushed fix awaits CI. No mandatory result schema. Reuse settled same-role workers, but independent reviewers start without writer context (`fork_turns=none`); never review one's own implementation.
