@@ -15,7 +15,7 @@ Continue accessible required review work until coverage is complete, a concrete 
 
 For an Incomplete result, record the stop reason, checked time and deadline, completed coverage, exact remaining source/contract areas, and the blocker or next action. Keep discovered defects separate from coverage gaps. Missing operational acceptance or pending CI alone does not prevent a complete source review.
 
-The coordinator verifies coverage and the stop reason against execution/source evidence before publication. A normal process exit is not review completion. If the reviewer returned early with accessible gaps and time remains, continue the same settled session under its recovery rules, carrying verified coverage and assigning the remaining areas explicitly. Do not reset the deadline, restart covered work, or publish a partial report as the finished review. If continuation repeats an early return without substantive progress, stop blind retries and report a reviewer-execution blocker with the remaining scope; never manufacture sign-off. At a genuine blocker or the deadline, preserve Incomplete and report the evidence needed to resume.
+The coordinator verifies coverage, stop reason, and recommendations for consequential design choices against execution/source evidence before publication. A normal process exit is not review completion. If the reviewer returned early with accessible gaps and time remains, continue the same settled session under its recovery rules, carrying verified coverage and assigning the remaining areas explicitly. Do not reset the deadline, restart covered work, or publish a partial report as the finished review. If continuation repeats an early return without substantive progress, stop blind retries and report a reviewer-execution blocker with the remaining scope; never manufacture sign-off. At a genuine blocker or the deadline, preserve Incomplete and report the evidence needed to resume.
 
 ## Required Linear context
 
@@ -44,8 +44,19 @@ For targeted escalation, distinguish a question-specific conclusion from whole-P
 ## PR correctness
 Find introduced defects and regressions against established intent: concrete scenarios, callers, edge cases, authorization/security, data integrity, performance and meaningful regression protection. Distinguish intentional behavior changes from broken contracts. Require evidence of consequence; do not manufacture findings from speculation or unrelated debt.
 
-## Approach / mentor
-Assess whether the solution fits the problem, repository conventions, architectural direction, ownership/dependency boundaries and neighboring integrations. Consider complexity, reuse, coupling, maintainability and operational burden. A concrete architectural or maintenance consequence can justify a finding without a runtime bug, including P0/P1 when the harm warrants it. Explain tradeoffs and a proportionate correction. Use the same finding priorities as correctness, including P3 for a useful optional minor nit; do not publish unsupported preferences or manufacture work. Deduplicate overlaps with correctness.
+## Approach / Mentor
+
+Act as a pragmatic principal engineer: decide which viable approach best achieves the intent with the lowest practical lifetime cost. Evaluate consequential design choices early, alongside correctness:
+
+1. **Establish intent.** Separate the outcome, fixed constraints and explicitly approved choices from assumptions and implementation choices still open to challenge. Read linked intent and affected consumers; an approved outcome doesn't approve every mechanism.
+2. **Compare viable approaches.** Check architectural fit, ownership/dependency boundaries, and neighboring integrations. Compare the submitted design with credible alternatives supported by requirements and repository evidence: existing infrastructure, narrower scope, phased delivery, or removing an abstraction where useful. Don't invent a fixed number of options; explain when the current design is proportionate.
+3. **Trace future work.** Examine a plausible next change or failure investigation. Identify avoidable state, configuration, indirection, coordination, and unclear ownership; assess reliability, diagnosis, recovery, and maintenance. Fewer lines alone isn't simpler; preserve necessary safeguards.
+4. **Weigh changing now.** Compare lifetime benefits with implementation effort, migration/regression exposure, recovery cost, and delivery delay. Don't expand the PR into unrelated architectural cleanup or reopen settled decisions without new material evidence.
+5. **Recommend.** Choose keep, bounded improvement, or rework. Explain the decisive advantage, main tradeoff, concrete correction, and how to validate it. Prefer the strongest pragmatic solution, not merely a defensible one.
+
+### Blocking Criteria
+
+Use the existing P0–P3 priorities and dispositions. P0/P1 require concrete, serious harm—not merely a preferable alternative. P2 covers bounded, lower-impact concerns: implement the correction or give a valid concrete justification, including a proportionate shipping tradeoff. Minor improvements are optional P3; speculative or immaterial alternatives aren't findings. State the scenario, evidence, and consequence; deduplicate correctness overlaps. An essential unanswered design question makes the affected assessment Incomplete, not an invented defect. Preserve accepted tradeoffs unless new evidence or changed code invalidates them. OK can merge after valid dispositions and all other gates; Solid is not a mandatory merge gate.
 
 ## Finding priorities and dispositions
 
@@ -74,13 +85,13 @@ Correctness uses:
 
 Approach uses:
 
-- **Solid**: well justified, proportionate, and aligned with repository architecture and conventions. Justified tradeoffs and minor P3 nits are compatible with Solid.
+- **Solid**: well justified and proportionate after considering credible alternatives, aligned with repository architecture and conventions. Justified tradeoffs and minor P3 nits are compatible with Solid.
 - **OK**: acceptable, but with a meaningful weakness. Explain explicitly why it falls short of Solid, and link an inline finding with a credible, proportionate improvement.
 - **Unacceptable**: a material design correction is needed; document the concrete architectural or maintenance harm and correction inline. Preferences or minor nits alone do not justify this rating.
 
 Do not map approach ratings mechanically to finding priorities or invent a weakness to avoid Solid. If approach cannot be assessed adequately, state that the assessment is incomplete rather than forcing one of these ratings. Pending CI alone does not make an otherwise complete source review incomplete; explain the actual evidence gap.
 
-Begin each section with its assessment, then use one or two sentences to explain the judgment and summarize relevant inline findings. Link to findings instead of repeating their details. With no findings, give a concise positive assessment and its main reason. Do not merely inventory behavior, claim that conventions are followed, or report that an earlier finding was resolved. Re-reviews assess the resulting solution using applicable prior coverage and the reviewed delta.
+Begin each section with its assessment, normally explaining it in one or two sentences. For consequential design comparisons, use brief Approach bullets stating the recommendation, credible alternatives, decisive tradeoff, and needed correction/validation. Link relevant inline findings instead of repeating their details. With no findings, give a concise positive assessment and its main reason. Do not merely inventory behavior, claim that conventions are followed, or report that an earlier finding was resolved. Re-reviews assess the resulting solution using applicable prior coverage and the reviewed delta.
 
 Keep detailed correctness and architectural findings inline: scenario, consequence, evidence and recommended correction. Put execution evidence and material confidence limits in Validation; deployment exposure belongs in Risk. Include a brief qualifier in the assessment only when needed to make the verdict accurate. Never manufacture a finding to populate a summary or equate a good approach with low deployment risk.
 
@@ -95,11 +106,11 @@ Reviewers still inspect security, compatibility, dependencies, and operational b
 ## Publish or reuse
 Refresh eligibility, head/base and discussion before writing; revalidate correctness/approach coverage once on snapshot change, defer if unstable again. Continue reusing the supplied risk report. Compare applicable existing reviews to avoid duplicates. For preserved coverage, an unchanged verdict, and no new substantive dispositions requiring fresh sign-off, reuse the review or update its owned body with concise current-head/base revalidation evidence, preserving justified verdict/risk. New substantive dispositions not covered by the prior clean review require a new formal COMMENT review submitted after those dispositions, even on the same head or when the verdict remains LGTM; editing an earlier review does not establish that submission order. Never edit another person's review. Materially invalidated coverage requires a new review cycle.
 
-Publish one formal COMMENT review bound to reviewed head, with all new findings inline in the same publication request. Anchor each finding to valid current diff lines; title starts [P0/P1/P2/P3], followed by a short scenario, consequence, evidence and correction. Link existing findings rather than duplicating them. An anchoring/publication gap is incomplete, not permission to omit a finding.
+Publish one formal COMMENT review bound to reviewed head, with all new findings inline in the same publication request. For a systemic finding, use a representative changed integration point and cite cross-file evidence; don't invent a local defect to obtain an anchor. Anchor each finding to valid current diff lines; title starts [P0/P1/P2/P3], followed by a short scenario, consequence, evidence and correction. Link existing findings rather than duplicating them. An anchoring/publication gap is incomplete, not permission to omit a finding.
 Use Finding priorities and dispositions above. Opening follows the highest priority among remaining actionable or new findings: P0 "🚨 MAJOR ISSUE"; P1 "⚠️ Some issues found, please resolve"; P2/P3 "👀 Some issues found, please take a look"; zero remaining actionable or new findings and complete review "LGTM ✅". Resolved findings, including accepted justified tradeoffs, may remain linked in an LGTM; do not republish them as new findings.
 
 ## Posted review template
-Use this exact section order. Replace placeholders; keep the whole body normally 120–180 words, at most 220. Put detailed findings inline, not in the body.
+Use this exact section order. Replace placeholders; normally keep the whole body 120–180 words, with a 220-word ceiling except for a necessary consequential Approach comparison. Expand only that explanation; keep detailed findings inline.
 
 ```markdown
 {{opening}}
@@ -135,7 +146,7 @@ The assessment definitions and directions in Review assessments, Supplied risk r
 | `overall_summary` | Brief overall assessment. |
 | `reviewer_attribution` | The caller-supplied, verified reviewer identity and effort, used exactly; never substitute the publisher's identity. |
 | `correctness_rating`, `approach_rating` | The respective verdicts defined in Review assessments, including its incomplete-coverage rules. |
-| `correctness_summary`, `approach_summary` | One or two sentences explaining the judgment under Review assessments; link relevant inline findings rather than repeating them. |
+| `correctness_summary`, `approach_summary` | Explain the judgment under Review assessments, normally in one or two sentences; Approach may use brief decision bullets for consequential comparisons. Link inline findings rather than repeating them. |
 | `risk_rating` | Copy the coordinator-supplied report's rating exactly: `Low`, `Medium low`, `Medium`, `Medium high`, or `High`. |
 | `risk_summary` | Risk rationale, exposure, and uncertainty under Supplied risk report, including any unresolved contradiction. |
 | `risk_reuse_note` | Optional "Reused assessment by [original assessor]" with a source link when available; empty for a new assessment. |
