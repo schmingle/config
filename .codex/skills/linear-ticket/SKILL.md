@@ -42,7 +42,7 @@ ambiguous mappings. Use numeric Linear values, not hardcoded M=3 or alphabetical
 Legacy `maxEstimate`/`mediumEstimateLabel` don't override `size`.
 
 Verify team/statuses; list configured-team Triage/Backlog and Todo/In Progress/In Review tickets assigned to the
-user or unassigned. Collect ID/URL, assignee, status, priority, estimate, parent, and
+user or unassigned. Collect ID/URL, assignee, status, creator, priority, estimate, parent, and
 creation/update times; paginate independently and deduplicate. Ignore creator filters.
 Recover tracked work from history/checkpoints and live ticket/PR evidence, including
 changed statuses/assignees; recovery doesn't confer eligibility.
@@ -179,8 +179,8 @@ Every run, including blocked/unchanged runs, reports:
   consequential, labeled already asked with original links; never treat nonresponse as demand.
 - **Still in Play:** Every tracked open ticket for the user or unresolved ownership, including holds.
 
-Still in Play table: `Ticket | Status | Estimate | PRs | Action | Update/notes`.
-Sort Action alphabetically (Skipped last), native status order, then oldest creation
+Still in Play table: `Ticket | Status | Creator | Estimate | PRs | Action | Update/notes`.
+Sort Action alphabetically with Not assessed last, then native status order and oldest creation
 (unknown last; ID breaks ties). Link tickets/PR states/evidence. Action is this run's work:
 observed merges are Assessed; inventory-only is Not assessed. Notes give disposition
 and next owner/action. Use unknown for unverified facts, — for verified none.
