@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # PR Merge Queue
 
-Advance eligible PRs through repairs, independent review, and authorized merges. Requires explicit invocation, including an approved scheduled prompt; configuration edits do not run the queue.
+Automate the PR pipeline to deliver high-quality code to `main` or the verified default branch reliably, quickly, and with efficient token use. Advance eligible PRs through repairs, independent review, and authorized merges; preserve risk/authorization boundaries and escalate consequential human decisions. Requires explicit invocation, including an approved scheduled prompt; configuration edits do not run the queue.
 
 ## Parameters
 
@@ -95,6 +95,8 @@ Unknown mergeability requires refresh; policy/approval blocks are not CI repairs
 
 Favor quick green work, bounded repairs, small finding dispositions, targeted revalidation, then full reviews; complexity matters more than role name. Respect explicit priorities/dependencies, use age for ties, and serve untouched PRs before extending difficult jobs. Fill remaining slots immediately without a phase barrier. Green and review may overlap on a stable head; writers may not overlap other writers or reviewers on the same PR/component. Refresh assignments when heads change.
 
+Choose actions that advance safe delivery or unblock dependent work while reusing settled evidence. Sequence overlapping repairs when an earlier integration can advance within the run and would materially invalidate the later repair; otherwise continue useful permitted work on stable snapshots. Keep unrelated work moving without a queue-wide phase barrier.
+
 When capacity opens, reconsider both untouched and deferred admitted candidates under these priorities and dispatch gates; a merge hold, including risk above the ceiling, does not by itself prevent useful permitted repair, disposition, or review work.
 
 #### Repairs
@@ -124,7 +126,7 @@ Use `gh pr merge NUMBER --repo HOST/OWNER/REPO --squash --match-head-commit SHA`
 
 Preserve deduplicated `Co-authored-by` trailers from every commit at the verified head in the squash body (`--body-file` when supplying it). Review, coordination, or merging alone earns no Codex attribution. Verify landed trailers; report loss without rewriting history.
 
-Never merge into an unmerged parent. Stack only concrete prerequisites with verified ancestry and GitHub base; independent siblings stay separate. After a parent lands, assign history-preserving reconciliation onto live `DEFAULT_BRANCH`, verify remaining diff/base/ancestry, and refresh review evidence. Missing intent or unsafe history holds that component only.
+Never merge into an unmerged parent. Follow the shared [stacking policy](../../AGENTS.md#pr-independence-and-dependency-stacking); do not convert ready PRs into new integration stacks without scoped approval. After a parent squash lands, distinguish missing ancestry from missing behavior: compare the original parent/child delta with landed content, incorporate live `DEFAULT_BRANCH` through a history-preserving merge, and verify the intended remaining diff/base/ancestry before retargeting. Give the independent reviewer the prior reviewed snapshot, parent landing, resulting diff, and conflict-resolution changes; reuse coverage under the review guide. Missing intent or unsafe history holds that component only.
 
 ### Settle and Report
 
@@ -133,6 +135,8 @@ Collect results, interrupt only owned overdue workers, reconcile uncertain write
 Every manual/scheduled run ends with a user-visible final reply, even on error/interruption; commentary or automation memory is insufficient. Empty discovery uses its short reply above. After admission, inventory every candidate exactly once, even with zero merges.
 
 Progress updates show PR, action, outcome/blocker, and remaining time. Keep decisions here, not automatic decision-request PR comments; above-ceiling risk alone does not request an exception.
+
+When a consequential human decision is needed, present the current change, review evidence, residual exposure, recommendation/alternatives, and exact requested authority. Finish obtainable agent preparation first; routine merges and CI waits remain progress status, not approval requests.
 
 Use this concise final format:
 

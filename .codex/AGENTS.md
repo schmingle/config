@@ -216,12 +216,12 @@ Codex co-authorship.
 
 ## PR independence and dependency stacking
 
-Avoid stacking by default. Create independent PRs from the repository's current default branch (`main` where applicable).
+Optimize safe delivery to the default branch with minimal waiting, conflict repair, repeated CI, and re-review. Prefer independent PRs when they can be authored and integrated independently.
 
 When PR2 must not merge before PR1, stack PR2 on PR1 to enforce that dependency. Establish actual branch ancestry and set PR2's GitHub base to PR1's branch; draft status, comments, descriptions, and Linear dependencies alone are insufficient. This verified dependency is sufficient reason to stack without a separate stacking request.
 
-Stack only when the child requires a concrete API, schema or behavior absent from current main; identify that dependency before choosing its base. Ancestry, ticket order, file overlap and shared rollout plans are insufficient.
+Stack when the child requires a concrete API, schema, or behavior absent from current main. For repeated changes to the same semantic or test region, prefer authoring from landed main when the expected wait is short; a short stack may instead enforce deliberate integration order when repeated reconciliation would be costly and waiting would materially delay useful authoring. Identify the dependency or concrete overlap and ordering benefit; file overlap, ticket order, and shared rollout plans alone are insufficient. Both cases require actual ancestry and the corresponding GitHub base.
 
-Reassess dependencies when splitting or extracting a PR; default to main, not the source branch. Use the smallest prerequisite and keep independent consumers as siblings.
+Reassess these reasons when splitting or extracting a PR; do not inherit its source branch automatically. Use the fewest justified ordering edges. Authors choose justified stacks during draft authoring; converting existing ready PRs into a new integration stack requires a concrete scoped proposal and approval. Preserve queue ownership after readiness.
 
 Before exceeding three open PRs in a chain, check for unnecessary edges or separable shared foundations. When a stack is deeper than five open PRs, suggest an audit to see whether it can be split or flattened. Depth alone does not require approval. An explicitly requested linear stack applies only to its requested scope.
