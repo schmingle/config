@@ -16,7 +16,7 @@ Execute the supplied ordered tickets in this standalone chat. It has no automati
 
 Always leave a useful own-chat execution report when the batch ends, including early blocker, deadline, or explicit stop. Include enough detail to inspect:
 
-1. All unresolved blockers, including unchanged ones, split into **Needs User Input or Intervention** and **Other Blockers**; write **None** when empty. Give affected ticket/PR links, the exact request or next-action owner and unblock, and attempted routine unblocks. Agent preparation still owed is not a user approval request; mark unverified resolution unknown rather than drop it.
+1. All unresolved blockers, including unchanged ones, split into numbered lists under **Needs User Input or Intervention** and **Other Blockers**; write **None** when empty. Give affected ticket/PR links, the exact request or next-action owner and unblock, and attempted routine unblocks. Routine merges and above-ceiling risk alone belong in progress, not blocker lists. Agent preparation still owed is not a user approval request; mark unverified resolution unknown rather than drop it.
 2. Completed/in-progress tickets and PR/artifact links, plus acceptance/contract alignment and material findings.
 3. Validation results and unverified limits.
 4. Remaining ordered work, skipped paths, and next ready step.
