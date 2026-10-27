@@ -225,8 +225,9 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
 
 - Preserve the creator's original ticket description verbatim. Prefer comments for updates;
   when description additions are needed, append them below a Markdown horizontal rule (`---`)
-  and the heading **Added by Codex After the Creator's Original Description**. Update only
-  clearly identified Codex additions; preserve the original and other authors' content.
+  and the heading **Added by <user mention>**, using the verified current user's native Linear
+  mention. This section follows the creator's original description. Update only
+  this workflow's clearly separated additions; preserve the original and other authors' content.
 - Honor read-only/report-only limits. Normal runs authorize Linear assessment/updates,
   eligible stale cancellations, and one ticket's implementation/commits/pushes/Draft/ready
   handoff. Exclude merging, auto-merge, deployment, production writes, project creation/
