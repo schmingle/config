@@ -24,17 +24,28 @@ Compare actionable tickets before choosing one; report critical questions withou
 
 ```mermaid
 flowchart TD
-    Find[Find Candidates] --> Filter[Filter Ownership]
+    Start[Start Run] -->|Checks Pass| Find[Find Candidates]
+    Start -->|Invalid Count, Active Run, or Inspection Error| Report[Report]
+    Find --> Filter[Filter Ownership]
     Filter -->|Retained Set| Triage[Triage Tickets]
-    Filter -->|None Retained| Report[Report]
+    Filter -->|None Retained| Report
     Triage -->|Set Triaged: Actionable Tickets| Deliver[Select and Deliver]
     Triage -->|None Actionable| Report
     Deliver -->|At Most One Implementation Ticket| Report
 ```
 
+### Start Run
+
+Reject invalid `count`. Before discovery, use native `list_threads` and targeted status/history
+reads to check recent active chats for another ongoing `linear-ticket` invocation, regardless
+of title. Exclude this run and configuration/review discussions. If another run is active,
+link it and stop; if inspection is unavailable or fails, report that and stop. A bounded listing
+is sufficient best effort, not an atomic lock. These exits report only the reason, without
+discovery, checkpoint reads, or ticket/PR writes; never interrupt the other run.
+
 ### Find Candidates
 
-Reject invalid `count` before discovery. Verify the intended Linear user/account/workspace
+Verify the intended Linear user/account/workspace
 through live lookup or confirmed identity, not OS/Git identity. Read `team`, `repository`, and
 the required nonempty `creatorIds` allowlist from `~/.codex/private/linear-ticket-workflows.json`;
 verify creator identities in the intended workspace, and stop if the allowlist is missing or invalid.
@@ -212,6 +223,10 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
 
 ## Rules
 
+- Preserve the creator's original ticket description verbatim. Prefer comments for updates;
+  when description additions are needed, append them below a Markdown horizontal rule (`---`)
+  and the heading **Added by Codex After the Creator's Original Description**. Update only
+  clearly identified Codex additions; preserve the original and other authors' content.
 - Honor read-only/report-only limits. Normal runs authorize Linear assessment/updates,
   eligible stale cancellations, and one ticket's implementation/commits/pushes/Draft/ready
   handoff. Exclude merging, auto-merge, deployment, production writes, project creation/
