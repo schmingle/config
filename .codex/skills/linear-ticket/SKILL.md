@@ -133,8 +133,18 @@ requests, preserve the outcome while independently choosing implementation/size.
 The complete outcome must fit **`size` and one or two coherent PRs**. Don't omit essential
 behavior, compatibility, permissions, or test protection to fit. Update estimates from
 evidence without claiming oversized work or removing its assignee. Above `size` is triage-only;
-no automatic children or oversized parent execution. Splits/project changes need approval;
-approved children need their own readiness checks. Tracking approval isn't implementation approval.
+no automatic children or oversized parent execution. Splits/project changes need approval.
+
+Before requesting split approval, investigate the complete decomposition. Each implementation
+leaf needs an evidence-supported estimate within `size`, a coherent outcome, dependencies,
+and acceptance/verification criteria. Cover all essential parent requirements, including
+indirect compatibility effects. Larger parents may track the combined outcome; don't relabel
+oversized implementation work as tracking or defer requirements to meet the ceiling.
+
+If missing evidence prevents credible sizing, finish obtainable investigation or report the gap
+before proposing children. Approved children still need execution readiness checks; tracking
+approval isn't implementation approval. If later evidence changes sizing, explain the new facts
+or earlier omission and propose one consolidated revision, not successive unassessed splits.
 
 ### Select and Deliver
 
