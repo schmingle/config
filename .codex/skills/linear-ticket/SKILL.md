@@ -169,8 +169,7 @@ Distinguish merged, deployed, and operationally accepted.
 
 Every run, including blocked/unchanged runs, reports:
 
-- One outcome sentence: screened/changed/build, separate still-in-play/ownership-exclusion/recent-closed
-  counts, and coverage limits;
+- One outcome sentence: screened/changed/build, still-in-play count, and coverage limits;
   timing once if useful, plus at most three result/intervention bullets.
 - **Critical Questions:** Only user decisions that unlock currently relevant work, resolve a
   consequential disposition, or address a current risk. Link the ticket, consequence, and
@@ -179,20 +178,17 @@ Every run, including blocked/unchanged runs, reports:
   speculative product questions in table notes. Repeat unanswered questions only while still
   consequential, labeled already asked with original links; never treat nonresponse as demand.
 - **Still in Play:** Every tracked open ticket for the user or unresolved ownership, including holds.
-- **Closed in the Last 24 Hours:** Native terminal transitions by actual closure time, not
-  PR merge/`updatedAt`; separate unknown times as unverified. Reopened tickets return to open.
-- **Owned by Others:** A linked list, not a table: `<ticket> - owned by <owner>`. Include
-  exclusions/handoffs once; distinguish intended from confirmed ownership. Keep unresolved
-  current ownership in Still in Play, not falsely attributed to a historical implementer.
 
-Both tables: `Ticket | Status | Estimate | PRs | Action | Update/notes`.
+Still in Play table: `Ticket | Status | Estimate | PRs | Action | Update/notes`.
 Sort Action alphabetically (Skipped last), native status order, then oldest creation
 (unknown last; ID breaks ties). Link tickets/PR states/evidence. Action is this run's work:
-observed merges/closures are Assessed; inventory-only is Not assessed. Notes give disposition,
-next owner/action, or closure time. Use unknown for unverified facts, — for verified none.
+observed merges are Assessed; inventory-only is Not assessed. Notes give disposition
+and next owner/action. Use unknown for unverified facts, — for verified none.
 Keep tracked work until verified closure or explicit tracking release; reassignment isn't
 release. Label carried-forward findings/incomplete recovery. Unrelated candidates aren't
-permanent watchlists. Omit empty sections; shorten prose, not required inventory.
+permanent watchlists. Do not collect closed-ticket or other-owner inventories solely for
+reporting; mention material outcomes or ownership blockers in the summary when useful.
+Omit empty sections; shorten prose, not required inventory.
 
 Finish after reporting: no interview or waiting for replies. Later answers update the
 relevant disposition within remaining authority/budget; they don't restart discovery,
