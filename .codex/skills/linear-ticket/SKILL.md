@@ -54,14 +54,35 @@ Before assessment/writes, normalize
 ambiguous mappings. Use numeric Linear values, not hardcoded M=3 or alphabetical comparisons.
 Legacy `maxEstimate`/`mediumEstimateLabel` don't override `size`.
 
-Verify team/statuses; list configured-team Triage/Backlog and Todo/In Progress/In Review tickets
-across all assignees for ownership triage. Collect ID/URL, assignee, status, creator, priority, estimate, parent, and
-creation/update times; paginate independently and deduplicate. Retain only tickets whose creator
-is in `creatorIds`; filter before deep assessment or writes.
-Recover tracked work from history/checkpoints and live ticket/PR evidence, including
-changed statuses/assignees; apply the same creator filter to recovery and reporting.
-Release nonmatching tickets from this workflow's inventory without changing their tickets/PRs.
-Nonmatching parents may supply dependency context, but aren't candidate or write targets.
+Verify team/statuses; discover configured-team Triage/Backlog and Todo/In Progress/In Review
+tickets across all assignees. Use supported server-side team/creator/status filters and metadata
+field selection; inspect the current interface rather than inventing arguments. Collect ID/URL,
+team, assignee, status, creator, priority, estimate, parent, and creation/update times. Paginate
+each query independently and deduplicate; verify `creatorIds` before deep assessment or writes.
+
+Reuse existing private checkpoints/current automation memory as caches for metadata and
+unassessed work. With a trustworthy checkpoint matching the verified workspace/user/team,
+repository, creator allowlist, and query scope, prefer metadata-first updated-since deltas
+with a boundary overlap and ID deduplication. Merge with prior candidates; don't drop older
+unassessed work. Refresh tracked IDs regardless of current team/status to detect closure,
+reopening, moves, reassignment, and creator changes. Recover tracked work from history/live
+sources; apply the creator filter to recovery/reporting. Release nonmatching tickets only
+from this workflow's inventory, without ticket/PR writes. Nonmatching parents are context only.
+
+Use full discovery when the checkpoint is missing/untrusted, scope/filter semantics change,
+or the interface cannot cover new/reopened/moved-in/status/creator changes reliably. Repeat
+full discovery at least every seven days. This backstop is metadata discovery, not unlimited
+assessment. Record scan start; advance the checkpoint no later than that time only after all
+queries are fully paginated and the result is saved successfully. On partial/error/blocked
+saves, retain the previous checkpoint and unresolved inventory; report actual scan coverage
+and any save failure. Absence from partial results is never closure. Don't invent a checkpoint.
+
+Issue `updatedAt` alone cannot detect linked PR, dependency, discussion/Slack, or human-decision
+changes. Refresh relevant source activity and newly linked references separately, including
+during full reconciliation; use supported metadata/deltas before rereading unchanged bodies.
+When unavailable, inspect relevant sources within the assessment budget and label uncovered
+work accordingly. Recheck due handoff/feedback deadlines and refresh affected live evidence
+before consequential writes. Cached summaries never replace exact human approval/STOP sources.
 
 Order assessment by human direction, native priority, impact, urgency, and meaningful
 activity. Replies, due feedback, and interrupted work matter; `updatedAt` alone doesn't.
@@ -295,6 +316,12 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
   questions/decisions, original feedback time, next action, inventory/closures, and assessed
   versus applied feedback. Recover stale/missing state from live sources; no private
   bookkeeping in tickets/PRs/repo trackers.
+- For automation runs, replace superseded memory with one concise current-state note:
+  scope, discovery/full-discovery checkpoints, coverage gaps, open-work/checkpoint links,
+  holds/deadlines/decisions, and next actions. Keep detailed history retrievable in native
+  chat/ticket/PR records or private checkpoints; before removing its only copy, preserve a
+  private historical record and reference. Keep the full tracked/unassessed inventory and
+  exact approval/STOP provenance recoverable. Memory never proves eligibility or clears a hold.
 - Memory/checkpoint saves never block reporting/questions. If blocked, briefly explain,
   retain results in chat, and complete the report. Don't substitute memory approval,
   wait, or bypass the restriction; recover later from chat/live evidence. No grill-me session.
