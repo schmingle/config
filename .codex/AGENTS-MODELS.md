@@ -36,7 +36,7 @@ mean high reasoning demand.
 | Codex-specific advice and review — assess Codex behavior, setup, and workflows | Sol · high | Sol · high | Sol · xhigh | Astra · medium |
 | Writing and editing — express supplied ideas, adapt voice, improve clarity | Terra · medium | Terra · medium | Terra · high | Terra · xhigh |
 | Structured extraction and classification — extract fields, categorize, transform explicit inputs | Terra · medium | Terra · medium | Terra · high | Terra · xhigh |
-| Coordination and execution — supervise workflows, operate tools, reconcile state | Sol · medium | Sol · medium | Sol · high | Sol · high |
+| Operational execution — follow defined procedures, operate tools, verify outcomes, reconcile affected records | Sol · medium | Sol · medium | Sol · high | Sol · high |
 
 Sol = GPT-6.1 Sol; Astra = GPT-6 Astra; Terra = GPT-6.1 Terra.
 Opus = Claude Opus 5.5 in a Claude-capable execution environment.
@@ -48,17 +48,37 @@ investigation. Use the specific code-review or Codex-specific row when applicabl
 general review covers other critiques, including architecture and plan review.
 Concrete tasks can change level with their actual constraints.
 
-These 36 cells are a provisional policy, not 36 independently established results.
+Supervision is a separate, manually controlled role: assessing progress, deciding
+next work, steering workers, and resolving blockers. It does not inherit the
+operational-execution row; no supervisor model mapping is defined here.
+
+### Execution mode: browser and desktop
+
+Browser and desktop control are execution modes that can serve different work
+types. For bounded UI execution, use this mode-specific recommendation:
+
+| Execution mode | Low | Medium | High | Xhigh |
+| --- | --- | --- | --- | --- |
+| Browser / desktop execution — navigate interfaces, fill forms, update records, download reports, verify saved results | Terra · medium | Terra · medium | Terra · high | Terra · xhigh |
+
+Apply this recommendation to operating the interface. Investigation, architecture,
+review, and decisions still follow their nature-of-work rows; using a browser
+does not reclassify the reasoning. API/CLI execution inherits the applicable
+nature-of-work recommendation. Respect available tools and explicit execution
+settings. Higher Terra effort choices remain provisional routing preferences.
+
+These nature-of-work and execution-mode cells are a provisional policy, not
+independently established results for every cell.
 The selected model and effort values reflect approved routing preferences, not
 new empirical findings. Review's capable-model floor is a judgment call. Retaining
 Terra at higher levels is a specialization hypothesis, not proof it outperforms
-stronger models. No direct comparative supervisor evidence establishes the
-coordination row, and exact effort choices generally have weak comparative support.
+stronger models. No direct comparative evidence establishes an optimal model for
+supervision, and exact effort choices generally have weak comparative support.
 
 Use **GPT-6.1 Sol at medium** when classification or evidence is insufficient to
 justify another recommendation, subject to explicit requests and workflow settings.
-Layer 2 will map concrete tasks to work types and default levels, with conditions
-that change their classification; it is not defined here yet.
+Layer 2 will map concrete tasks to work types, default levels, and execution modes,
+with conditions that change their classification; it is not defined here yet.
 
 ## Evidence and confidence
 
