@@ -34,7 +34,7 @@ mean high reasoning demand.
 | General review — challenge assumptions, feasibility, boundaries, alternatives in plans, architecture, or other material | Sol · xhigh | Sol · xhigh | Sol · xhigh | Opus 5.5 · medium |
 | Investigation and analysis — retrieve evidence, diagnose causes, reconcile findings | Sol · high | Sol · high | Sol · xhigh | Sol · xhigh |
 | Codex-specific advice and review — assess Codex behavior, setup, and workflows | Sol · high | Sol · high | Sol · xhigh | Astra · medium |
-| Writing and editing — express supplied ideas, adapt voice, improve clarity | Terra · medium | Terra · medium | Terra · high | Terra · xhigh |
+| Writing and editing — express supplied ideas, adapt voice, improve clarity | Terra · medium | Terra · medium | Terra · high | Sol · high |
 | Structured extraction and classification — extract fields, categorize, transform explicit inputs | Terra · medium | Terra · medium | Terra · high | Terra · xhigh |
 | Operational execution — follow defined procedures, operate tools, verify outcomes, reconcile affected records | Sol · medium | Sol · medium | Sol · high | Sol · high |
 
@@ -106,7 +106,8 @@ with conditions that change their classification; it is not defined here yet.
 
 ## Additional candidates
 
-- The Terra writing row follows OpenAI's task positioning. Using Terra for
+- Terra for writing follows OpenAI's task positioning; Sol high at xhigh writing
+  demand is a routing preference, not a demonstrated optimum. Using Terra for
   extraction and classification is a routing preference; its exact effort choices
   remain provisional. No personal voice advantage or optimum across levels has
   been established.
