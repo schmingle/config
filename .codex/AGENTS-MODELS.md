@@ -34,8 +34,8 @@ mean high reasoning demand.
 | General review — challenge assumptions, feasibility, boundaries, alternatives in plans, architecture, or other material | Sol · xhigh | Sol · xhigh | Sol · xhigh | Opus 5.5 · medium |
 | Investigation and analysis — retrieve evidence, diagnose causes, reconcile findings | Sol · high | Sol · high | Sol · xhigh | Sol · xhigh |
 | Codex-specific advice and review — assess Codex behavior, setup, and workflows | Sol · high | Sol · high | Sol · xhigh | Astra · medium |
-| Writing and editing — express supplied ideas, adapt voice, improve clarity | Terra · low | Terra · medium | Terra · medium | Terra · high |
-| Structured extraction and classification — extract fields, categorize, transform explicit inputs | Terra · low | Terra · medium | Terra · medium | Terra · high |
+| Writing and editing — express supplied ideas, adapt voice, improve clarity | Terra · medium | Terra · medium | Terra · high | Terra · xhigh |
+| Structured extraction and classification — extract fields, categorize, transform explicit inputs | Terra · medium | Terra · medium | Terra · high | Terra · xhigh |
 | Coordination and execution — supervise workflows, operate tools, reconcile state | Sol · medium | Sol · medium | Sol · high | Sol · high |
 
 Sol = GPT-6.1 Sol; Astra = GPT-6 Astra; Terra = GPT-6.1 Terra.
