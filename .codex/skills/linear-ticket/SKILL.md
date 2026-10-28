@@ -80,8 +80,8 @@ assessment budget; age or lack of a visible update alone isn't proof of inactivi
   current investigation, then responsibility for the affected area. If multiple intended owners
   remain tied, choose the first named in the original human request, not an agent summary or
   generated offer. Exclude incidental mentions, reviewers, FYIs, and people who declined.
-  Set one assignee and post one concise Linear comment linking the evidence and explaining
-  the choice or fallback; FYI-mention the other intended owners using verified native mentions.
+  Set one assignee and post one Linear comment; FYI-mention the other intended owners
+  using verified native mentions.
   Add those owners as subscribers through a supported interface, preserving existing subscribers,
   and verify the result. Mentioning alone isn't subscription proof; report unavailable or
   unverified subscription controls without inventing success. Missing identity/scope evidence
@@ -97,6 +97,10 @@ assessment budget; age or lack of a visible update alone isn't proof of inactivi
   then assign to the user and comment on the handoff if no objection or competing activity.
   A clear earlier acceptance permits immediate handoff.
   Don't reset the window or duplicate offers. No new schedules or waiting for replies.
+
+For assignment comments, name the assignee and briefly explain the choice or fallback,
+linking the source. Usually one or two sentences; include constraints when they change
+the recipient's next action.
 
 Never use silence to override a refusal, active PR/project ownership, or human STOP.
 Ticket staleness is separate from stale ownership; don't cancel other-owned tickets.
