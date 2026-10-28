@@ -206,7 +206,13 @@ Every run, including blocked/unchanged runs, reports:
 - **Still in Play:** Every tracked open ticket passing the creator filter for the user or
   unresolved ownership, including holds.
 
-Still in Play table: `Ticket | Status | Creator | Estimate | PRs | Action | Update/notes`.
+Still in Play table: `Ticket | Status | Creator | Assignee | Estimate | PRs | Action | Update/notes`.
+Assignee: show the current Linear assignee's name without a qualifier. If unassigned but
+context establishes an intended or suggested owner, show `Name (inferred from Slack)` or
+`Name (inferred from Linear)`; use `Name A or Name B` when the intended person is unresolved.
+An explicit commitment outside the assignee field still uses the inferred-source qualifier.
+Otherwise show `Unassigned`, or `unknown` if the field/evidence wasn't verified. Don't add
+an Unassigned prefix or separate commitment labels; reporting an owner doesn't assign the ticket.
 Sort Action alphabetically with Not assessed last, then native status order and oldest creation
 (unknown last; ID breaks ties). Link tickets/PR states/evidence. Action is this run's work:
 observed merges are Assessed; inventory-only is Not assessed. Notes give disposition
