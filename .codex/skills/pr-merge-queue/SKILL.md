@@ -41,7 +41,7 @@ Branches represent concurrent jobs, not queue-wide phases. Merge eligible PRs be
 ### Start Run
 
 1. **Validate Parameters.** Reject unknown or invalid parameters and report the error without queue actions. Record invocation start with the clock tool or `date`.
-2. **Check Active Invocations.** Resolve the intended repository from the explicit target or current chat/project context/remote. Use native `list_threads` and compact status/history reads to check recent active chats for another running `pr-merge-queue` invocation targeting that repository. Match current assignments, not titles or completed turns; exclude this run and dispatch-only supervisors. If found, identify/link it and stop without interrupting it. If inspection is unavailable or fails, report the error and stop. A bounded listing is sufficient: this is best effort, not proof of exhaustive coverage or an atomic lock.
+2. **Check Active Invocations.** Resolve the intended repository from the explicit target or current chat/project context/remote. Use native `list_threads` and compact status/history reads to check recent active chats for another running `pr-merge-queue` invocation targeting that repository. Match current assignments, not titles or completed turns; exclude this run and dispatch-only supervisors. If found, identify/link it and stop without interrupting it. Correct recoverable inspection errors and retry once; if inspection remains unavailable or unsuccessful, report the error and stop. A bounded listing is sufficient: this is best effort, not proof of exhaustive coverage or an atomic lock.
 
 If both checks pass, proceed to Discover Candidates.
 

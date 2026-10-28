@@ -39,7 +39,8 @@ flowchart TD
 Reject invalid `count`. Before discovery, use native `list_threads` and targeted status/history
 reads to check recent active chats for another ongoing `linear-ticket` invocation, regardless
 of title. Exclude this run and configuration/review discussions. If another run is active,
-link it and stop; if inspection is unavailable or fails, report that and stop. A bounded listing
+link it and stop. Correct recoverable inspection errors and retry once; if inspection remains
+unavailable or unsuccessful, report that and stop. A bounded listing
 is sufficient best effort, not an atomic lock. These exits report only the reason, without
 discovery, checkpoint reads, or ticket/PR writes; never interrupt the other run.
 
