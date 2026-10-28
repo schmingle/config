@@ -71,21 +71,26 @@ Label inventory-only checks Not assessed; new deep investigation still consumes 
 
 ### Reconcile Ownership
 
-Check current relevance, assignment, description/full discussion, linked PRs, and relevant
-Slack before ownership writes. Search ID/URL, broadening as needed. Deep reads consume the
-assessment budget; age or lack of a visible update alone isn't proof of inactivity.
+Check current assignment, description/full discussion, linked PRs, and relevant Slack for
+ticket-specific ownership evidence and later completion, withdrawal, refusal, or superseding direction.
+Search ID/URL, broadening as needed. Ownership reconciliation needs reasonable evidence
+that the person owns this work, independently of full relevance, completion, sizing, or
+implementation-readiness investigation. Deep reads consume the assessment budget;
+age or lack of a visible update alone isn't proof of inactivity or invalid ownership.
 
-- **Unassigned:** A clear, still-applicable human request, acknowledgement, or commitment
-  establishes intended ownership. Choose the strongest-supported owner: explicit commitment,
-  current investigation, then responsibility for the affected area. If multiple intended owners
+- **Unassigned:** A ticket-specific human request, acknowledgement, or commitment is
+  sufficient when no later evidence contradicts it or establishes completed work.
+  Among owners established by that human evidence, choose the strongest-supported:
+  explicit commitment, current investigation, then responsibility for the affected area. If multiple intended owners
   remain tied, choose the first named in the original human request, not an agent summary or
   generated offer. Exclude incidental mentions, reviewers, FYIs, and people who declined.
-  Set one assignee and post one Linear comment; FYI-mention the other intended owners
-  using verified native mentions.
+  Set and verify one assignee during this run, then post one Linear comment; FYI-mention
+  the other intended owners using verified native mentions.
   Add those owners as subscribers through a supported interface, preserving existing subscribers,
   and verify the result. Mentioning alone isn't subscription proof; report unavailable or
-  unverified subscription controls without inventing success. Missing identity/scope evidence
-  still blocks assignment; tie-breaking resolves routing, not acceptance or progress.
+  unverified subscription controls separately while preserving the assignment. Unresolved
+  identity or applicability of the ownership evidence to this ticket blocks assignment;
+  tie-breaking resolves routing, not acceptance or progress.
 - **Assigned:** Verify current ownership and later human handoffs; reconcile clear superseding
   direction with a reasoned comment. Don't overwrite assignments from weak inference.
 - **Apparently inactive, assigned to someone else:** Confirm the work remains relevant and
@@ -133,9 +138,9 @@ workflow triage. Dispositions:
 - **Hold:** Unresolved intended behavior/essential scope, unsafe unknowns, ownership,
   dependencies, access, or
   permission block affected work. Investigate obtainable facts; otherwise report blocker,
-  owner, resumption condition, and critical user questions. Don't claim held work. Ask other
-  parties on the ticket only when authorized/useful. Above `size`, recommend a split/project
-  and report needed approval.
+  owner, resumption condition, and critical user questions. Don't claim held work for
+  implementation. Ask other parties on the ticket only when authorized/useful. Above `size`,
+  recommend a split/project and report needed approval.
 
 Judge complete outcomes, including rollout/acceptance. Multi-phase/multi-owner work may
 need project framing; a bounded approved-project leaf can qualify independently. Recheck
@@ -234,8 +239,10 @@ Every run, including blocked/unchanged runs, reports:
 Still in Play table: `Ticket | Status | Creator | Assignee | Estimate | PRs | Action | Update/notes`.
 Assignee: show the current Linear assignee's name without a qualifier. If unassigned but
 context establishes an intended or suggested owner, show `Name (inferred from Slack)` or
-`Name (inferred from Linear)`; apply the ownership tie-break rather than retaining alternatives,
-and explain any blocked or unverified assignment in notes.
+`Name (inferred from Linear)` only with a concrete ownership/write blocker or exhausted
+change budget stated in notes. Otherwise complete the supported assignment before reporting;
+apply the ownership tie-break rather than retaining alternatives. Readiness or subscription
+uncertainty alone doesn't justify leaving a supported owner inferred.
 An explicit commitment outside the assignee field still uses the inferred-source qualifier.
 Otherwise show `Unassigned`, or `unknown` if the field/evidence wasn't verified. Don't add
 an Unassigned prefix or separate commitment labels; reporting an owner doesn't assign the ticket.
