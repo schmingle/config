@@ -28,28 +28,32 @@ mean high reasoning demand.
 
 | Nature of work | Low | Medium | High | Xhigh |
 | --- | --- | --- | --- | --- |
-| Code generation — implement, fix, refactor, write tests | Sol · low | Sol · medium | Sol · high | Sol · xhigh |
-| Code review — find defects, regressions, contract violations | Sol · high | Sol · high | Opus 5.5 · high | Opus 5.5 · high |
-| Architecture / plan generation — design approaches, interfaces, execution plans | Sol · medium | Sol · high | Astra · high | Astra · xhigh |
-| Architecture / plan review — challenge assumptions, feasibility, boundaries, alternatives | Astra · medium | Astra · high | Astra · high | Astra · xhigh |
-| Investigation and analysis — retrieve evidence, diagnose causes, reconcile findings | Sol · medium | Sol · medium | Sol · high | Astra · high |
+| Code generation — implement, fix, refactor, write tests | Sol · medium | Sol · medium | Sol · high | Sol · xhigh |
+| Code review — find defects, regressions, contract violations | Sol · high | Sol · high | Sol · xhigh | Opus 5.5 · medium |
+| Architecture / plan generation — design approaches, interfaces, execution plans | Sol · high | Sol · high | Sol · xhigh | Opus 5.5 · medium |
+| General review — challenge assumptions, feasibility, boundaries, alternatives in plans, architecture, or other material | Sol · xhigh | Sol · xhigh | Sol · xhigh | Opus 5.5 · medium |
+| Investigation and analysis — retrieve evidence, diagnose causes, reconcile findings | Sol · high | Sol · high | Sol · xhigh | Sol · xhigh |
+| Codex-specific advice and review — assess Codex behavior, setup, and workflows | Sol · high | Sol · high | Sol · xhigh | Astra · medium |
 | Writing and editing — express supplied ideas, adapt voice, improve clarity | Terra · low | Terra · medium | Terra · medium | Terra · high |
-| Structured extraction and classification — extract fields, categorize, transform explicit inputs | Luna · low | Luna · medium | Luna · medium | Luna · high |
+| Structured extraction and classification — extract fields, categorize, transform explicit inputs | Terra · low | Terra · medium | Terra · medium | Terra · high |
 | Coordination and execution — supervise workflows, operate tools, reconcile state | Sol · medium | Sol · medium | Sol · high | Sol · high |
 
-Sol = GPT-6.1 Sol; Astra = GPT-6 Astra; Terra = GPT-6.1 Terra; Luna = GPT-6 Luna.
+Sol = GPT-6.1 Sol; Astra = GPT-6 Astra; Terra = GPT-6.1 Terra.
 Opus = Claude Opus 5.5 in a Claude-capable execution environment.
 
 Classify by the dominant intellectual work. Researching conflicting sources to
 form a recommendation is investigation or architecture; polishing the resulting
 recommendation is writing. Extraction requiring substantial inference moves into
-investigation. Concrete tasks can change level with their actual constraints.
+investigation. Use the specific code-review or Codex-specific row when applicable;
+general review covers other critiques, including architecture and plan review.
+Concrete tasks can change level with their actual constraints.
 
-These 32 cells are a provisional policy, not 32 independently established results.
-Architecture review's capable-model floor is a judgment call. Retaining Terra and
-Luna at higher levels is a specialization hypothesis, not proof they outperform
+These 36 cells are a provisional policy, not 36 independently established results.
+The selected model and effort values reflect approved routing preferences, not
+new empirical findings. Review's capable-model floor is a judgment call. Retaining
+Terra at higher levels is a specialization hypothesis, not proof it outperforms
 stronger models. No direct comparative supervisor evidence establishes the
-coordination row, and the xhigh architecture cells have weak comparative support.
+coordination row, and exact effort choices generally have weak comparative support.
 
 Use **GPT-6.1 Sol at medium** when classification or evidence is insufficient to
 justify another recommendation, subject to explicit requests and workflow settings.
@@ -69,7 +73,8 @@ that change their classification; it is not defined here yet.
   Its baseline was a production model mix, not a direct Sol comparison.
 - **Exact effort: generally low confidence.** [Anthropic's Opus guidance](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
   starts at medium and reports gains over an earlier Opus generation at higher
-  effort. High for difficult review is a conservative recommendation. Effort
+  effort. Medium for xhigh review follows the selected policy, not a demonstrated
+  optimum for that task level. Effort
   labels are not equivalent compute budgets across models or vendors.
 - **Environment matters.** [Databricks' adopter study](https://www.databricks.com/blog/benchmarking-coding-agents-databricks-multi-million-line-codebase)
   found more than twofold task-cost differences for the same model and effort
@@ -81,9 +86,10 @@ that change their classification; it is not defined here yet.
 
 ## Additional candidates
 
-- The Terra writing and Luna extraction rows follow the task positioning in
-  OpenAI's model-selection guidance. Their exact effort choices remain provisional;
-  no personal voice advantage or optimum across levels has been established.
+- The Terra writing row follows OpenAI's task positioning. Using Terra for
+  extraction and classification is a routing preference; its exact effort choices
+  remain provisional. No personal voice advantage or optimum across levels has
+  been established.
 - Claude Sonnet 5.5 / medium: Claude-native everyday candidate. Current evidence
   does not establish a reason to migrate an existing Sol workflow.
 - Claude Haiku: alternative for prescribed edits and mechanical extraction.
