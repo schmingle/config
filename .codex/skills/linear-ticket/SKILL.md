@@ -76,9 +76,16 @@ Slack before ownership writes. Search ID/URL, broadening as needed. Deep reads c
 assessment budget; age or lack of a visible update alone isn't proof of inactivity.
 
 - **Unassigned:** A clear, still-applicable human request, acknowledgement, or commitment
-  naming one owner authorizes assignment to that person and one concise Linear comment
-  linking why. FYIs, expertise, incidental mentions, and historical work on a distinct outcome
-  aren't enough. Resolve ambiguous alternatives instead of choosing arbitrarily.
+  establishes intended ownership. Choose the strongest-supported owner: explicit commitment,
+  current investigation, then responsibility for the affected area. If multiple intended owners
+  remain tied, choose the first named in the original human request, not an agent summary or
+  generated offer. Exclude incidental mentions, reviewers, FYIs, and people who declined.
+  Set one assignee and post one concise Linear comment linking the evidence and explaining
+  the choice or fallback; FYI-mention the other intended owners using verified native mentions.
+  Add those owners as subscribers through a supported interface, preserving existing subscribers,
+  and verify the result. Mentioning alone isn't subscription proof; report unavailable or
+  unverified subscription controls without inventing success. Missing identity/scope evidence
+  still blocks assignment; tie-breaking resolves routing, not acceptance or progress.
 - **Assigned:** Verify current ownership and later human handoffs; reconcile clear superseding
   direction with a reasoned comment. Don't overwrite assignments from weak inference.
 - **Apparently inactive, assigned to someone else:** Confirm the work remains relevant and
@@ -223,7 +230,8 @@ Every run, including blocked/unchanged runs, reports:
 Still in Play table: `Ticket | Status | Creator | Assignee | Estimate | PRs | Action | Update/notes`.
 Assignee: show the current Linear assignee's name without a qualifier. If unassigned but
 context establishes an intended or suggested owner, show `Name (inferred from Slack)` or
-`Name (inferred from Linear)`; use `Name A or Name B` when the intended person is unresolved.
+`Name (inferred from Linear)`; apply the ownership tie-break rather than retaining alternatives,
+and explain any blocked or unverified assignment in notes.
 An explicit commitment outside the assignee field still uses the inferred-source qualifier.
 Otherwise show `Unassigned`, or `unknown` if the field/evidence wasn't verified. Don't add
 an Unassigned prefix or separate commitment labels; reporting an owner doesn't assign the ticket.
