@@ -8,22 +8,53 @@ This document is advisory. It does not override an explicit model request,
 agent execution fields, workflow requirements, or available runtime capabilities.
 Do not change configurations or start additional model runs merely to apply it.
 
-## Recommended mapping
+## Layer 1: nature of work × level
 
-Use **GPT-6.1 Sol at medium** as the everyday default. Increase effort for concrete
-technical complexity; use specialist models when the task warrants their role.
-Keep the default when evidence for switching is weak or the benefit is immaterial.
+Each cell recommends a model and reasoning effort independently. Levels describe
+demand within each work type, not the model's effort setting or an equivalent
+absolute difficulty across rows. An xhigh task does not automatically need xhigh
+effort, and several levels may use the same model and effort.
 
-| Task | Model / effort | Trigger and evidence limits |
-| --- | --- | --- |
-| Project supervision and workflow coordination | GPT-6.1 Sol / medium | Routine ownership, dependencies, next actions, and evidence reconciliation. No direct comparative supervisor evidence. |
-| Scoped implementation and PR authoring | GPT-6.1 Sol / medium | Use high for difficult diagnosis, interacting contracts, or substantial changes across modules. Exact effort is a judgment call. |
-| Operations and verification | GPT-6.1 Sol / medium | Use high for diagnosis. Keep operational proof and approval gates independent of model choice. |
-| Investigation and quantitative analysis | GPT-6.1 Sol / medium | Use high for difficult causal or statistical reasoning; retain explicit uncertainty and source checks. |
-| Architecture, strategy, and consequential decisions | GPT-6 Astra / high | Specialist for challenging assumptions, conflicting evidence, and consequential ambiguity. Superiority over Sol high is unproven. |
-| Writing, synthesis, and reporting | GPT-6.1 Sol / medium | Preserve facts, audience, voice, and exact revision constraints. No established personal voice winner. |
-| Routine independent code review | GPT-6.1 Sol / high | Provisional effort choice; implementation scores do not establish review quality. |
-| Difficult correctness and architectural review | Claude Opus 5.5 / high | Specialist for complex independent review. Relevant review evidence exists, but high is not a demonstrated optimum or proven superior to Sol. |
+| Level | Meaning within the work type |
+| --- | --- |
+| Low | Prescribed approach, explicit inputs, little judgment, easy verification. |
+| Medium | Bounded problem, established patterns, some investigation and choices. |
+| High | Substantial ambiguity, interacting constraints, difficult diagnosis or tradeoffs. |
+| Xhigh | Deep uncertainty or broad interactions requiring sustained synthesis and independent judgment within the work type. |
+
+Volume alone does not increase the reasoning level. Risk independently governs
+approval and verification requirements; high consequence does not automatically
+mean high reasoning demand.
+
+| Nature of work | Low | Medium | High | Xhigh |
+| --- | --- | --- | --- | --- |
+| Code generation — implement, fix, refactor, write tests | Sol · low | Sol · medium | Sol · high | Sol · xhigh |
+| Code review — find defects, regressions, contract violations | Sol · high | Sol · high | Opus 5.5 · high | Opus 5.5 · high |
+| Architecture / plan generation — design approaches, interfaces, execution plans | Sol · medium | Sol · high | Astra · high | Astra · xhigh |
+| Architecture / plan review — challenge assumptions, feasibility, boundaries, alternatives | Astra · medium | Astra · high | Astra · high | Astra · xhigh |
+| Investigation and analysis — retrieve evidence, diagnose causes, reconcile findings | Sol · medium | Sol · medium | Sol · high | Astra · high |
+| Writing and editing — express supplied ideas, adapt voice, improve clarity | Terra · low | Terra · medium | Terra · medium | Terra · high |
+| Structured extraction and classification — extract fields, categorize, transform explicit inputs | Luna · low | Luna · medium | Luna · medium | Luna · high |
+| Coordination and execution — supervise workflows, operate tools, reconcile state | Sol · medium | Sol · medium | Sol · high | Sol · high |
+
+Sol = GPT-6.1 Sol; Astra = GPT-6 Astra; Terra = GPT-6.1 Terra; Luna = GPT-6 Luna.
+Opus = Claude Opus 5.5 in a Claude-capable execution environment.
+
+Classify by the dominant intellectual work. Researching conflicting sources to
+form a recommendation is investigation or architecture; polishing the resulting
+recommendation is writing. Extraction requiring substantial inference moves into
+investigation. Concrete tasks can change level with their actual constraints.
+
+These 32 cells are a provisional policy, not 32 independently established results.
+Architecture review's capable-model floor is a judgment call. Retaining Terra and
+Luna at higher levels is a specialization hypothesis, not proof they outperform
+stronger models. No direct comparative supervisor evidence establishes the
+coordination row, and the xhigh architecture cells have weak comparative support.
+
+Use **GPT-6.1 Sol at medium** when classification or evidence is insufficient to
+justify another recommendation, subject to explicit requests and workflow settings.
+Layer 2 will map concrete tasks to work types and default levels, with conditions
+that change their classification; it is not defined here yet.
 
 ## Evidence and confidence
 
@@ -48,14 +79,15 @@ Keep the default when evidence for switching is weak or the benefit is immateria
   distinguishes implementation, terminal execution, and repository understanding.
   No model-specific chart values from that page were verified for this mapping.
 
-## Candidates outside the default mapping
+## Additional candidates
 
-- GPT-6.1 Terra / medium: supplied-material writing and computer use candidate,
-  supported by OpenAI positioning; no established advantage worth a routine switch.
+- The Terra writing and Luna extraction rows follow the task positioning in
+  OpenAI's model-selection guidance. Their exact effort choices remain provisional;
+  no personal voice advantage or optimum across levels has been established.
 - Claude Sonnet 5.5 / medium: Claude-native everyday candidate. Current evidence
   does not establish a reason to migrate an existing Sol workflow.
-- GPT-6 Luna or Claude Haiku: candidates for prescribed edits and mechanical
-  extraction. No exact effort recommendation is established here.
+- Claude Haiku: alternative for prescribed edits and mechanical extraction.
+  No exact effort recommendation is established here.
 - Other providers: add only for a concrete relevant capability or substantial
   advantage that outweighs another environment and its maintenance.
 
