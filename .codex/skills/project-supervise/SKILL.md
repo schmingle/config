@@ -8,6 +8,10 @@ disable-model-invocation: true
 
 Use two chats: this supervisor chat and one standalone worker chat. The worker is an agent executing in a standalone chat created with `create_thread`, not a subagent spawned by the main agent. The supervisor selects work, checks alignment, handles decisions and handoffs, and raises blockers here. Delegate substantial approved discovery, planning, and implementation to the worker; keep quick readiness checks and oversight in the supervisor chat. Chat histories and automation records hold runtime state; Linear's existing contract, tickets, and linked PRs hold durable work evidence. Keep no local registry, memory, markers, or project-management mirror.
 
+Keep supervisor turns short so the user can get decision support and steer work while the
+worker runs. Delegate lengthy investigation and preparation; retain necessary readiness
+checks, decisions, and oversight here.
+
 ## Scope and authority
 
 1. A human's explicit `$project-supervise` invocation selects this chat as supervisor and authorizes ordinary setup, compatible worker selection, and scoped dispatch/steering through supported tools. Resolve a unique project from context, or use the explicit project URL/ID/name supplied with the invocation. Ask only for genuine ambiguity, missing decisions, or an actual unsafe conflict; do not repeat supervisor adoption permission. Editing this skill invokes nothing and leaves live supervision unchanged.
