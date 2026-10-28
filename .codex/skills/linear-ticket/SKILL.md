@@ -26,7 +26,7 @@ Compare actionable tickets before choosing one; report critical questions withou
 flowchart TD
     Start[Start Run] -->|Checks Pass| Find[Find Candidates]
     Start -->|Invalid Count, Active Run, or Inspection Error| Report[Report]
-    Find --> Filter[Filter Ownership]
+    Find --> Filter[Reconcile Ownership]
     Filter -->|Retained Set| Triage[Triage Tickets]
     Filter -->|None Retained| Report
     Triage -->|Set Triaged: Actionable Tickets| Deliver[Select and Deliver]
@@ -54,10 +54,10 @@ Before assessment/writes, normalize
 ambiguous mappings. Use numeric Linear values, not hardcoded M=3 or alphabetical comparisons.
 Legacy `maxEstimate`/`mediumEstimateLabel` don't override `size`.
 
-Verify team/statuses; list configured-team Triage/Backlog and Todo/In Progress/In Review tickets assigned to the
-user or unassigned. Collect ID/URL, assignee, status, creator, priority, estimate, parent, and
+Verify team/statuses; list configured-team Triage/Backlog and Todo/In Progress/In Review tickets
+across all assignees for ownership triage. Collect ID/URL, assignee, status, creator, priority, estimate, parent, and
 creation/update times; paginate independently and deduplicate. Retain only tickets whose creator
-is in `creatorIds`, whether assigned to the user or unassigned; filter before deep assessment or writes.
+is in `creatorIds`; filter before deep assessment or writes.
 Recover tracked work from history/checkpoints and live ticket/PR evidence, including
 changed statuses/assignees; apply the same creator filter to recovery and reporting.
 Release nonmatching tickets from this workflow's inventory without changing their tickets/PRs.
@@ -69,25 +69,38 @@ Lightly refresh unchanged holds and queued PRs. Reopen completed assessments onl
 new evidence; finish incomplete promising assessments. Use remaining slots for new candidates.
 Label inventory-only checks Not assessed; new deep investigation still consumes a slot.
 
-### Filter Ownership
+### Reconcile Ownership
 
-Check assignment, description, full discussion, linked PR activity, and relevant Slack
-threads before triage writes. Search ticket ID/URL, broadening to issue terms as needed.
-Deep ownership reads use the assessment budget; don't investigate the entire inventory
-or treat unread ownership as clear. Retain:
+Check current relevance, assignment, description/full discussion, linked PRs, and relevant
+Slack before ownership writes. Search ID/URL, broadening as needed. Deep reads consume the
+assessment budget; age or lack of a visible update alone isn't proof of inactivity.
 
-- **Assigned to the current user:** The creator allowlist still applies. Assignment supersedes older
-  routing requests; coordinate genuinely active competing work before writes/building.
-- **Unassigned with no intended assignee:** Named requests, handoffs, or actual investigation/
-  implementation establish intended ownership, even before a response. If directed to
-  anyone, wait for assignment. Silence, age, or generic "anyone can pick it up" don't erase it.
+- **Unassigned:** A clear, still-applicable human request, acknowledgement, or commitment
+  naming one owner authorizes assignment to that person and one concise Linear comment
+  linking why. FYIs, expertise, incidental mentions, and historical work on a distinct outcome
+  aren't enough. Resolve ambiguous alternatives instead of choosing arbitrarily.
+- **Assigned:** Verify current ownership and later human handoffs; reconcile clear superseding
+  direction with a reasoned comment. Don't overwrite assignments from weak inference.
+- **Apparently inactive, assigned to someone else:** Confirm the work remains relevant and
+  inspect discussion, PRs, and project/worker activity. Post one Linear handoff offer in the
+  user's voice: "Are you still working on this? I can take it if not. Unless you'd prefer to
+  keep it, I'll pick it up after [date/time]." Mention the owner and set a deadline two business
+  days after publication (Monday–Friday, preserving local time in America/Chicago).
+  On a later normal run, after that deadline, recheck replies, assignment, and activity; only
+  then assign to the user and comment on the handoff if no objection or competing activity.
+  A clear earlier acceptance permits immediate handoff.
+  Don't reset the window or duplicate offers. No new schedules or waiting for replies.
 
-Skip other-owned or consequentially ambiguous work unchanged; report intended versus
-confirmed ownership and urgent gaps. FYIs, incidental mentions, expertise, advice/review
-requests, and tracking links alone aren't implementation ownership. Reviews on the user's
-own PR aren't competing ownership. Historical manual fulfillment or implementation doesn't
-assign a distinct follow-up request; establish ownership of the current outcome. No takeover
-timers/offers or other-owned cancellations.
+Never use silence to override a refusal, active PR/project ownership, or human STOP.
+Ticket staleness is separate from stale ownership; don't cancel other-owned tickets.
+Record evidence, original offer/deadline, next owner/action, and unresolved ambiguity in
+existing ticket discussion and report notes. A missing/unverified offer or deadline cannot
+justify takeover. No assignment implies a start, deadline commitment, or implementation approval.
+
+Retain user-owned tickets and unassigned work with no intended owner for implementation
+triage; keep unresolved ownership/handoff cases visible in the report while independent work
+continues. Other-owned work isn't executable by this workflow. Reviews on the user's PR
+aren't competing ownership. Assignment changes don't override scope, size, or readiness gates.
 
 ### Triage Tickets
 
@@ -168,7 +181,8 @@ Compare the assessed set's actionable tickets by human direction, native priorit
 urgency, dependencies, readiness, and meaningful activity. Recommend priority-field changes;
 don't silently apply them. Select **one** authorized outcome within `size`, including safe
 Draft-and-clarify; leave others queued without invented blockers. Incomplete assessment
-isn't readiness. If none qualify, report instead of forcing a build.
+isn't readiness. If none qualify, report instead of forcing a build. Assign selected unassigned
+work to the user before implementation; ownership reconciliation alone doesn't select a build.
 
 Follow repository isolation/authoring/testing guidance and protected-test approvals. Once
 selected, a new blocker doesn't permit choosing another implementation. Preserve/reuse
@@ -204,7 +218,7 @@ Every run, including blocked/unchanged runs, reports:
   speculative product questions in table notes. Repeat unanswered questions only while still
   consequential, labeled already asked with original links; never treat nonresponse as demand.
 - **Still in Play:** Every tracked open ticket passing the creator filter for the user or
-  unresolved ownership, including holds.
+  unresolved ownership/handoffs, including holds and open offers with their response deadlines.
 
 Still in Play table: `Ticket | Status | Creator | Assignee | Estimate | PRs | Action | Update/notes`.
 Assignee: show the current Linear assignee's name without a qualifier. If unassigned but
@@ -246,8 +260,9 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
 - Verify the repository remote before code access. Reuse sufficient evidence; refresh affected
   ownership/discussion/prerequisites/PRs before writes. Missing evidence blocks dependent
   actions, not independent work; report incomplete coverage, never false emptiness.
-- STOP holds require fresh resumption direction. Completed approvals aren't standing
-  instructions/eligibility exceptions. Don't duplicate external outreach/reminders, invent
+- STOP holds require fresh resumption direction. Only the explicit handoff process above
+  authorizes reassignment after silence; silence never approves implementation or scope changes.
+  Completed approvals aren't standing instructions/eligibility exceptions. Don't duplicate external outreach/reminders, invent
   questions, or promise background follow-up.
 - Use the user's voice and [canonical writing guide](../../agents/writer.md#guide-location).
   Comments: outcome/needed response, next action, at most 100 words. Once decisions settle,
