@@ -314,7 +314,7 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
   questions, or promise background follow-up.
 - Use the user's voice and [canonical writing guide](../../agents/writer.md#guide-location).
   Comments: outcome/needed response, next action, at most 100 words. Direct requests/questions
-  to their recipients using verified native @-mentions. Once decisions settle,
+  to their recipients using verified native @-mentions in the form `@person: question`. Once decisions settle,
   publish one cohesive plan covering action, rationale, needed input, and verification.
   Reuse plans and preserve approval/discussion evidence; don't post each partial answer.
   Significant questions, blockers, and delivery results may merit separate comments;
