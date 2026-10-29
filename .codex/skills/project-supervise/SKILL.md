@@ -44,15 +44,41 @@ checks, decisions, and oversight here.
 3. **Act on evidence.** Let useful active work continue without repeated nudges. For each idle slot within the approved cap, dispatch the next meaningful batch once its prior owned execution, including helpers, is settled and the audit supports readiness. A blocked lane does not idle independent lanes; unknown execution occupies its slot until resolved. For implementation drift within approved scope, steer the worker to fix it while the PR is a draft through supported authorized messaging, and later check actual correction evidence; after ready, report remaining drift here for the queue or human; an active batch retains its deadline. Escalate missing decisions, scope gaps, and permissions here with the smallest needed input while unaffected authoring continues. Do not amend the project/tickets to fit the implementation.
 4. **Carry work through the next handoff.** Complete all eligible dispatches within the approved cap before returning. Verify the single existing heartbeat is active and the roster, each batch deadline, and next expected check are recoverable in this chat or supported native metadata. Then report here and return; let the next existing heartbeat inspect progress. Use a bounded immediate wait only when needed to resolve uncertain dispatch, a required handoff result, or a concrete issue that cannot safely wait until that check; do not repeatedly wait or resume merely to watch useful active work. A finished batch or ready PR is not project completion. Once owned work is settled, dispatch the next eligible batch without another routine human nudge. When implementation ends, reconcile queue outcomes and prepare the next authorized read-only prerequisite checks and concrete decision package. Name the next execution owner, action, evidence, and any approval needed; do not stop at a generic checklist. Before proposing closure or changing the project to Completed, follow the [completion gate](references/completion.md), including an independent challenge of the combined merged outcome. Record unmet criteria as gaps rather than completion. Apply the pause policy after verified closure or when no useful work or active process remains.
 
-5. **Report here.** Every invocation leaves a concise, self-contained final reply, including blocked, stopped, unchanged and unverifiable runs. Use these sections in order:
-   - **Planning proposals** — omit when empty. Label each **PLAN CHANGE PROPOSAL**. State the current approved plan → exact proposed changes/additions, reasoning, delivery/validation impact, and specific approval requested. Link affected records. Include pending proposals even when unchanged; do not hide them in routine ticket or blocker prompts. Preparation still owed by an agent is not a ready approval request.
-   - **Blockers** — write **None** when empty. State every unresolved obstacle, affected work, next-action owner, and concrete unblock or missing evidence. For a human decision/action, give the exact request, recommendation and what it unblocks; refer to a planning proposal by its short name without duplicating it. Queue-owned review/CI/merge work stays queue-owned; risk alone is not a human merge assignment.
-   - **Next steps** — state the next authorized actions and owners, including useful work continuing while blocked. If none can proceed, state the wait and resume condition. Do not list unapproved proposals as execution commitments.
-   - **Other** — omit when empty. Summarize material outcomes, alignment, worker progress/drift, validation limits, and control/recovery details when relevant. Distinguish authored, merged, deployed and accepted work; a finished batch is not a finished project.
+5. **Report here.** Every invocation leaves a concise, self-contained final reply, including blocked, stopped, unchanged and unverifiable runs. Use the template below with separate Markdown headings and bullet lists, never inline label-and-paragraph summaries. Keep this order:
+   - **Planning proposals** — omit when empty. Label each **PLAN CHANGE PROPOSAL**. State the current approved plan → exact proposed changes/additions, reasoning, delivery/validation impact, and specific approval requested. Link affected records. Include pending proposals even when unchanged; do not hide them in routine ticket or blocker prompts. An operational permission to diagnose or execute the existing plan is not a planning proposal unless it changes planned work or requirements; put that approval under Blockers. Preparation still owed by an agent is not a ready approval request.
+   - **Blockers** — only approvals, decisions or interventions currently required from the human; write **None** when empty. State the exact request, recommendation, affected work and what it unblocks. Refer to a planning proposal by its short name without duplicating it. Do not list supervisor-, worker- or queue-owned execution problems as human blockers; queue risk alone is not a human merge assignment.
+   - **Next steps** — state the next authorized actions and owners. Own routine execution problems and their resolution; mention an execution obstacle only when needed to explain the next action. If none can proceed, state the wait and resume condition. Do not list unapproved proposals as execution commitments.
+   - **Other** — omit when empty. Summarize material outcomes, delivery risks, alignment, validation limits, and control/recovery details when relevant. Mention execution problems only when they materially affect delivery or confidence; give the impact and recovery action, not an activity log. Distinguish authored, merged, deployed and accepted work; a finished batch is not a finished project.
 
-   Restate important pending decisions and blockers in full even when repetitive; never require scrolling to an earlier turn or following a link to understand the request. Carry unresolved items forward until current evidence establishes resolution; mark uncertain resolution unknown. A sufficient human answer closes the request, not any remaining implementation wait.
 
-   Keep unchanged scheduled notifications quiet while retaining the complete own-chat report in the supported heartbeat response. Preserve saved notification preferences and the required response format; do not add user-facing prose to a quiet heartbeat. Notify only on meaningful changes, actionable requests, failures or completion. Disclose an unavailable notification path without inventing another destination or automation. Host interruption may prevent a report; surface missing output or unknown settlement next cycle.
+### Report template
+
+```markdown
+## Planning proposals
+
+- **PLAN CHANGE PROPOSAL — [name]:** [Current plan → proposed change/addition; reasoning and impact; exact approval requested; links.]
+
+## Blockers
+
+- [Exact approval, decision or intervention needed from the human; recommendation and what it unblocks. Use "None" if empty.]
+
+## Next steps
+
+- [Owner — next authorized action and intended result, or the wait/resume condition.]
+
+## Other
+
+- [Material outcome or delivery risk, evidence/limits, and recovery action when relevant.]
+```
+
+Omit the entire Planning proposals or Other section when empty. Keep Blockers and
+Next steps even when there is no action. Replace placeholders with concrete facts;
+do not print template instructions. The template formats the report content; the
+host's required heartbeat envelope and quiet-notification rules still take precedence.
+
+Restate important pending proposals and human blockers in full even when repetitive; never require scrolling to an earlier turn or following a link to understand the request. Carry these unresolved proposals and human requests forward until current evidence establishes resolution; mark uncertain resolution unknown. A sufficient human answer closes the request, not any remaining implementation wait.
+
+Keep unchanged scheduled notifications quiet while retaining the complete own-chat report in the supported heartbeat response. Preserve saved notification preferences and the required response format; do not add user-facing prose to a quiet heartbeat. Notify only on meaningful changes, actionable requests, failures or completion. Disclose an unavailable notification path without inventing another destination or automation. Host interruption may prevent a report; surface missing output or unknown settlement next cycle.
 
 ## Pause and stop
 
