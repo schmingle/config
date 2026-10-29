@@ -8,7 +8,8 @@ disable-model-invocation: false
 
 **Goal:** Ensure the project has a sufficient, concise contract for its intended outcome and is prepared for effective execution by reconciling verified facts, identifying material gaps, and recommending concrete next actions.
 
-The audit is the quality authority for assessing the contract, not authority to change approved human intent. Challenge goals and approach when the evidence warrants it, recommend the smallest correction, and obtain approval before changing the approved plan.
+The user owns the plan presented by the Linear project and tickets. Assess and challenge it
+when warranted; agents propose changes and apply only the user's specifically approved amendments.
 
 **Key questions:**
 
@@ -29,5 +30,18 @@ May be invoked by a human or agent within the existing task scope. Creating or r
       1. Recommendation: [Concrete action or option; label Recommended for a preferred choice]
       2. [Additional action or alternative, when applicable]
    ```
+
+   Present each plan amendment separately from routine findings, grooming, and execution asks:
+
+   ```markdown
+   **PLAN CHANGE PROPOSAL — [Specific change]**
+   - **Change:** [Current → proposed plan; affected project/ticket links]
+   - **Reasoning:** [Evidence, why this is better, and material tradeoffs]
+   - **Impact:** [Effects on scope, acceptance, order/dependencies, ownership, effort, or risk]
+   - **Approval needed:** [Exact amendment for the user to approve before it is applied]
+   ```
+
+   Include only material impacts; preserve the current plan while approval is pending.
+   Any approval question must also say **PLAN CHANGE** and name the amendment being approved.
 
 Do not execute tickets, change PRs, run acceptance checks, probe sensitive access, deploy, or mutate production. Do not start supervision, tasks, or automations, create a readiness certificate or audit ledger, or invoke another explicit-only skill.
