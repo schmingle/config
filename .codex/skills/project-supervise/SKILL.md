@@ -54,19 +54,19 @@ checks, decisions, and oversight here.
 ### Report template
 
 ```markdown
-## Planning proposals
+### Planning proposals
 
-- **PLAN CHANGE PROPOSAL — [name]:** [Current plan → proposed change/addition; reasoning and impact; exact approval requested; links.]
+- [Current plan → proposed change/addition; reasoning and impact; exact approval requested; links.]
 
-## Blockers
+### Blockers
 
 - [Exact approval, decision or intervention needed from the human; recommendation and what it unblocks. Use "None" if empty.]
 
-## Next steps
+### Next steps
 
 - [Owner — next authorized action and intended result, or the wait/resume condition.]
 
-## Other
+### Other
 
 - [Material outcome or delivery risk, evidence/limits, and recovery action when relevant.]
 ```
