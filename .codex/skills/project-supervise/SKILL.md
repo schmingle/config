@@ -55,8 +55,6 @@ checks, decisions, and oversight here.
 ### Report template
 
 ```markdown
-### Summary
-
 [Two to four concise sentences: progress; plan alignment; execution assessment; recommended improvement, or why no change is warranted.]
 
 ### Planning proposals
