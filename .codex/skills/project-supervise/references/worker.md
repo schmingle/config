@@ -18,7 +18,7 @@ Always leave a useful own-chat execution report when the batch ends, including e
 
 1. All unresolved blockers, including unchanged ones, split into numbered lists under **Needs User Input or Intervention** and **Other Blockers**; write **None** when empty. Give affected ticket/PR links, the exact request or next-action owner and unblock, and attempted routine unblocks. Routine merges and above-ceiling risk alone belong in progress. Explicitly human-owned actions that block work belong under Needs User Input or Intervention, with exact links, readiness, and what they unblock. Agent preparation still owed is not a user approval request; mark unverified resolution unknown rather than drop it.
 2. Completed/in-progress tickets and PR/artifact links, plus acceptance/contract alignment and material findings.
-3. Validation results and unverified limits.
+3. Validation results and unverified limits, with the revision each result covers and evidence for the assigned acceptance criteria. Name known residuals and why they are retained or unresolved; do not infer whole-project completion from this assignment.
 4. Remaining ordered work, skipped paths, and next ready step.
 5. Stop reason/time, original deadline, and actual settlement of owned execution/writes, including unknowns.
 
