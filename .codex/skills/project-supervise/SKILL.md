@@ -45,6 +45,7 @@ checks, decisions, and oversight here.
 4. **Carry work through the next handoff.** Complete all eligible dispatches within the approved cap before returning. Verify the single existing heartbeat is active and the roster, each batch deadline, and next expected check are recoverable in this chat or supported native metadata. Then report here and return; let the next existing heartbeat inspect progress. Use a bounded immediate wait only when needed to resolve uncertain dispatch, a required handoff result, or a concrete issue that cannot safely wait until that check; do not repeatedly wait or resume merely to watch useful active work. A finished batch or ready PR is not project completion. Once owned work is settled, dispatch the next eligible batch without another routine human nudge. When implementation ends, reconcile queue outcomes and prepare the next authorized read-only prerequisite checks and concrete decision package. Name the next execution owner, action, evidence, and any approval needed; do not stop at a generic checklist. Before proposing closure or changing the project to Completed, follow the [completion gate](references/completion.md), including an independent challenge of the combined merged outcome. Record unmet criteria as gaps rather than completion. Apply the pause policy after verified closure or when no useful work or active process remains.
 
 5. **Report here.** Every invocation leaves a concise, self-contained final reply, including blocked, stopped, unchanged and unverifiable runs. Use the template below with separate Markdown headings and bullet lists, never inline label-and-paragraph summaries. Keep this order:
+   - **Summary** — two to four concise sentences covering meaningful progress, alignment with the approved plan, an evidence-based critique of execution, and a concrete recommendation for improvement. State when no material concern or change is warranted; do not invent criticism or recommendations. Keep unapproved changes as recommendations, not commitments, and detail any actual plan amendment under Planning proposals.
    - **Planning proposals** — omit when empty. Label each **PLAN CHANGE PROPOSAL**. State the current approved plan → exact proposed changes/additions, reasoning, delivery/validation impact, and specific approval requested. Link affected records. Include pending proposals even when unchanged; do not hide them in routine ticket or blocker prompts. An operational permission to diagnose or execute the existing plan is not a planning proposal unless it changes planned work or requirements; put that approval under Blockers. Preparation still owed by an agent is not a ready approval request.
    - **Blockers** — only approvals, decisions or interventions currently required from the human; write **None** when empty. State the exact request, recommendation, affected work and what it unblocks. Refer to a planning proposal by its short name without duplicating it. Do not list supervisor-, worker- or queue-owned execution problems as human blockers; queue risk alone is not a human merge assignment.
    - **Next steps** — state the next authorized actions and owners. Own routine execution problems and their resolution; mention an execution obstacle only when needed to explain the next action. If none can proceed, state the wait and resume condition. Do not list unapproved proposals as execution commitments.
@@ -54,6 +55,10 @@ checks, decisions, and oversight here.
 ### Report template
 
 ```markdown
+### Summary
+
+[Two to four concise sentences: progress; plan alignment; execution assessment; recommended improvement, or why no change is warranted.]
+
 ### Planning proposals
 
 - [Current plan → proposed change/addition; reasoning and impact; exact approval requested; links.]
@@ -72,7 +77,7 @@ checks, decisions, and oversight here.
 ```
 
 Omit the entire Planning proposals or Other section when empty. Keep Blockers and
-Next steps even when there is no action. Replace placeholders with concrete facts;
+Next steps even when there is no action. Always include the concise Summary above them. Replace placeholders with concrete facts;
 do not print template instructions. The template formats the report content; the
 host's required heartbeat envelope and quiet-notification rules still take precedence.
 
