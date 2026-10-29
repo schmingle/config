@@ -222,14 +222,21 @@ Draft-and-clarify; leave others queued without invented blockers. Incomplete ass
 isn't readiness. If none qualify, report instead of forcing a build. Assign selected unassigned
 work to the user before implementation; ownership reconciliation alone doesn't select a build.
 
+Before implementing, trace the reported case through relevant acceptance behavior to surface
+likely questions, policy conflicts, and material approach differences. Combine known questions
+and the proposed approach in the first implementation comment; native status records routine starts.
+Lead with important questions/approval requests in bold, stating the choice, recommendation,
+and whether safe Draft work can proceed or affected work needs an answer. Apply the same
+question-first format to consequential discoveries during implementation.
+
 Follow repository isolation/authoring/testing guidance and protected-test approvals. Once
 selected, a new blocker doesn't permit choosing another implementation. Preserve/reuse
 existing branches/PRs; two-PR outcomes share acceptance, feedback timing, and combined validation.
 Confirm plan/assignment; new work enters Todo then In Progress, while resumed work keeps
 its lifecycle. Create Draft PRs with ticket links, behavior, approach, acceptance, and validation.
 
-For Draft-and-clarify, post the implementation question or material approach difference
-with rationale and Draft PR link. Keep affected PRs Draft until substantive feedback is
+For Draft-and-clarify, publish known questions before implementation; add the Draft PR link
+when available. Keep affected PRs Draft until substantive feedback is
 applied or **48 hours from original server publication** expire and documented safe defaults
 are used. Edits, reruns, and other PRs don't reset the window. Changed intended behavior/
 essential scope or unsafe unknowns still need approval before affected work; time never bypasses
@@ -306,7 +313,8 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
   Completed approvals aren't standing instructions/eligibility exceptions. Don't duplicate external outreach/reminders, invent
   questions, or promise background follow-up.
 - Use the user's voice and [canonical writing guide](../../agents/writer.md#guide-location).
-  Comments: outcome/needed response, next action, at most 100 words. Once decisions settle,
+  Comments: outcome/needed response, next action, at most 100 words. Direct requests/questions
+  to their recipients using verified native @-mentions. Once decisions settle,
   publish one cohesive plan covering action, rationale, needed input, and verification.
   Reuse plans and preserve approval/discussion evidence; don't post each partial answer.
   Significant questions, blockers, and delivery results may merit separate comments;
