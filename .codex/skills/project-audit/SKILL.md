@@ -10,6 +10,9 @@ disable-model-invocation: false
 
 The user owns the plan presented by the Linear project and tickets. Assess and challenge it
 when warranted; agents propose changes and apply only the user's specifically approved amendments.
+During supervised implementation, apply the [manual Linear write gate](../../AGENTS.md#linear-writes-during-supervised-implementation):
+report corrections and proposals in the supervisor chat, applying only writes covered by the
+user's approval or explicit instruction. An agent-invoked audit grants no additional write authority.
 
 **Key questions:**
 

@@ -124,12 +124,25 @@ disregard evidence or change recorded priorities without approval.
 3. **Labels track ongoing workstreams.** Use labels such as Foundation, Recruiting, Security, and Ops for continuing categories of work. Tickets can carry these labels without belonging to a project. Use a project when a finite initiative emerges within a workstream.
 4. **Pins reflect current focus.** The user generally focuses on one or two big rocks at a time. Keep roughly two or three major priorities pinned in Codex; use Linear to track the rest. Do not change pins without a request.
 5. **Make switching easy.** Keep each project's current state, next action, blockers, consequential decisions, and important links easy to find. A fresh Codex chat should be able to recover the project contract and work evidence from Linear; workflow runtime state may live in native chats and automations.
-6. **Maintain state; preserve the approved plan.** Follow the shared [plan and state permissions](skills/project-init/references/project-contract.md#plan-and-state-permissions): agents may reconcile verified statuses, PR links, evidence, and observed blockers; changes to the approved project contract or ticket specifications require human approval. Reuse concrete approvals already given. Prefer native fields and integrations, reserving comments for significant outcomes, exceptions, or decisions needing attention. Distinguish implementation, deployment, and operational acceptance; never infer human acceptance from implementation progress. Unchanged records need no writes. Project posts follow the [status update policy](#project-status-updates).
+6. **Maintain state; preserve the approved plan.** Follow the shared [plan and state permissions](skills/project-init/references/project-contract.md#plan-and-state-permissions): reconcile verified statuses, PR links, evidence, and observed blockers within the owning workflow's write authority, including the [supervised implementation gate](#linear-writes-during-supervised-implementation). Changes to the approved project contract or ticket specifications require human approval. Reuse concrete approvals already given. Prefer native fields and integrations, reserving comments for significant outcomes, exceptions, or decisions needing attention. Distinguish implementation, deployment, and operational acceptance; never infer human acceptance from implementation progress. Unchanged records need no writes. Project posts follow the [status update policy](#project-status-updates).
 7. **Keep shared status updates quick to read.** Follow the project status update policy below for project posts. For other external status updates, aim for a five-second scan and at most 30 seconds to read, leading with the outcome, blocker, or next action and linking supporting detail. These limits do not apply to useful supervisor own-chat replies or worker own-chat execution reports, which may be detailed when useful, or to project contracts, ticket specifications, and PR descriptions requiring sufficient context.
 8. **Reference tickets by ID.** Include the actual ticket identifier whenever mentioning a ticket, optionally followed by its short title, so Linear can link it automatically. In chat and other formats, link the identifier to the known ticket URL when available; never invent identifiers or links.
 9. **Prefer a one-to-one mapping between implementation tickets and PRs.** Split work into scoped tickets or sub-issues as needed, with a clear outcome and validation for each implementation ticket. Parent tickets may track the combined outcome. Preserve coherent, atomic changes and existing work; explain necessary exceptions. Follow the owning workflow's authorization and limits; creating, splitting, or reorganizing tickets in an approved project plan requires approval for that change.
 
 Keep project management in Linear and maintained technical documentation beside the code.
+
+### Linear writes during supervised implementation
+
+Agents primarily implement the approved tickets and deliver PRs. Include ticket identifiers
+and links in PRs and rely on Linear's integrations for routine linking and status tracking.
+Manual creation or editing of tickets/projects, meaningful plan changes, ticket comments,
+and project updates require the user's approval or explicit instruction covering that action.
+This includes manual status and link edits. Instructions may come from the user in chat or
+an automation, or be relayed by a supervisor within that same authorized scope; a supervisor
+cannot grant itself or a worker additional authority. A generic supervision invocation alone
+does not authorize these writes. Read Linear and report findings/proposals in the supervisor
+chat while continuing independent approved implementation. Other workflows retain their
+explicitly authorized scope.
 
 Do not apply the `noautomerge` label to a PR, including during creation, without my explicit approval for that PR or a clearly scoped set of PRs. A perceived risk or approval requirement is not approval to add the label.
 
@@ -140,6 +153,8 @@ Do not apply the `noautomerge` label to a PR, including during creation, without
 3. **The project supervisor owns progress and alignment.** Read worker progress and ticket/PR evidence to assess useful outcomes and adherence to the approved ticket/plan, then steer the worker or raise blockers within scope; never change PRs. This is not another PR review or deployment/acceptance assignment. Distinguish authored PRs from queue, deployment, and operational acceptance still needed; follow the owning workflow's wait/pause policy and authorization boundaries.
 
 ### Project status updates
+
+These rules govern authorized posts; cadence alone does not authorize publication.
 
 1. **Batch meaningful changes.** Publish routine project status updates at most once every two hours, measured from the last published project update, including exceptions. Count a later edit timestamp only when it represents a meaningful published revision. Post only meaningful accumulated changes to project progress, outlook, or next action; unchanged runs skip posting even after two hours. Do not bypass this cadence by editing an existing status update or substituting project comments.
 2. **Keep exceptions narrow.** Only a genuinely urgent project risk or verified project completion may justify an immediate post. Do not repeat unchanged exceptions. Routine blockers, questions, pauses, stops, resumes, handoffs, worker dispatches, checkpoints, or individual PR/CI changes do not bypass the cadence. Surface needed human input immediately in the owning supervisor chat and, when the owning workflow permits, the relevant ticket without an extra project post.
