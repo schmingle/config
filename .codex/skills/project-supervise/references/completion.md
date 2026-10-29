@@ -31,14 +31,15 @@ proof that the project's outcome is complete.
    are satisfied. Otherwise name the gap, owner and next action. A concrete new
    contradiction reopens the assessment; speculative repeat audits do not.
 
-Keep one concise closure record in the existing Linear evaluation ticket or
-project record: outcome and criteria evidence; assessed revision; independent
-assessor, challenge coverage and findings/disposition; remaining obligations and
-why they do not block this contract. Link existing evidence rather than copying it.
-Runtime/deployment/operational acceptance are required only where the approved
-contract requires them; source evidence cannot substitute for required live proof.
-No separate tracker, blanket human closure approval or new permanent reviewer is
-required. The supervisor owns the closure decision and existing reporting cadence.
+Prepare one concise closure summary in the supervisor chat: criteria evidence;
+assessed revision; independent assessor, coverage and findings/disposition; and any
+remaining obligations that do not block this contract. Link existing evidence.
+Publishing it in Linear or changing project status requires the user's scoped
+approval or explicit instruction under the [manual Linear write gate](../../../AGENTS.md#linear-writes-during-supervised-implementation).
+The supervisor owns the completion assessment; that judgment grants no write authority.
+Required deployment, operational proof and human acceptance remain governed by the
+approved contract. No additional blanket acceptance gate, tracker or permanent
+reviewer is required.
 
 ## Independent oversight
 
@@ -48,9 +49,10 @@ as a claim to test, not the answer. Form your own counterexample search and
 inspect whether claimed fixes and consequential retention/exclusion decisions hold.
 Do not merely request another audit or accept a second summary as verification.
 
-Keep the claim unverified while required evidence is missing. Send concrete gaps
-to the owning supervisor, preserving worker/queue ownership; verify consequential
-corrections before accepting closure. If already closed, require reconciliation
-and reopening where the approved criteria remain unmet. Preserve authority over
+Keep the claim unverified while required evidence is missing. Report concrete gaps
+here, or to the owning supervisor through an already-authorized channel, preserving
+worker/queue ownership. Verify consequential corrections before accepting closure.
+If already closed with unmet criteria, identify the needed reconciliation/reopening;
+apply record changes only under the manual-write gate above. Preserve authority over
 scope, production and human acceptance. One completed scoped challenge suffices
 until a finding, consequential change or new evidence invalidates its coverage.
