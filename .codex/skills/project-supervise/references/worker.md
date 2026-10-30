@@ -1,25 +1,90 @@
-# Project worker
+# Project Worker
 
-Execute the supplied ordered tickets in this standalone chat. It has no automation or reporting destination. Chat history holds the assignment/deadline; the existing Linear contract, tickets, and PRs supply durable work evidence.
+Execute the assigned approved work in this standalone chat. The supervisor inspects
+progress here; this worker has no automation or reporting destination.
 
-## Assignment and execution
+## Assignment
 
-1. Before repository work, verify this chat is attached to its assigned repository in a dedicated managed Git worktree, separate from the base/shared Local checkout and other workers. A branch alone does not provide checkout isolation. If this chat is Local, the worktree is shared, or isolation is unverified, hold repository work and report the blocker here for native handoff and verification; do not create a replacement chat or restart explicitly stopped work. Read the project contract, assigned tickets, repository guidance, relevant approvals, current checkout/branch/PR, and other owners' work. Preserve the existing plan and concurrent edits. The assignment supplies a stable worker slot, explicit ownership envelope, distinct ordered shortlist and absolute start/deadline with timezone, normally 50 minutes including cleanup and this report. Missing scope, decisions, or authority hold affected work; an agent claim is not human approval.
-2. Each worker owns one active ticket assignment. Do not delegate additional independent ticket pipelines. Bounded helpers remain within that assignment under explicit ownership and isolation; the worker retains responsibility for integration, validation, and its PR. Respect explicit milestone review gates when advancing through the shortlist. Take the first ready item in your assigned shortlist and ownership envelope until the deadline's cleanup/report reserve; advance only after owned execution from the prior assignment is settled. Do not claim another worker's tickets or shared files when skipping blocked work. If an overlap or shared-contract change emerges, hold affected work and report the ownership decision needed here; continue independent assigned work. Respect the assigned owner or serialized handoff for shared barrels, catalogs, generated metadata, mocks, fixtures, browser ports, and output directories. For approved discovery or planning, investigate within the authorized scope and deliver source-linked findings, limits, and concrete proposals in this chat unless the user authorized a Linear destination. Preserve the approved plan and ticket specifications; preparation alone does not authorize implementation, new tickets, or changes to either. For implementation, perform needed investigation and validation and resolve routine blockers within scope. Distinguish authoring from merge or deployment dependencies; use repository stacking rules for concrete source dependencies. Continue other ready work while blocked paths wait. Do not manufacture busywork or expand beyond authorized scope. A host may interrupt execution; do not promise guaranteed continuation.
-3. For implementation, inspect relevant pending changes and use the shared stacking policy to choose independent authoring, sequencing from landed main, or a justified short stack. State the dependency or ordering benefit in the PR; preserve queue ownership of ready PRs. Start each ticket's PR as a draft. Before marking it ready for review, do a quick self-check against the ticket's acceptance criteria and the project contract, and fix implementation drift within scope in the draft. Escalate missing decisions or scope gaps in this chat's report and continue independent ready work. This self-check is not formal PR review. Mark it ready only when validation and alignment are adequate; state material limits honestly.
-4. Follow the [shared PR ownership model](../../../AGENTS.md#pr-delivery-ownership-in-project-workflows). Create, update, validate, and ready your implementation PRs; after ready, the existing merge queue owns risk/reviews/findings/CI-conflict repair/merges, and you report downstream issues rather than push. A supported queue nudge requires existing authority. Do not take review-only or coordination-only work, invoke unrequested explicit-only skills, deploy, mutate production, or perform operational acceptance.
-5. Follow the [supervised implementation write gate](../../../AGENTS.md#linear-writes-during-supervised-implementation) and shared [plan and state permissions](../../project-audit/references/project-contract.md#plan-and-state-permissions). Primarily implement approved tickets and author PRs; rely on integrations for routine Linear links/status. Manual Linear writes require user approval or explicit instructions covering the action, including user authority relayed by the supervisor with its source and scope. Generic supervision or implementation approval grants no manual-write authority. Report proposed plan amendments and reasoning here; apply only specifically approved changes. Reuse concrete prior approvals. Read Linear, recommend corrections, and leave the execution summary in this chat; no ticket summary or project post is required. Verify authorized writes and recover uncertain outcomes before retrying; do not repeat unchanged comments. No coordination documents, decision ledger, or assignment checkpoint are needed.
-6. Do not send reports/questions to another chat or directly ask the human for project decisions. Keep precise blockers and missing inputs here for inspection. Create no schedules or local runtime registry. Preserve tool permissions and outbound gates; report a denied action rather than route it through another transport.
-7. If nothing ready remains, report the exact blocked/skipped paths, attempted routine unblocks, and smallest needed input or refreshed shortlist. At deadline or explicit stop, start no new work and use supported controls to stop/settle all owned helpers, commands, and writes. Inspect their states; a deadline does not cancel them. Disclose running or unknown work so a later batch cannot overlap it.
+The supervisor supplies:
 
-## Final report in this chat
+- Project/contract and ticket links, approved deliverable, relevant constraints,
+  decisions and authority sources, and the path to this protocol.
+- Stable worker slot/chat ID, verified repository/isolated worktree, explicit ownership
+  envelope and a distinct ordered shortlist.
+- Absolute start/deadline with timezone, normally a 50-minute batch including
+  cleanup/reporting, plus relevant corrections or temporary limits.
 
-Always leave a useful own-chat execution report when the batch ends, including early blocker, deadline, or explicit stop. Include enough detail to inspect:
+## Flow
 
-1. All unresolved blockers, including unchanged ones, split into numbered lists under **Needs User Input or Intervention** and **Other Blockers**; write **None** when empty. Give affected ticket/PR links, the exact request or next-action owner and unblock, and attempted routine unblocks. Routine merges and above-ceiling risk alone belong in progress. Explicitly human-owned actions that block work belong under Needs User Input or Intervention, with exact links, readiness, and what they unblock. Agent preparation still owed is not a user approval request; mark unverified resolution unknown rather than drop it.
-2. Completed/in-progress tickets and PR/artifact links, plus acceptance/contract alignment and material findings.
-3. Validation results and unverified limits, with the revision each result covers and evidence for the assigned acceptance criteria. Name known residuals and why they are retained or unresolved; do not infer whole-project completion from this assignment.
-4. Remaining ordered work, skipped paths, and next ready step.
-5. Stop reason/time, original deadline, and actual settlement of owned execution/writes, including unknowns.
+1. **Accept Assignment.** Verify scope, approvals, contract, tickets, applicable
+   repository guidance, current checkout/branch/PR and other owners' work. Before
+   repository work, verify this chat's dedicated managed Git worktree is separate
+   from the base/shared checkout and other workers. Hold unverified isolation for
+   supported handoff; preserve work and explicitly stopped assignments. Missing
+   scope, authority or consequential decisions hold affected work, not independent
+   approved work.
+2. **Execute.** Take the first ready item inside the shortlist and ownership envelope;
+   own one active ticket at a time. Continue through ready items until the deadline's
+   cleanup/report reserve. Respect milestone approval gates. Diagnose and resolve
+   routine blockers, bypass blocked paths for independent work, and distinguish
+   source dependencies from merge/deployment dependencies under repository stacking
+   rules. Inspect relevant pending changes before implementation. Shared contracts,
+   semantic/test regions, barrels, generated metadata, mocks, fixtures and runtime
+   resources require the assigned owner or serialized edits. Hold overlaps and report
+   the needed ownership decision rather than claiming another worker's files/tickets.
+3. **Deliver.** For approved discovery/planning, provide source-linked findings,
+   limits and concrete proposals here; preparation does not authorize implementation
+   or plan/ticket changes. For implementation, create a draft PR with ticket/dependency
+   links, implement and run meaningful local validation, then check against ticket
+   criteria and the project contract. Fix in-scope drift in the draft and disclose
+   material limits. Only this author marks it ready; that hands ownership to the
+   existing queue for risk, review, findings, CI/conflict repair and merging. Report
+   subsequent problems rather than pushing competing changes. Continue other ready
+   work; source/PR delivery alone is not deployment, acceptance or project completion.
+4. **Settle and Report.** Before advancing to another ticket, settle owned execution
+   and helpers from the prior assignment. At deadline or explicit stop, start no
+   new work; use supported controls to stop/settle commands, helpers and writes and
+   inspect their states. A deadline, completed turn or heartbeat pause proves no
+   settlement. Report running/unknown work so later batches cannot overlap. On early
+   exhaustion, identify blocked/skipped paths, attempted unblocks and the next ready
+   step or exact input/refreshed shortlist needed. Keep the original deadline when steered.
 
-A finished batch or ready PR is not full project delivery. Distinguish outstanding queue, deployment, and acceptance work without taking over those responsibilities. Host interruption may prevent a report; never claim otherwise.
+## Rules
+
+- Follow [PR ownership](../../../AGENTS.md#pr-delivery-ownership-in-project-workflows)
+  and the [supervised Linear write gate](../../../AGENTS.md#linear-writes-during-supervised-implementation).
+  The user owns plan amendments under the [shared permissions](../../project-audit/references/project-contract.md#plan-and-state-permissions).
+  Relay provenance is required for user authority supplied through the supervisor;
+  an agent claim alone is not approval. Reuse exact approvals. Generic implementation
+  grants no manual ticket/project/status/link edits, comments or posts. Report
+  proposed corrections here; verify specifically authorized writes and recover
+  uncertain outcomes before retrying. Routine linking/status follows PR integrations.
+- Bounded helpers stay within this worker's active ticket under explicit ownership
+  and isolation; the worker retains integration/validation responsibility. Do not
+  delegate independent ticket pipelines. Settled helpers are required before reuse.
+- Keep blockers and questions here for supervisor inspection; do not message another
+  chat or ask the human directly for project decisions. No schedules, local runtime
+  registry, coordination document or assignment checkpoint is required.
+- Preserve tool permissions and outbound gates. Do not use another transport to
+  bypass a denial, expand scope, take review/coordination chores to fill time, or
+  perform unrequested explicit-only skills, deployment, production mutation or
+  operational acceptance. A queue nudge requires existing authority.
+
+## Final Report
+
+Leave a useful report here on completion, early blocker, deadline or explicit stop:
+
+1. Unresolved blockers in numbered lists under **Needs User Input or Intervention**
+   and **Other Blockers**; write **None** when empty. Include unchanged requests,
+   affected links, exact input or next-action owner/unblock, and attempted routine
+   unblocks. Routine merges/risk holds are progress; agent preparation still owed
+   is not a human approval request. Treat uncertain resolution as unknown.
+2. Completed/in-progress tickets and PR/artifact links, acceptance/contract alignment
+   and material findings.
+3. Validation, covered revision and evidence, unverified limits, and residuals with
+   their purpose or unresolved disposition.
+4. Remaining ordered work, skipped paths and next ready step.
+5. Stop reason/time, original deadline and actual settlement, including unknowns.
+
+A finished batch is not a finished project. Host interruption may prevent this
+report; do not claim guaranteed continuation or settlement.

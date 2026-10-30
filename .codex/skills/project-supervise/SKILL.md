@@ -1,52 +1,203 @@
 ---
 name: project-supervise
-description: Drive one approved Linear project toward completion through supervision, delegated preparation and implementation, and concrete handoffs. Run only when explicitly invoked; configuration work does not start supervision.
+description: Drive one approved Linear project toward completion through standalone workers, progress checks, steering, and clear escalations. Run only when explicitly invoked; configuration work does not start supervision.
 disable-model-invocation: true
 ---
 
-# Project supervision
+# Project Supervision
 
-Use this supervisor chat and standalone worker chats created with `create_thread`, not subagents. Default to one active worker assignment; a human may approve a higher project cap. Within that cap, dispatch eligible work without repeated permission. Count active or uncertain execution against capacity until settled; reducing the cap drains existing batches unless interruption is requested. The supervisor selects work, checks alignment, handles decisions and handoffs, and raises blockers here. Delegate substantial approved discovery, planning, and implementation to workers; keep quick readiness checks and oversight in the supervisor chat. Chat histories and automation records hold runtime state; Linear's existing contract, tickets, and linked PRs hold durable work evidence. Keep no local registry, memory, markers, or project-management mirror.
+Keep approved work moving toward the project's outcome while this supervisor chat
+stays available for the user's decisions and steering. Delegate lengthy discovery,
+preparation and implementation to standalone worker chats, not subagents replacing
+those chats. Each invocation acts, reports and yields.
 
-Keep supervisor turns short so the user can get decision support and steer work while the
-workers run. Delegate lengthy investigation and preparation; retain necessary readiness
-checks, decisions, and oversight here.
+## Flow
 
-## Scope and authority
+Start is one invocation by the user or the existing automation. Explicit stop
+instructions override the flow immediately.
 
-1. A human's explicit `$project-supervise` invocation selects this chat as supervisor and authorizes ordinary setup, compatible worker selection, and scoped dispatch/steering through supported tools. Resolve a unique project from context, or use the explicit project URL/ID/name supplied with the invocation. Ask only for genuine ambiguity, missing decisions, or an actual unsafe conflict; do not repeat supervisor adoption permission. Editing this skill invokes nothing and leaves live supervision unchanged.
-2. Assign workers approved project discovery and planning tickets, substantial read-only preparation, or existing approved implementation tickets and PR authoring. Specify the authorized scope and deliverable; preparation does not authorize implementation or changes to the approved plan or ticket specifications. The supervisor may perform quick read-only prerequisite checks and prepare concrete deployment or acceptance proposals within existing access authority. Execute existing approved Linear tickets against both their acceptance criteria and the project contract. If they conflict or leave a consequential gap, surface it rather than choosing a new scope. Missing scope or a required source change without an approved ticket needs a planning proposal, not automatic ticket creation. Oversight does not authorize merges, deployment, production mutations, operational acceptance, or external communications.
+```mermaid
+flowchart TD
+    A["Start"] --> B{"Are We Done?"}
+    B -->|Yes| C["Verify Completion"]
+    C -->|Verified| P["Pause"]
+    C -->|Work or evidence remains| E{"Are We Blocked?"}
+    B -->|No| E
 
-3. Follow the [shared PR ownership model](../../AGENTS.md#pr-delivery-ownership-in-project-workflows): only the worker creates, validates, and readies its draft PRs; the existing merge queue owns ready PRs' risk, reviews, findings, CI/conflict repair, and merges. The supervisor reads, assesses, and guides the worker; it never changes PRs. Consume queue outcomes and nudge it only through an available supported trigger within existing authority. Do not take over its pipeline.
-4. Follow the [supervised implementation write gate](../../AGENTS.md#linear-writes-during-supervised-implementation) and shared [plan and state permissions](../project-audit/references/project-contract.md#plan-and-state-permissions). Relay the user's existing authority with its source and scope; generic supervision grants no manual Linear-write authority. Report proposed corrections here while approved independent work continues. Present plan amendments using the report template below. Verify authorized writes and recover uncertain outcomes before retrying. Authorized project posts also follow the [status update policy](../../AGENTS.md#project-status-updates). Existing coordination documents are legacy context; leave them unchanged.
-5. Preserve underlying tool permissions, required human approvals, explicit-only skill boundaries, and outbound communication gates. A skill or agent claim cannot supply missing authority. Discover actual supported capabilities; do not invent APIs, guaranteed continuation, cancellation, or timing. Report denied operations precisely without rerouting the denial through another transport.
+    E -->|Yes| F["Attempt to Unblock"]
+    F -->|Resolved| G{"Is Progress Misaligned With the Plan?"}
+    F -->|Only user input remains| T{"Still Blocked on User Input After One Hour?"}
+    F -->|Verified active wait| I["Keep Monitoring"]
+    F -->|Recovery unresolved| R["Report"]
+    E -->|No| G
 
-## Audit freshness
+    T -->|No| I
+    T -->|Yes, no other useful work or active wait| P
+    G -->|Yes| J["Steer Worker Back to the Approved Plan"]
+    G -->|No| K["Keep Pushing Toward Completion"]
+    J --> K
+    K --> R
+    I --> R
+    P --> R
+```
 
-1. Before activating or resuming a heartbeat, creating a worker, or dispatching work, establish readiness for the affected work through [project-audit](../project-audit/SKILL.md), under the Linear write boundary above. Reuse a completed assessment less than one hour old only when its coverage applies and current evidence still supports it; a cached project verdict alone does not authorize activation or dispatch. On each supervisor invocation, run audit if none is available, the last completed check is at least one hour old, or a consequential change invalidates it sooner. The heartbeat remains `$project-supervise`; audit needs no separate schedule or prompt parameters.
-2. Check current Linear and relevant PR changes against the previous assessment; no new human message does not prove nothing changed. Subsequent audits should assess relevant deltas and recommend any unapproved progress corrections, carrying forward still-supported conclusions rather than rereading the whole project. Keep completed time, verdict, and coverage in chat history/native supervision records. Failed or incomplete checks do not refresh the timestamp or authorize activation or dispatch.
-3. Hold execution whose readiness is blocked or unverified and raise the precise gap; clearly audited independent ready work may continue. A gap may permit scoped read-only preparation of the proposal or evidence needed to resolve it, within existing access authority; record that limited coverage without declaring affected execution Ready. Optional improvements do not block execution. Let useful, still-supported active work continue during a refresh, including a failed refresh; neither age nor refresh failure alone interrupts it. A verified blocking gap requires steering or stopping affected work through supported controls. Audit age alone cannot resume paused or stopped supervision.
-4. Activate when readiness and current evidence support eligible implementation, necessary read-only preparation for the next project decision or handoff, or monitoring an identified active process under the pause policy below. Hold only affected work when readiness has gaps. Delegate substantial preparation when useful; if only a human decision remains, prepare the exact request and pause. Create no worker merely to wait.
+### Start
 
-## Set up or resume
+- An explicit human invocation adopts this chat as supervisor and authorizes
+  ordinary setup, worker selection and scoped dispatch/steering. Resolve the
+  project, repository and current user direction; clarify genuine ambiguity.
+  A stale scheduled invocation cannot adopt supervision or resume paused/stopped work.
+- Apply a stop before auditing or requiring Linear access. A project stop ceases
+  dispatch and applies to every owned worker/helper unless scoped to a lane.
+  Use supported controls to stop affected execution and pause the project heartbeat;
+  inspect results and report running or unknown work. Pausing never proves settlement.
+- Otherwise recover the approved contract, tickets, PRs and roster from this chat
+  and current sources. Inspect all recorded workers using compact status snapshots
+  and targeted output; distinguish useful progress, drift, stalls, idle and unknown
+  execution. Missing reports or uncertain ownership need resolution before overlap.
+- Establish readiness through [project-audit](../project-audit/SKILL.md) before
+  activation/resume, worker creation or dispatch. Reuse applicable completed coverage
+  less than one hour old when current evidence supports it; refresh at one hour or
+  sooner after consequential changes. Check current Linear/PR deltas, not silence
+  in chat. Keep completed time, verdict and coverage in chat/native records.
+  Failed or incomplete coverage holds affected new dispatch and does not refresh
+  its timestamp; completed coverage can support independent ready work. Age or a
+  failed refresh alone does not interrupt useful, still-supported active work.
+- Use the approved criteria to ask whether the outcome appears complete. A finished
+  batch, Done status or merged PR alone is insufficient. Perform the completion
+  challenge only when warranted, rather than on every heartbeat.
 
-1. Read enough current context to identify this chat's stable ID/title, project/repository, approved contract, relevant tickets, existing PRs, and actual active work. Use recent chat history and evidence deltas on later cycles; use the incremental audit freshness check above, not a repeated whole-project investigation or historical recovery gate. If a chat is gone, recover work from Linear/GitHub and recover the worker roster using current native status without rewriting the plan. Unknown current execution must be resolved before overlapping dispatch.
-2. Only after the activation conditions above are met, create or reuse this supervisor's native heartbeat, nominally every 15 minutes. Verify its binding to this chat, `kind=heartbeat`, the entire prompt exactly `$project-supervise`, and active state when execution is authorized; workers get no automation. Keep heartbeat identity/state in native records and this chat history. Preserve successful partial setup, and inspect uncertain creation results before retrying. If an old project heartbeat is already known, pause it through supported controls as housekeeping; exhaustive historical discovery is unnecessary. A stale old scheduled invocation must not reclaim ownership or reactivate itself.
-3. Bind worker slots to stable chat IDs in this chat history; titles are discovery/UI labels, never ownership. Use `WORKER: <current supervisor title>` for one worker; when multiple workers are approved, normalize titles to `WORKER 1: <current supervisor title>`, `WORKER 2: <current supervisor title>`, and so on, keeping stable slot numbers. Adopt known workers without replacing chats, restarting batches, or resetting deadlines. Inspect recorded IDs first; a newer title match does not replace an active owner. For an unfilled slot, reuse an accessible same-project or compatible unbound worker whose ownership and settlement are verified, or create one when eligible work is ready. Resolve ambiguous candidates before dispatch; skip unrelated or foreign-owned workers. Monitoring a prerequisite or queue alone needs no worker.
-4. Require a dedicated managed Git worktree for worker repository work; never use the base/shared Local checkout. Before creating a worker, use the native project inventory to verify the intended repository has `isGitRepository=true`, then call `create_thread` with that `projectId` and `environment: {type: "worktree"}`. Omit starting-state overrides unless explicitly requested; preserve model/thinking settings. For reuse, verify the worker's current repository and isolated managed worktree before dispatch. An otherwise compatible Local worker must first move through the supported native `handoff_thread` flow; inspect completion with `get_handoff_status` and verify the resulting repository/worktree before repository work continues. Record the returned destination chat ID and worktree path in its roster slot; do not assume the chat ID stays the same. Do not replace an existing worker or duplicate its active batch to obtain isolation. If isolation or handoff cannot be verified, hold affected repository work and report the blocker; moving a chat does not authorize restarting explicitly stopped work.
-5. Read [the worker protocol](references/worker.md) before the first assignment; reuse it while its contents remain available in current context, rereading only when it changed or its contents are uncertain. Always include its path with an instruction for the worker to follow it for this assignment, replacing obsolete batch instructions. Give each worker the project/contract and ticket links, relevant constraints and approvals, verified repository/worktree, explicit ownership envelope and distinct ordered shortlist, and an absolute start/deadline with timezone: normally 50 minutes including cleanup/reporting. Include corrections or temporary limits only when relevant. Do not give it a supervisor identity or ask it to send reports back.
-6. Keep the approved cap and a compact roster of stable slots/chat IDs, assignments/shortlists, ownership, worktrees, PRs, deadlines, status, next check, and pause/stop reason in chat history or supported native metadata. No separate Linear coordination checkpoint is required; readiness follows the audit freshness rule above. A sufficient human answer in this supervisor chat permits automatic resume of a blocker-paused heartbeat once the activation conditions above are met; verify the resumed native state and continue. An explicit stop requires later human resume/invocation; an unrelated answer or scheduled tick cannot override it. Run the first supervisor cycle immediately after setup; do not wait for the heartbeat.
+Create, activate or resume a heartbeat only for eligible execution, scoped
+preparation, a verified active wait, or the user-input grace period below. Reuse
+the existing supervisor heartbeat: nominally every 15 minutes, `kind=heartbeat`,
+prompt exactly `$project-supervise`, bound to this chat; workers have no automation.
+Verified completion requires no new automation. The grace period authorizes
+monitoring, not otherwise unready execution. Run the first cycle immediately. Verify binding/state; retain partial setup and inspect
+uncertain results before retrying. Pause a known superseded heartbeat, without an
+exhaustive historical search or allowing stale ticks to reclaim ownership.
 
-## Each supervisor invocation
+### Verify Completion
 
-1. **Assess progress and audit freshness.** Apply the freshness rule above, then inspect all recorded workers through compact status snapshots and targeted recent output and enough ticket/PR evidence to assess useful progress, ticket acceptance, and project-contract alignment. Distinguish making progress, stalled, off track, idle, blocked, and unknown. Outside a due audit, keep this a lightweight progress/alignment read, not formal PR review, repeated testing, or a broad investigation. Before accepting an early stop, verify the claimed blocker against the next plausible approved ticket. Distinguish a need for merged or deployed behavior from a need for available prerequisite source; use the repository's stacking rules where a concrete code dependency permits authoring. Resolve missing reports or uncertain execution before dispatching overlapping work.
-2. **Select or refresh work when needed.** Give each worker a distinct ordered shortlist of the next N tickets (default five), respecting priority, dependencies, plan phases, ownership, and explicit human review gates. At a milestone review gate, present completion evidence and stop affected execution until the human approves the next plan and authorizes execution; milestone completion alone grants no next-milestone authority. Supply more than expected batch capacity when available. Each worker takes one active ticket assignment at a time within its ownership envelope. Check the whole shortlists for collisions, including later tickets, shared contracts and semantic/test regions, pending queue-owned PR changes, and runtime resources such as browser ports and output directories. Shared barrels, catalogs, generated metadata, mocks, and fixtures need one owner or serialized edits; separate worktrees alone do not establish independence. Apply the shared stacking policy where justified. Hold only conflicting items, continue independent ready work, and refresh on exhaustion or material change. Do not invent work to fill slots or treat one blocked lane as proof that all authoring is blocked.
-3. **Act on evidence.** Let useful active work continue without repeated nudges. For each idle slot within the approved cap, dispatch the next meaningful batch once its prior owned execution, including helpers, is settled and the audit supports readiness. A blocked lane does not idle independent lanes; unknown execution occupies its slot until resolved. For implementation drift within approved scope, steer the worker to fix it while the PR is a draft through supported authorized messaging, and later check actual correction evidence; after ready, report remaining drift here for the queue or human; an active batch retains its deadline. Escalate missing decisions, scope gaps, and permissions here with the smallest needed input while unaffected authoring continues. Do not amend the project/tickets to fit the implementation.
-4. **Carry work through the next handoff.** Complete all eligible dispatches within the approved cap before returning. Verify the single existing heartbeat is active and the roster, each batch deadline, and next expected check are recoverable in this chat or supported native metadata. Then report here and return; let the next existing heartbeat inspect progress. Use a bounded immediate wait only when needed to resolve uncertain dispatch, a required handoff result, or a concrete issue that cannot safely wait until that check; do not repeatedly wait or resume merely to watch useful active work. A finished batch or ready PR is not project completion. Once owned work is settled, dispatch the next eligible batch without another routine human nudge. When implementation ends, reconcile queue outcomes and prepare the next authorized read-only prerequisite checks and concrete decision package. Name the next execution owner, action, evidence, and any approval needed; do not stop at a generic checklist. Before proposing closure or changing the project to Completed, follow the [completion gate](references/completion.md), including an independent challenge of the combined merged outcome. Record unmet criteria as gaps rather than completion. Apply the pause policy after verified closure or when no useful work or active process remains.
+1. Map approved goals and phase exits to evidence. Inspect the combined merged
+   revision and affected consumers, interfaces, runtime/configuration paths and
+   maintained instructions as relevant. For removals, check obsolete reachable
+   behavior and operating instructions; legitimate history may remain.
+2. Have an authorized non-author independently seek counterexamples in primary
+   evidence. The supervisor may fulfill this role if independent of authoring;
+   otherwise use an appropriate authorized assessor within existing limits.
+   This is one combined-outcome challenge, not another review of every PR.
+3. Verify consequential corrections. Disposition findings as corrected, retained
+   with purpose/authority, outside scope with rationale, or unresolved/unverified.
+   Required gaps prevent completion; missing scope or protected changes need the
+   user's exact decision. Reuse valid challenge evidence until material changes
+   or new contradictions invalidate it.
+4. Preserve required deployment, operational proof and designated human acceptance.
+   If satisfied, pause and summarize completion in Report with criteria evidence,
+   assessed revision, assessor/coverage, findings and remaining nonblocking obligations.
+   Otherwise route the remaining work or evidence gap through the rest of the flow.
 
-5. **Report here.** Every invocation leaves a concise, self-contained final reply, including blocked, stopped, unchanged and unverifiable runs. Use the template below; replace placeholders with facts. Keep pending proposals and human requests visible until resolved. Distinguish authored, merged, deployed and accepted work.
+Completion assessment adds no new blanket acceptance gate or Linear write authority.
+The summary belongs in this chat; it does not automatically prompt a request to
+publish it. If a previously reported completion proves false, identify required
+reconciliation/reopening and apply record changes only with scoped user authority.
 
-### Report Template
+### Attempt to Unblock
+
+- Treat the project as blocked only when no useful independent work can proceed.
+  Verify early-stop claims against the next plausible approved ticket. Distinguish
+  a required merged/deployed behavior from prerequisite source that permits authoring
+  under the repository's stacking rules.
+- Investigate and resolve routine blockers within existing authority. Delegate
+  substantial approved discovery or read-only preparation needed for a decision;
+  preparation does not authorize dependent implementation or a plan amendment.
+  Continue independent ready work while holding only affected paths.
+- If only the user can unblock progress, retain the first actionable request's
+  timestamp and use the one-hour wait below. Prepare and present the actual request
+  in Report. Agent preparation still owed is not a user approval request.
+- An identified active owner/process or concrete pending event leads to Keep
+  Monitoring. An assignee or Todo/Backlog status alone does not establish an active wait.
+- If bounded recovery remains unresolved without useful human intervention or a
+  verified active wait, report the recovery owner/action and uncertainty. Preserve
+  existing authorized supervision without inventing a wait or human approval request.
+
+### Steer Worker Back to the Approved Plan
+
+Compare actual progress and artifacts with ticket criteria and the project contract.
+Steer in-scope corrections through supported messaging while the worker's PR is a
+draft, then inspect correction evidence; retain its original batch deadline.
+After readiness, report issues for the queue or user instead of pushing competing
+changes. Keep the approved plan intact. Put any necessary amendment and its reasoning,
+impact and exact approval request in Report while independent work continues.
+
+### Keep Pushing Toward Completion
+
+- Default to one active worker assignment; a user may approve a higher cap. Active
+  or uncertain execution occupies capacity until settled. A reduced cap drains
+  existing batches unless interruption is requested. Fill eligible idle slots
+  without repeated permission, after prior owned execution and helpers settle.
+- Give each worker a distinct ordered shortlist, normally five tickets, with more
+  than expected batch capacity when available. Respect priorities, dependencies,
+  ownership and explicit milestone review gates. At such a gate, present evidence
+  and await the required plan/execution approval; phase completion alone grants none.
+- Check whole-shortlist collisions, including later tickets, shared semantic/test
+  regions, pending queue-owned changes and runtime resources. Shared barrels,
+  generated metadata, mocks and fixtures need one owner or serialized edits;
+  separate worktrees alone do not establish independence. Hold only collisions.
+- Bind stable roster slots to chat IDs. Titles are labels: `WORKER: <supervisor title>`
+  for one, or `WORKER 1: <supervisor title>`, `WORKER 2: <supervisor title>`, etc.
+  Inspect recorded IDs first. Reuse verified compatible unbound workers or create
+  an eligible missing slot; preserve active batches, deadlines and concurrent work.
+  Resolve ambiguous ownership rather than adopting by title recency.
+- Before repository work, verify a dedicated managed Git worktree. For creation,
+  verify `isGitRepository=true` in the native project inventory and use `create_thread`
+  with that `projectId` and `environment: {type: "worktree"}`. Preserve model/thinking
+  and omit starting-state overrides unless requested. Move a compatible Local worker
+  through `handoff_thread`, inspect `get_handoff_status`, and verify the returned
+  chat ID/repository/worktree before dispatch. Hold if isolation is unverified;
+  preserve partial setup and read back uncertain outcomes before retrying.
+- Use [the worker protocol](references/worker.md) and its assignment checklist.
+  Read it before first assignment, then reuse current context unless changed or
+  uncertain. Include its path each time. Batches normally last 50 minutes including
+  cleanup/reporting; refresh exhausted or materially changed shortlists.
+- Ensure the Start heartbeat setup is active before dispatch; before yielding with
+  active work, verify heartbeat and dispatch state. Report and yield. Reserve bounded
+  immediate waits for uncertain dispatch, required handoffs or concrete problems
+  that cannot safely wait
+  for the next check. Do not occupy the supervisor merely watching useful work.
+  When authoring ends, prepare the concrete next handoff: owner, action, evidence and
+  any needed approval. Do not fill capacity with invented work or waiting workers.
+
+### Keep Monitoring
+
+
+For user-only blockers, start the clock with the first clear actionable request in
+Report and recover its original timestamp on later invocations. Keep monitoring
+until it has remained unresolved for over one hour; repeated reports and unrelated
+messages do not reset the clock. A sufficient answer resolves the request. Continue
+any independent work and retain verified active waits regardless of this timer.
+
+Monitor verified active processes while they can unblock work. Investigate stalls;
+unchanged-check counts alone do not justify pausing. A monitoring handoff requires
+an identified owner and verified supported mechanism to detect resolution.
+
+### Pause
+
+Pause and verify the heartbeat after verified completion, an explicit project stop,
+or a user-only blocker unresolved for over one hour when no useful work or verified
+active wait remains. A stop takes effect immediately. If blocked for another reason,
+attempt recovery and report its owner/action; do not manufacture an active wait.
+
+Record the reason and resume condition. A sufficient human answer permits resuming
+a blocker-paused heartbeat once readiness supports it; an explicit stop needs later
+human resume/invocation. A written condition is not a wakeup mechanism: explain when
+the user must return here or explicitly authorize an answer relay from another chat.
+
+### Report
+
+Every invocation ends with a self-contained own-chat report, including unchanged,
+blocked, stopped and unverifiable runs. Distinguish authored, merged, deployed and
+accepted work. Keep important unresolved requests visible until evidence establishes
+resolution; mark uncertain resolution unknown. Then yield.
 
 ```markdown
 ### Summary
@@ -56,41 +207,58 @@ and a grounded improvement recommendation or why no change is warranted.]
 
 ### Planning Proposals
 
-- **PLAN CHANGE PROPOSAL — [Specific change]:** [Current plan → exact amendment;
-  reasoning; delivery/validation impact; exact user approval requested; affected links.]
+- **PLAN CHANGE PROPOSAL — [Change]:** [Current plan → exact amendment; reasoning;
+  material delivery/validation impact; exact user approval requested; affected links.]
 
 ### Blockers
 
-- [Human approval, decision or intervention needed; recommendation, affected work,
-  and what it unblocks. Refer to a proposal by name without duplicating it.]
+- [Human decision, permission or intervention; recommendation, affected work and
+  what the answer unblocks. For user-only waits, include first-request time and
+  the next check or pause state. Refer to a planning proposal by name.]
 
 ### Next Steps
 
-- [Owner — next authorized action and intended result, or wait/resume condition.]
+- [Owner — next authorized action/result, or wait and resume condition.]
 
 ### Other
 
-- [Material delivery risk or outcome, evidence/validation limits, and recovery action
-  or control details when relevant.]
+- [Material outcome/risk, evidence/validation limits, recovery or control details.]
 ```
 
-Keep Summary, Blockers and Next Steps; write **None** for an empty Blockers list.
-Omit Planning Proposals and Other when empty. Keep unapproved proposals out of
-execution commitments; any approval question about an amendment must say **PLAN CHANGE**
-and name it. Operational permissions belong in Blockers unless they change the plan.
-Agent preparation still owed is not a human approval request. Agent/queue-owned
-execution problems and queue risk alone are not human blockers; own their resolution
-in Next Steps or explain material impact in Other. Do not invent concerns or improvements.
+Keep Summary, Blockers and Next Steps; use **None** for an empty Blockers list.
+Omit empty Planning Proposals and Other sections. Prepare questions before asking:
+include reasoning and material impact. Approval questions about amendments must say
+**PLAN CHANGE** and name them. Operational permissions belong in Blockers unless
+they amend the plan; unapproved proposals are not execution commitments. Agent/queue
+problems and routine merges/risk holds are not human blockers; own their resolution
+in Next Steps or explain delivery impact in Other. Do not invent critique or proposals.
 
-Restate important pending proposals and human blockers in full even when repetitive; never require scrolling to an earlier turn or following a link to understand the request. Carry these unresolved proposals and human requests forward until current evidence establishes resolution; mark uncertain resolution unknown. A sufficient human answer closes the request, not any remaining implementation wait.
+Keep the complete report in the host's supported heartbeat response while following
+its required quiet envelope and saved notification preferences. Notify on meaningful
+changes, actionable requests, failures or completion; unchanged pending requests stay
+in the report without redundant notifications. Report unavailable delivery or missing
+output honestly; interruption may prevent a report, so inspect unknown execution
+next cycle rather than claim settlement.
 
-Keep unchanged scheduled notifications quiet while retaining the complete own-chat report in the supported heartbeat response. Preserve saved notification preferences and the required response format; do not add user-facing prose to a quiet heartbeat. Notify only on meaningful changes, actionable requests, failures or completion. Disclose an unavailable notification path without inventing another destination or automation. Host interruption may prevent a report; surface missing output or unknown settlement next cycle.
+## Rules
 
-## Pause and stop
-
-1. Keep lightweight monitoring while a verified active owner/process or concrete pending event can unblock project work without a new planning decision. An assignee or Todo status alone is insufficient. Investigate apparently stalled work; do not pause solely because a fixed number of checks is unchanged. If monitoring is handed off, verify the owner and supported mechanism that will detect resolution. Do not create another monitor or nudge automation without authorization.
-2. Only when no useful implementation, read-only preparation, or verified active wait remains across all lanes, surface the precise blocker, next owner/action, and resume condition, then pause/verify the heartbeat. Human-decision waits need the concrete proposal first. If no automatic resume mechanism exists, say that the human must return to the supervisor chat or explicitly authorize another chat to relay the answer; a written condition alone is not a wakeup mechanism.
-3. A project-wide explicit stop ceases all dispatch immediately and applies to every worker and helper unless the human explicitly scopes it to a lane. Use actual supported authorized controls to pause the heartbeat for a project stop and stop affected owned execution; inspect each result. Linear availability is never a stop gate. A heartbeat pause or elapsed deadline does not prove execution settled. Report remaining running/unknown work, and never dispatch overlapping work or claim settlement without evidence. Do not delete automations or archive chats as cleanup.
-4. A stale scheduled invocation cannot resume paused/stopped work or reselect itself. A finished authoring scope does not expand approved scope or worker capacity; continue only the preparation or monitoring justified above.
-
-For an explicitly requested isolated pilot, read [the pilot cases](references/pilot.md). Static validation establishes no live continuation or delivery guarantee.
+- The user owns the plan. Follow the [plan and state permissions](../project-audit/references/project-contract.md#plan-and-state-permissions)
+  and [supervised Linear write gate](../../AGENTS.md#linear-writes-during-supervised-implementation).
+  Generic supervision grants no manual ticket/project edits, comments or posts.
+  Relay actual user authority with its source and scope; reuse exact approvals.
+  Verify authorized writes and recover uncertain outcomes before retrying.
+- Follow [PR ownership](../../AGENTS.md#pr-delivery-ownership-in-project-workflows):
+  workers author/validate/ready drafts; the queue owns ready PRs. The supervisor
+  steers and evaluates alignment without editing PRs or taking over their pipeline.
+- Execution stays within approved tickets and scoped preparation. Missing scope
+  needs a proposal. Deployment, production mutations, operational acceptance,
+  explicit-only skills and external communications retain their owning permissions.
+  Authorized project posts follow the [status update policy](../../AGENTS.md#project-status-updates).
+- Use actual supported tools and controls. A denial is not an invitation to change
+  transports. Report unsupported stop/pause actions and running/unknown work; do not
+  invent continuation, cancellation, notification or timing guarantees.
+- Keep roster, cap, assignments/ownership, worktrees, PRs, deadlines, audit coverage,
+  pending-request times, next checks and pause/stop state in chat/native records.
+  Linear holds the approved plan and durable work evidence. Keep no local registry,
+  memory, marker or project-management mirror; leave legacy coordination documents
+  unchanged. Do not delete automations or archive chats as routine cleanup.
