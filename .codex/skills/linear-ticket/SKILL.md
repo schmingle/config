@@ -67,7 +67,8 @@ repository, creator allowlist, and query scope, prefer metadata-first updated-si
 with a boundary overlap and ID deduplication. Merge with prior candidates; don't drop older
 unassessed work. Refresh tracked IDs regardless of current team/status to detect closure,
 reopening, moves, reassignment, and creator changes. Recover tracked work from history/live
-sources; apply the creator filter to recovery/reporting. Release nonmatching tickets only
+sources; apply the creator filter to inventory/execution eligibility. Excluded tickets may
+appear as decision/dependency context under Report. Release nonmatching tickets only
 from this workflow's inventory, without ticket/PR writes. Nonmatching parents are context only.
 
 Use full discovery when the checkpoint is missing/untrusted, scope/filter semantics change,
@@ -89,7 +90,7 @@ Order assessment by human direction, native priority, impact, urgency, and meani
 activity. Replies, due feedback, and interrupted work matter; `updatedAt` alone doesn't.
 Lightly refresh unchanged holds and queued PRs. Reopen completed assessments only on relevant
 new evidence; finish incomplete promising assessments. Use remaining slots for new candidates.
-Report inventory-only or deferred assessments as Skipped with the actual reason;
+When shown, label inventory-only or deferred assessments Skipped with the actual reason;
 new deep investigation still consumes a slot.
 
 ### Reconcile Ownership
@@ -138,8 +139,9 @@ unverified offer or deadline cannot justify takeover. No assignment implies a st
 deadline commitment, or implementation approval.
 
 Retain user-owned tickets and unassigned work with no intended owner for implementation
-triage; keep unresolved ownership/handoff cases visible in the report while independent work
-continues. Other-owned work isn't executable by this workflow. Reviews on the user's PR
+triage. Retain unresolved ownership/handoffs internally; surface consequential decisions or
+passive waits under Report while independent work continues. Other-owned work isn't
+executable by this workflow. Reviews on the user's PR
 aren't competing ownership. Assignment changes don't override scope, size, or readiness gates.
 
 ### Triage Tickets
@@ -257,22 +259,26 @@ Distinguish merged, deployed, and operationally accepted.
 
 ### Report
 
-Every run, including blocked/unchanged runs, reports:
+Every run, including blocked/unchanged runs, gives one outcome sentence with meaningful
+changes/delivery. Include counts, timing or coverage limits only when useful to the decision.
+Then use these sections in order, placing each ticket once:
 
-- One outcome sentence: screened/changed/build, still-in-play count, and coverage limits;
-  timing once if useful, plus at most three result/intervention bullets.
-- **Critical Questions:** Only user decisions that unlock currently relevant work, resolve a
-  consequential disposition, or address a current risk. Link the ticket, consequence, and
-  recommendation. Investigate first and identify the actual decision owner; another person's
-  routine follow-up isn't automatically a user question. Keep parked prerequisites and
-  speculative product questions in table notes. Repeat unanswered questions only while still
-  consequential, labeled already asked with original links; never treat nonresponse as demand.
-  Include other proposed outreach with its intended audience and recommendation here, or in
-  Update/notes when no user decision is needed.
-- **Still in Play:** Every tracked open ticket passing the creator filter for the user or
-  unresolved ownership/handoffs, including holds and open offers with their response deadlines.
+- **Needs Your Input:** Numbered decisions/interventions for currently relevant work.
+  Link the ticket, recommendation and what the answer unblocks; identify the actual decision
+  owner after investigation. Include proposed outreach with its audience. Retain unanswered
+  consequential asks with original links; silence never resolves them. Workflow exclusions
+  such as size or creator filters can merit a decision here; exclusion doesn't imply low value.
+- **Active Work:** A Markdown table for ready candidates, implementation or PR delivery
+  actively progressing, and material scope/size comparisons. Keep decision-only tickets above.
+- **Waiting:** A compact list or sentence for passive feedback, prerequisites or handoffs;
+  give each ticket's next event/owner and deadline when applicable.
 
-Still in Play table: `Ticket | Status | Creator | Assignee | Estimate | PRs | Action | Update/notes`.
+Omit unchanged work needing no user attention, including other-owned or inventory-only
+tickets. Report material actions in the outcome sentence without repeating ticket details.
+Sort each section by explicit human direction, priority/impact, then oldest creation
+(unknown last; ID breaks ties), not by Action. Omit empty sections and routine execution receipts.
+
+Active Work table: `Ticket | Status | Creator | Assignee | Estimate | PRs | Action | Update/notes`.
 Assignee: show the current Linear assignee's name without a qualifier. If unassigned but
 context establishes an intended or suggested owner, show `Name (inferred from Slack)` or
 `Name (inferred from Linear)` only with a concrete ownership/write blocker or exhausted
@@ -282,8 +288,7 @@ uncertainty alone doesn't justify leaving a supported owner inferred.
 An explicit commitment outside the assignee field still uses the inferred-source qualifier.
 Otherwise show `Unassigned`, or `unknown` if the field/evidence wasn't verified. Don't add
 an Unassigned prefix or separate commitment labels; reporting an owner doesn't assign the ticket.
-Sort Action alphabetically with Skipped last, then native status order and oldest creation
-(unknown last; ID breaks ties). Link tickets/PR states/evidence. Action is this run's work:
+Link tickets/PR states/evidence. Action is this run's work:
 observed merges are Assessed; inventory-only or deferred assessments are Skipped.
 Notes explain why the ticket is included when unclear, what was checked/changed, and its
 disposition or next action. For Skipped, state the concrete reason: owner actively working,
@@ -291,11 +296,11 @@ ownership not yet stale, unchanged prior disposition, exhausted budget, or unava
 Distinguish verified routing from incomplete assessment; skipped work remains pending where
 checks are unfinished. An assignee alone doesn't establish activity or staleness.
 Use unknown for unverified facts, — for verified none.
-Keep tracked work until verified closure, creator-filter exclusion, or explicit tracking release; reassignment isn't
-release. Label carried-forward findings/incomplete recovery. Unrelated candidates aren't
-permanent watchlists. Do not collect closed-ticket or other-owner inventories solely for
-reporting; mention material outcomes or ownership blockers in the summary when useful.
-Omit empty sections; shorten prose, not required inventory.
+Keep the full internal inventory until verified closure, creator-filter exclusion or explicit
+tracking release; report omission and reassignment aren't release. Retain unresolved holds,
+offers/deadlines and incomplete checks privately; label carried-forward findings when shown.
+Do not collect closed/other-owner inventories solely for reporting. Surfacing excluded work
+as a decision or dependency grants no eligibility exception or execution authority.
 
 Finish after reporting: no interview or waiting for replies. Later answers update the
 relevant disposition within remaining authority/budget; they don't restart discovery,
