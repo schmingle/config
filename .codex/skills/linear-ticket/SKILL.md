@@ -56,23 +56,37 @@ ambiguous mappings. Use numeric Linear values, not hardcoded M=3 or alphabetical
 Legacy `maxEstimate`/`mediumEstimateLabel` don't override `size`.
 
 Verify team/statuses; discover configured-team Triage/Backlog and Todo/In Progress/In Review
-tickets across all assignees. Use supported server-side team/creator/status filters and metadata
+tickets across all assignees. For creator filtering only, a subticket inherits its parent's
+effective creator recursively; a root ticket uses its own creator. Verify the live parent
+chain and compare that effective creator with `creatorIds`, regardless of who created the
+subticket. Keep Linear's actual creator unchanged; inheritance grants no ownership,
+scope, size, readiness, or implementation exception. If ancestry cannot be verified,
+hold creator eligibility rather than assuming a match or excluding the ticket.
+
+Use supported server-side team/status filters and metadata
 field selection; inspect the current interface rather than inventing arguments. Collect ID/URL,
-team, assignee, status, creator, priority, estimate, parent, and creation/update times. Paginate
-each query independently and deduplicate; verify `creatorIds` before deep assessment or writes.
+team, assignee, status, actual creator, priority, estimate, parent, and creation/update times.
+Do not use a server-side direct-creator filter that would omit eligible descendants;
+discover team/status metadata first, then resolve ancestry, including parents outside the
+candidate team/status scope. Paginate each query independently and deduplicate; verify
+effective creators against `creatorIds` before deep assessment or writes. Parent metadata
+lookups alone do not consume assessment slots.
 
 Reuse existing private checkpoints/current automation memory as caches for metadata and
 unassessed work. With a trustworthy checkpoint matching the verified workspace/user/team,
 repository, creator allowlist, and query scope, prefer metadata-first updated-since deltas
 with a boundary overlap and ID deduplication. Merge with prior candidates; don't drop older
 unassessed work. Refresh tracked IDs regardless of current team/status to detect closure,
-reopening, moves, reassignment, and creator changes. Recover tracked work from history/live
+reopening, moves, reassignment, and creator or parent changes. Refresh relevant ancestor
+metadata and recompute descendant eligibility when ancestry or an ancestor's creator changes;
+a child's timestamp alone does not cover those changes. Recover tracked work from history/live
 sources; apply the creator filter to inventory/execution eligibility. Excluded tickets may
 appear as decision/dependency context under Report. Release nonmatching tickets only
-from this workflow's inventory, without ticket/PR writes. Nonmatching parents are context only.
+from this workflow's inventory, without ticket/PR writes. Parents outside the candidate scope
+remain ancestry/dependency context, not automatically executable work.
 
 Use full discovery when the checkpoint is missing/untrusted, scope/filter semantics change,
-or the interface cannot cover new/reopened/moved-in/status/creator changes reliably. Repeat
+or the interface cannot cover new/reopened/moved-in/status/creator/ancestry changes reliably. Repeat
 full discovery at least every seven days. This backstop is metadata discovery, not unlimited
 assessment. Record scan start; advance the checkpoint no later than that time only after all
 queries are fully paginated and the result is saved successfully. On partial/error/blocked
@@ -279,6 +293,8 @@ Sort each section by explicit human direction, priority/impact, then oldest crea
 (unknown last; ID breaks ties), not by Action. Omit empty sections and routine execution receipts.
 
 Active Work table: `Ticket | Status | Creator | Assignee | Estimate | PRs | Action | Update/notes`.
+Creator: show the actual creator; when different, identify the inherited effective creator
+and source parent in notes so eligibility is clear.
 Assignee: show the current Linear assignee's name without a qualifier. If unassigned but
 context establishes an intended or suggested owner, show `Name (inferred from Slack)` or
 `Name (inferred from Linear)` only with a concrete ownership/write blocker or exhausted
