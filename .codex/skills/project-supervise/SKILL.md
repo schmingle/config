@@ -1,6 +1,6 @@
 ---
 name: project-supervise
-description: Drive one approved Linear project toward completion through standalone workers, progress checks, steering, and clear escalations. Run only when explicitly invoked; configuration work does not start supervision.
+description: Drive one approved Linear project toward completion through worker subagents, progress checks, steering, and clear escalations. Run only when explicitly invoked; configuration work does not start supervision.
 disable-model-invocation: true
 ---
 
@@ -8,13 +8,15 @@ disable-model-invocation: true
 
 Keep approved work moving toward the project's outcome while this supervisor chat
 stays available for the user's decisions and steering. Delegate lengthy discovery,
-preparation and implementation to standalone worker chats, not subagents replacing
-those chats. Each invocation acts, reports and yields.
+preparation and implementation to reusable worker subagents. Stay active while useful
+execution or a concrete pending event can advance; ordinary messages and steering do
+not implicitly stop work or request detach.
 
 ## Flow
 
 Start is one invocation by the user or the existing automation. Explicit stop
-instructions override the flow immediately.
+instructions override the flow immediately. Detach from any stage follows Detach;
+it ends only the supervisor turn.
 
 ```mermaid
 flowchart TD
@@ -43,6 +45,12 @@ flowchart TD
     K --> R
     I --> R
     P --> R
+    R --> V{"Execution or Concrete Wait Can Advance?"}
+    V -->|Yes; no stop, pause or detach| W["Bounded Native Wait"]
+    W -->|Event or wait ends| B
+    V -->|No, paused, stopped or detached| Y["Yield"]
+    D["Explicit Detach From Any Stage"] --> X["Detach"]
+    X --> R
 ```
 
 ### Start
@@ -60,10 +68,12 @@ flowchart TD
   pause the heartbeat through supported controls; inspect and report running/unknown
   work. Pausing does not prove settlement.
 - Otherwise recover contract, tickets, PRs and roster from this chat/current sources.
-  Inspect active or uncertain assignments with compact snapshots and targeted output.
+  Reconcile recorded subagent IDs using native status, messages/results and targeted history
+  before dispatch, including after a heartbeat or user message. Inspect active or uncertain assignments.
   Once the final report is captured and owned commands/helpers/writes are verified
   settled, retain the roster entry without routine polling. Recheck before reuse or
-  on new activity, contradictory evidence or recovery need. Resolve missing reports
+  on new activity, contradictory evidence or recovery need. Capture pending escalations before
+  reusing an agent; keep them until actually resolved. Resolve missing reports
   and uncertain ownership before overlap. Attempt authorized unblocks for each blocked or
   stalled lane and prepare exact human requests even while others progress. Global
   blockage controls project-wide waiting/pausing, not attention to individual lanes.
@@ -128,7 +138,8 @@ reconciliation/reopening; change records only with scoped user authority.
   Hold affected paths while independent ready work continues.
 - For user-only blockers, present the actionable request in Report and retain its
   first timestamp for the one-hour wait. Unfinished agent preparation is not a user approval
-  request.
+  request. Relay the user's actual answer to the same worker with its request context;
+  verify the handoff before treating affected work as resumed. Continue independent work.
 - Monitor identified active owners/processes or concrete pending events. An assignee
   or Todo/Backlog status alone establishes no active wait.
 - When bounded recovery is exhausted without useful human intervention or a credible
@@ -161,31 +172,27 @@ approval requested; continue independent work.
   pending changes and runtime resources. Barrels, generated metadata, mocks and
   fixtures need one owner or serialized edits. Separate worktrees alone do not prove
   independence. Hold only collisions.
-- Bind each assignment to this supervisor's stable chat ID and host; verified user
-  direction can reassign that binding. Include it in every worker handoff. Bind stable
-  roster slots to worker chat IDs. Titles are labels: `WORKER: <supervisor title>`
-  for one, or `WORKER 1: <supervisor title>`, etc. Inspect recorded IDs first; reuse
-  verified compatible unbound workers or create eligible missing slots. Preserve
-  active batches, deadlines and concurrent work. Resolve ownership ambiguity rather than
-  selecting by title recency.
-- Verify dedicated managed Git worktrees before repository work. Before creation,
-  verify native inventory `isGitRepository=true`; use `create_thread` with its
-  `projectId`, `environment: {type: "worktree"}`, preserved model/thinking and no
-  starting-state override unless requested. For compatible Local workers, use
-  `handoff_thread`, inspect `get_handoff_status` and verify returned chat ID, repository and
-  worktree before dispatch. Hold unverified isolation; preserve partial setup and
-  read back uncertain outcomes before retrying.
+- Bind roster slots to stable subagent IDs and the verified parent/supervisor chat identity.
+  Use `spawn_agent` with `fork_turns="none"` and a compact assignment; reuse the same
+  worker with `followup_task` and steer with `send_message`. Inspect recorded agents
+  before spawning; a completed turn may mean blocked, not completed work. Missing IDs,
+  reports or uncertain execution require recovery before replacement or overlapping dispatch.
+- Verify a dedicated managed Git worktree for each repository execution slot. Reuse a
+  suitable settled checkout or create one through supported `create_worktree` controls
+  from the verified repository/ref; pass its absolute path to the subagent and verify
+  checkout/ownership before edits. Subagents share the parent's default directory:
+  spawning alone provides no isolation. Preserve partial setup and uncertain writes.
 - Read [the worker contract](references/worker.md) and assignment checklist before
   first assignment; reuse current context unless changed/uncertain. Every assignment
   supplies its resolved absolute path and explicitly directs the worker to read and follow it.
   Batches normally last 50 minutes including cleanup/reporting. Refresh exhausted or
   materially changed shortlists.
-- Activate the Start heartbeat setup before dispatch; verify heartbeat/dispatch state
-  before yielding with active work. Report and yield; reserve bounded immediate waits
-  for uncertain dispatch, required handoffs or problems unsafe to defer. Keep the
-  supervisor available while workers execute. After authoring, prepare the next
-  handoff's owner, action, evidence and needed approval. Dispatch only useful work;
-  create no workers merely to wait.
+- Verify the Start heartbeat and dispatch state. While work or a concrete event can
+  advance, coordinate through bounded native waits/status checks, process messages
+  promptly at supported boundaries, and report material changes without repetitive polls.
+  Ordinary steering changes only its stated scope; preserve unaffected execution/deadlines.
+  Prepare the next handoff and dispatch useful work without routine batch approvals.
+  Runtime subagent capacity is separate from the approved project assignment cap.
 
 Off hours, the user authorizes a separate queue chat when project-ready PRs have
 materially new actionable work or a verified unblock. Resolve the repository's saved,
@@ -196,8 +203,9 @@ Respect current user queue stops and scoped holds; a fresh chat resets no author
 
 Before launch, inspect recent native chats for an active same-repository queue run;
 link/monitor it rather than adding another prompt. Resolve inspection errors or hold.
-Otherwise use the native isolated setup above to create a fresh queue chat with
-the approved invocation; require it to verify its repository/worktree before work.
+Otherwise verify the saved project is a Git repository and use `create_thread` with
+that project ID and `environment: {type: "worktree"}` for a separate queue chat carrying
+the approved invocation. Require verified repository/worktree isolation before work.
 Retain all queue risk/review/ownership/merge safeguards.
 Record the returned ID and triggering PR revisions/result here; reconcile uncertain
 creation before retrying. Admission is best effort, not an atomic lock. Do not
@@ -220,6 +228,22 @@ Monitor verified processes that can unblock work; investigate stalls. Do not pau
 because checks remain unchanged. Monitoring handoffs need an identified owner and
 verified supported resolution-detection mechanism.
 
+Worker completion/escalation is not guaranteed to wake an idle supervisor. After yielding,
+retrieve pending results on the next heartbeat or relevant user turn; status requests use
+current evidence. Busy coordination can process incoming worker messages directly.
+If no useful execution or credible event can advance, Report and yield while the heartbeat
+monitors any remaining grace period; do not stay busy merely waiting for a human answer.
+
+### Detach
+
+On an explicit user instruction to detach, finish or reconcile the current supervisor
+operation, capture agent IDs/status, assignments, deadlines and pending requests, then
+briefly Report and end the turn without waiting for workers to finish. Leave work/subagents,
+scope, deadlines, timers and the existing heartbeat unchanged. This is neither stop nor
+pause and does not require worker settlement. A pending parent tool may delay yielding;
+detach is an instruction convention, not a native client command. A later user turn or
+heartbeat resumes coordination under existing authority unless stopped/paused.
+
 ### Pause
 
 Pause and verify the heartbeat after verified completion or an explicit project
@@ -239,10 +263,11 @@ another monitor.
 
 ### Report
 
-End every invocation with a self-contained report here, including unchanged, blocked,
-stopped and unverifiable runs. Distinguish authored, merged, deployed and accepted
+Report meaningful changes and actionable escalations here during coordination. Finish
+with a self-contained report on detach, completion, stop/pause or no useful execution/wait,
+including blocked or unverifiable state. Distinguish authored, merged, deployed and accepted
 work. Retain unresolved requests until evidence resolves them; uncertainty stays unknown.
-Then yield.
+Progress reports alone do not require yielding while useful coordination continues.
 
 ```markdown
 ### Summary
@@ -311,3 +336,8 @@ inspect unknown execution next cycle rather than claiming settlement.
   Linear holds the approved plan and durable work evidence. Keep no local registry,
   memory, marker or project-management mirror; leave legacy coordination documents
   unchanged. Do not delete automations or archive chats as routine cleanup.
+- Existing standalone worker chats retain their assignments and ownership. Inspect them
+  through native chat tools as needed; do not migrate, replace, interrupt or archive them
+  merely to adopt this model. Transfer work only on explicit user migration direction.
+  Restart recovery and client interruption propagation are not assumed; recover actual
+  execution before proceeding. Unknown work still occupies capacity.
