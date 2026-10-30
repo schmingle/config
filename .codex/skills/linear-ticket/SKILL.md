@@ -131,9 +131,10 @@ the recipient's next action.
 
 Never use silence to override a refusal, active PR/project ownership, or human STOP.
 Ticket staleness is separate from stale ownership; don't cancel other-owned tickets.
-Record evidence, original offer/deadline, next owner/action, and unresolved ambiguity in
-existing ticket discussion and report notes. A missing/unverified offer or deadline cannot
-justify takeover. No assignment implies a start, deadline commitment, or implementation approval.
+Keep ownership evidence, original offer/deadline, next action, and ambiguity in report notes/
+private checkpoints; include relevant evidence in permitted ownership comments. A missing/
+unverified offer or deadline cannot justify takeover. No assignment implies a start,
+deadline commitment, or implementation approval.
 
 Retain user-owned tickets and unassigned work with no intended owner for implementation
 triage; keep unresolved ownership/handoff cases visible in the report while independent work
@@ -161,8 +162,8 @@ workflow triage. Dispositions:
   dependencies, access, or
   permission block affected work. Investigate obtainable facts; otherwise report blocker,
   owner, resumption condition, and critical user questions. Don't claim held work for
-  implementation. Ask other parties on the ticket only when authorized/useful. Above `size`,
-  recommend a split/project and report needed approval.
+  implementation. Route follow-up questions and split/project approval requests to the user
+  in this chat. Above `size`, recommend a split/project and report needed approval.
 
 Judge complete outcomes, including rollout/acceptance. Multi-phase/multi-owner work may
 need project framing; a bounded approved-project leaf can qualify independently. Recheck
@@ -179,7 +180,7 @@ not proof of a fix:
 
 - **Under 4 weeks (28 days):** Normal triage.
 - **4 to under 12 weeks:** Lean toward cancellation for resolved, superseded, abandoned,
-  or unprioritized need. Ask once if specific uncertainty could change the result.
+  or unprioritized need. Ask the user once in this chat if uncertainty could change the result.
 - **12 weeks (84 days) or older:** Default to cancellation unless the bounded check finds
   meaningful persisting impact, renewed demand, active commitment, or a live dependency.
   Cite ticket-specific retention evidence and continue triage. An active project, related product
@@ -223,11 +224,11 @@ isn't readiness. If none qualify, report instead of forcing a build. Assign sele
 work to the user before implementation; ownership reconciliation alone doesn't select a build.
 
 Before implementing, trace the reported case through relevant acceptance behavior to surface
-likely questions, policy conflicts, and material approach differences. Combine known questions
-and the proposed approach in the first implementation comment; native status records routine starts.
-Lead with important questions/approval requests in bold, stating the choice, recommendation,
-and whether safe Draft work can proceed or affected work needs an answer. Apply the same
-question-first format to consequential discoveries during implementation.
+likely questions, policy conflicts, and material approach differences. Combine the proposed
+approach and known participant questions in the first implementation comment; native status
+records routine starts. Ask user-directed questions/approvals in this chat. State the choice,
+recommendation, and whether safe Draft work can proceed or affected work needs an answer.
+Route later discoveries and proposed follow-up comments to the user here before publishing.
 
 Follow repository isolation/authoring/testing guidance and protected-test approvals. Once
 selected, a new blocker doesn't permit choosing another implementation. Preserve/reuse
@@ -235,10 +236,13 @@ existing branches/PRs; two-PR outcomes share acceptance, feedback timing, and co
 Confirm plan/assignment; new work enters Todo then In Progress, while resumed work keeps
 its lifecycle. Create Draft PRs with ticket links, behavior, approach, acceptance, and validation.
 
-For Draft-and-clarify, publish known questions before implementation; add the Draft PR link
-when available. Keep affected PRs Draft until substantive feedback is
-applied or **48 hours from original server publication** expire and documented safe defaults
-are used. Edits, reruns, and other PRs don't reset the window. Changed intended behavior/
+For Draft-and-clarify, publish participant questions in the initial implementation comment
+before implementation; edit it to add the Draft PR link when available. Keep affected PRs
+Draft until substantive feedback is applied or **48 hours from the questions' original ticket
+server publication** expire and documented safe defaults are used. User-directed questions
+go in this chat and require an answer or explicit direction before affected PRs become ready;
+chat silence doesn't start or satisfy that window. Safe Draft work may continue.
+Edits, reruns, and other PRs don't reset the window. Changed intended behavior/
 essential scope or unsafe unknowns still need approval before affected work; time never bypasses
 human Draft holds, ownership, relevance, prerequisites, permission, or tests.
 
@@ -262,6 +266,8 @@ Every run, including blocked/unchanged runs, reports:
   routine follow-up isn't automatically a user question. Keep parked prerequisites and
   speculative product questions in table notes. Repeat unanswered questions only while still
   consequential, labeled already asked with original links; never treat nonresponse as demand.
+  Include other proposed outreach with its intended audience and recommendation here, or in
+  Update/notes when no user decision is needed.
 - **Still in Play:** Every tracked open ticket passing the creator filter for the user or
   unresolved ownership/handoffs, including holds and open offers with their response deadlines.
 
@@ -291,8 +297,8 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
 
 ## Rules
 
-- Preserve the creator's original ticket description verbatim. Prefer comments for updates;
-  when description additions are needed, append them below a Markdown horizontal rule (`---`)
+- Preserve the creator's original ticket description verbatim. Use comments only as permitted
+  below. When description additions are needed, append them below a Markdown horizontal rule (`---`)
   and the heading **Added by <user mention>**, using the verified current user's native Linear
   mention. This section follows the creator's original description. Update only
   this workflow's clearly separated additions; preserve the original and other authors' content.
@@ -312,13 +318,16 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
   authorizes reassignment after silence; silence never approves implementation or scope changes.
   Completed approvals aren't standing instructions/eligibility exceptions. Don't duplicate external outreach/reminders, invent
   questions, or promise background follow-up.
-- Use the user's voice and [canonical writing guide](../../agents/writer.md#guide-location).
-  Comments: outcome/needed response, next action, at most 100 words. Direct requests/questions
-  to their recipients using verified native @-mentions in the form `@person: question`. Once decisions settle,
-  publish one cohesive plan covering action, rationale, needed input, and verification.
-  Reuse plans and preserve approval/discussion evidence; don't post each partial answer.
-  Significant questions, blockers, and delivery results may merit separate comments;
-  technical detail belongs in specifications/PRs, not workflow receipts/interview provenance.
+- Messages intended for the user belong in this chat, including approval requests.
+  Otherwise, ticket comments are limited to ownership assignments/handoffs and takeover
+  offers/completion; stale cancellation reasons and reopening invitations; the first
+  implementation update with the approach and known participant questions; and ready delivery.
+  Add a later Draft PR link by editing the initial implementation comment. Route other
+  proposed comments to the user here and await explicit instruction before publishing.
+  Use the user's voice and [canonical writing guide](../../agents/writer.md#guide-location).
+  Keep comments within 100 words, lead with important requests in bold, and address recipients
+  using verified native mentions: `@person: question`. Consolidate related information into
+  the applicable comment; technical detail belongs in specifications/PRs.
 - Keep settings/checkpoints private. Checkpoints at
   `~/.codex/private/linear-ticket-workflow-state/<verified-issue-uuid>.json` are caches, not
   authority (directory 0700/files 0600). Preserve sources, approval scope/completion,
