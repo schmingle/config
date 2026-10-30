@@ -55,6 +55,9 @@ flowchart TD
   and current sources. Inspect all recorded workers using compact status snapshots
   and targeted output; distinguish useful progress, drift, stalls, idle and unknown
   execution. Missing reports or uncertain ownership need resolution before overlap.
+  For each blocked or stalled lane, attempt authorized unblocks and prepare exact
+  human requests in Report even while other lanes progress. The global blocked
+  question governs project-wide waiting/pausing, not attention to individual blockers.
 - Establish readiness through [project-audit](../project-audit/SKILL.md) before
   activation/resume, worker creation or dispatch. Reuse applicable completed coverage
   less than one hour old when current evidence supports it; refresh at one hour or
@@ -63,6 +66,12 @@ flowchart TD
   Failed or incomplete coverage holds affected new dispatch and does not refresh
   its timestamp; completed coverage can support independent ready work. Age or a
   failed refresh alone does not interrupt useful, still-supported active work.
+  For a lengthy cold-start audit, first complete bounded readiness coverage for a
+  scoped read-only audit/preparation assignment: verify target, existing authority,
+  ownership, deliverable and supported isolated setup. Verify the actual worktree
+  before repository dispatch. Delegate from that limited completed coverage;
+  keep broader readiness unverified and implementation gated on its own completed,
+  current assessment. Limited preparation coverage does not refresh a full audit.
 - Use the approved criteria to ask whether the outcome appears complete. A finished
   batch, Done status or merged PR alone is insufficient. Perform the completion
   challenge only when warranted, rather than on every heartbeat.

@@ -23,6 +23,17 @@ other external actions require the applicable explicit authority.
 - **Readiness and alignment:** failed/incomplete coverage holds affected new dispatch
   without stopping supported active/independent work. Drift is corrected in drafts;
   user-owned plan changes stay proposals. Readiness age alone cannot resume a pause.
+- **Partial blockage:** one worker needs recovery or a user decision while another
+  progresses. Attempt the lane's authorized unblocks and prepare its exact request;
+  continue independent work and do not pause project-wide.
+- **Cold-start audit:** no full audit exists and evidence gathering is lengthy.
+  Complete limited target/authority/ownership/deliverable and supported-setup
+  readiness, verifying actual isolation before repository dispatch. Delegate only
+  read-only audit/preparation. Keep implementation gated and full-audit
+  freshness unchanged until its own assessment completes.
+- **Worker loop:** exercise delivery, corrections, a blocked-item skip and the next
+  ready item. Each transition verifies prior owned execution settled. Stop/deadline
+  from any stage goes to settlement/report; unknown execution prevents another ticket.
 - **Authority and delivery:** generic supervision makes no manual Linear writes;
   scoped user authority permits only the named writes with provenance/readback.
   Draft self-check precedes readiness; queue owns ready PRs. Preserve protected tests,
@@ -30,7 +41,8 @@ other external actions require the applicable explicit authority.
 - **Wait and stop:** monitor an identified active process despite unchanged checks.
   A Todo assignee alone is not active. User-only waits retain the first actionable
   ask time, stay active for one hour, and pause only after it expires with no other
-  useful work or active wait. Reminders do not reset the clock. An explicit stop
+  useful work or active wait. A partial answer closes only resolved requests; retain
+  the original time for unanswered decisions. Reminders do not reset the clock. An explicit stop
   takes precedence even during a Linear outage; verify controls and disclose each
   running/unknown execution without claiming settlement from a heartbeat pause.
 - **Unresolved recovery:** an infrastructure failure with no active recovery or

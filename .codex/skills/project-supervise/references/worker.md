@@ -20,42 +20,72 @@ The supervisor supplies:
 
 ## Flow
 
-1. **Accept Assignment.** Verify scope, approvals, project contract, tickets, applicable
-   repository guidance, current checkout/branch/PR and other owners' work. Before
-   repository work, verify this chat's dedicated managed Git worktree is separate
-   from the base/shared checkout and other workers. Hold unverified isolation for
-   supported handoff; preserve work and explicitly stopped assignments. Missing
-   scope, authority or consequential decisions hold affected work, not independent
-   approved work.
-2. **Execute.** Take the first ready item inside the shortlist and ownership envelope;
-   own one active ticket at a time. Continue through ready items until the deadline's
-   cleanup/report reserve. Respect milestone approval gates. Diagnose and resolve
-   routine blockers, bypass blocked paths for independent work, and distinguish
-   source dependencies from merge/deployment dependencies under repository stacking
-   rules. Inspect relevant pending changes before implementation. Shared contracts,
-   semantic/test regions, barrels, generated metadata, mocks, fixtures and runtime
-   resources require the assigned owner or serialized edits. Hold overlaps and report
-   the needed ownership decision rather than claiming another worker's files/tickets.
-3. **Deliver.** For approved discovery/planning, provide source-linked findings,
-   limits and concrete proposals here; preparation does not authorize implementation
-   or plan/ticket changes. For implementation, create a draft PR with ticket/dependency
-   links, implement and run meaningful local validation. Before marking ready,
-   check the implementation against ticket/project criteria and execution against
-   this worker contract. Correct in-scope deviations and disclose unresolved limits.
-   Only this author marks it ready; that hands ownership to the
-   existing queue for risk, review, findings, CI/conflict repair and merging. Report
-   subsequent problems rather than pushing competing changes. Continue other ready
-   work; source/PR delivery alone is not deployment, acceptance or project completion.
-4. **Settle and Report.** Before advancing to another ticket, settle owned execution
-   and helpers from the prior assignment. At deadline or explicit stop, start no
-   new work; use supported controls to stop/settle commands, helpers and writes and
-   inspect their states. A deadline, completed turn or heartbeat pause proves no
-   settlement. Report running/unknown work so later batches cannot overlap. On early
-   exhaustion, identify blocked/skipped paths, attempted unblocks and the next ready
-   step or exact input/refreshed shortlist needed. Keep the original deadline when steered.
-   Before the final report, check compliance with this contract using actual work,
-   validation, handoff and process state. Correct in-scope deviations while execution
-   remains authorized; report unresolved deviations or unknowns.
+Stop or deadline from any stage goes directly to Settle and Report.
+
+```mermaid
+flowchart TD
+    A["Accept Assignment"] --> B{"Next Ready Item and Time Remains?"}
+    A -->|Assignment cannot be accepted| F["Settle and Report"]
+    B -->|Yes| C["Execute or Unblock"]
+    B -->|No| F
+    C -->|Completed| D["Deliver"]
+    C -->|Blocked; try independent work| E["Settle Owned Execution"]
+    D -->|Corrections needed| C
+    D -->|Deliverable checked| E
+    E -->|Verified settled| B
+    E -->|Running or unknown| F
+    S["Stop or Deadline From Any Stage"] --> F
+```
+
+### Accept Assignment
+
+Read this contract and verify scope, approvals, project/tickets, repository guidance,
+checkout/branch/PR and other owners' work. Verify this chat's dedicated managed Git
+worktree is separate from shared checkouts and other workers. Hold unverified
+isolation for supported handoff; preserve existing work and stopped assignments.
+Missing scope, authority or consequential decisions hold affected work.
+
+### Select Next Item
+
+Take the first ready item in the shortlist and ownership envelope; own one active
+ticket at a time. Respect milestone gates and the deadline's cleanup/report reserve.
+Skip blocked paths for independent approved work; never claim another owner's files
+or tickets. If nothing is ready, report skipped paths, attempted unblocks and the
+exact input or refreshed shortlist needed.
+
+### Execute or Unblock
+
+Resolve routine blockers within scope. Distinguish source dependencies from required
+merge/deployment behavior under repository stacking rules; inspect relevant pending
+changes before implementation. Shared semantic/test regions, contracts, barrels,
+generated metadata, fixtures and runtime resources need an assigned owner or serialized
+edits. Hold overlaps and report the ownership decision. Keep the original deadline
+when steered. Before skipping blocked work, settle its owned execution.
+
+### Deliver
+
+For approved discovery/planning, provide source-linked findings, limits and proposals
+here; preparation grants no implementation or plan-change authority. For implementation,
+author a draft with ticket/dependency links and meaningful local validation. Before
+readying it, check implementation against ticket/project criteria and execution against
+this contract. Correct in-scope deviations while execution remains authorized; disclose
+unresolved limits. Only this author readies the PR, handing risk/reviews/findings/CI/
+conflict repair/merging to the queue. Report later problems instead of pushing competing
+changes. A source/PR deliverable alone proves no deployment or project acceptance.
+
+### Settle Owned Execution
+
+Verify the item's commands, helpers and writes have settled before selecting another
+ticket. Running or unknown execution prevents advancing to another ticket; report
+its state rather than treating a completed turn as proof of settlement.
+
+### Settle and Report
+
+At stop/deadline start no new work. Use supported controls to stop/settle owned
+commands, helpers and writes, then inspect actual states. A heartbeat pause or deadline
+proves no settlement. Check contract compliance against actual work, validation,
+handoff and process state; correct in-scope deviations only while execution remains
+authorized. Leave the Final Report below, including unresolved deviations and unknowns.
 
 ## Rules
 
