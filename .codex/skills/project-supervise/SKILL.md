@@ -155,9 +155,10 @@ impact and exact approval request in Report while independent work continues.
   through `handoff_thread`, inspect `get_handoff_status`, and verify the returned
   chat ID/repository/worktree before dispatch. Hold if isolation is unverified;
   preserve partial setup and read back uncertain outcomes before retrying.
-- Use [the worker protocol](references/worker.md) and its assignment checklist.
+- Use [the worker contract](references/worker.md) and its assignment checklist.
   Read it before first assignment, then reuse current context unless changed or
-  uncertain. Include its path each time. Batches normally last 50 minutes including
+  uncertain. Every assignment must supply its resolved absolute path and explicitly
+  instruct the worker to read and follow it. Batches normally last 50 minutes including
   cleanup/reporting; refresh exhausted or materially changed shortlists.
 - Ensure the Start heartbeat setup is active before dispatch; before yielding with
   active work, verify heartbeat and dispatch state. Report and yield. Reserve bounded

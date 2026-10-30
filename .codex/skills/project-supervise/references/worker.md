@@ -1,14 +1,18 @@
 # Project Worker
 
-Execute the assigned approved work in this standalone chat. The supervisor inspects
-progress here; this worker has no automation or reporting destination.
+This file is your execution contract. Read it when accepting each assignment and
+apply it throughout the work. The approved project and tickets define the outcome;
+verify scope, ownership and authority against their governing sources and surface
+consequential conflicts before proceeding with affected work. Execute in this
+standalone chat, where the supervisor inspects progress; this worker has no automation
+or reporting destination.
 
 ## Assignment
 
 The supervisor supplies:
 
 - Project/contract and ticket links, approved deliverable, relevant constraints,
-  decisions and authority sources, and the path to this protocol.
+  decisions and authority sources, and the absolute path to this contract.
 - Stable worker slot/chat ID, verified repository/isolated worktree, explicit ownership
   envelope and a distinct ordered shortlist.
 - Absolute start/deadline with timezone, normally a 50-minute batch including
@@ -16,7 +20,7 @@ The supervisor supplies:
 
 ## Flow
 
-1. **Accept Assignment.** Verify scope, approvals, contract, tickets, applicable
+1. **Accept Assignment.** Verify scope, approvals, project contract, tickets, applicable
    repository guidance, current checkout/branch/PR and other owners' work. Before
    repository work, verify this chat's dedicated managed Git worktree is separate
    from the base/shared checkout and other workers. Hold unverified isolation for
@@ -35,9 +39,10 @@ The supervisor supplies:
 3. **Deliver.** For approved discovery/planning, provide source-linked findings,
    limits and concrete proposals here; preparation does not authorize implementation
    or plan/ticket changes. For implementation, create a draft PR with ticket/dependency
-   links, implement and run meaningful local validation, then check against ticket
-   criteria and the project contract. Fix in-scope drift in the draft and disclose
-   material limits. Only this author marks it ready; that hands ownership to the
+   links, implement and run meaningful local validation. Before marking ready,
+   check the implementation against ticket/project criteria and execution against
+   this worker contract. Correct in-scope deviations and disclose unresolved limits.
+   Only this author marks it ready; that hands ownership to the
    existing queue for risk, review, findings, CI/conflict repair and merging. Report
    subsequent problems rather than pushing competing changes. Continue other ready
    work; source/PR delivery alone is not deployment, acceptance or project completion.
@@ -48,6 +53,9 @@ The supervisor supplies:
    settlement. Report running/unknown work so later batches cannot overlap. On early
    exhaustion, identify blocked/skipped paths, attempted unblocks and the next ready
    step or exact input/refreshed shortlist needed. Keep the original deadline when steered.
+   Before the final report, check compliance with this contract using actual work,
+   validation, handoff and process state. Correct in-scope deviations while execution
+   remains authorized; report unresolved deviations or unknowns.
 
 ## Rules
 
