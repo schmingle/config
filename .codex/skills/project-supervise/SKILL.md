@@ -51,6 +51,10 @@ flowchart TD
   worker selection and scoped dispatch/steering. Resolve project, repository and
   user direction; clarify ambiguity. Stale ticks cannot adopt supervision or
   resume paused/stopped work.
+- Once project execution is authorized, keep advancing that approved scope while
+  supervision is active. Batch completion does not expire execution authority.
+  An already-paused supervisor schedule requires user direction to resume under Pause;
+  existing stop, monitoring and self-pause rules still apply.
 - Apply stops before audits or Linear access. A project stop ceases dispatch and
   covers every owned worker/helper unless lane-scoped. Stop affected execution and
   pause the heartbeat through supported controls; inspect and report running/unknown
@@ -149,8 +153,10 @@ approval requested; continue independent work.
   after prior execution and helpers settle.
 - Assign distinct ordered shortlists, normally five tickets, exceeding expected
   batch capacity when available. Respect priorities, dependencies, ownership and
-  milestone review gates. Present gate evidence and await required plan/execution
-  approval; phase completion grants none.
+  milestone review gates. Refresh shortlists and dispatch successive batches within
+  standing execution authority without renewed permission. Obtain still-required
+  plan/execution approvals; phase completion neither expands authority nor creates
+  a new approval gate within already-authorized scope.
 - Check entire shortlists for collisions: shared semantic/test regions, queue-owned
   pending changes and runtime resources. Barrels, generated metadata, mocks and
   fixtures need one owner or serialized edits. Separate worktrees alone do not prove
@@ -224,10 +230,12 @@ request's full one-hour response window. Unknown status is not evidence of idlen
 Explicit stops still apply immediately, with unsettled execution disclosed.
 
 Record the reason, recovery owner/action and resume condition. A sufficient answer
-permits blocker-paused resumption once ready; explicit stops require later human
-resume/invocation. Pausing ends automatic recovery checks: explain that the user must
-return here or authorize a supported wakeup/answer relay. A written condition provides
-no wakeup; do not silently create another monitor.
+from the human resolving the blocker counts as direction to resume blocker-paused
+supervision once ready. Other pauses and explicit stops require later human
+resume/invocation; stale ticks cannot resume supervision. Pausing ends automatic
+recovery checks: explain that the user must return here or authorize a supported
+wakeup/answer relay. A written condition provides no wakeup; do not silently create
+another monitor.
 
 ### Report
 
@@ -291,7 +299,11 @@ inspect unknown execution next cycle rather than claiming settlement.
   explicit-only skills and external communications retain their owning permissions.
   Authorized project posts follow the [status update policy](../../AGENTS.md#project-status-updates).
 - Use actual supported tools and controls. A denial is not an invitation to change
-  transports. Report unsupported stop/pause actions and running/unknown work; do not
+  transports. For an authorization rejection, retrieve the existing human approval
+  and its scope; submit that evidence through supported review controls when available.
+  Retry only after addressing the rejection's stated concern. If still denied, report
+  the enforcement blocker and continue independent authorized work.
+  Report unsupported stop/pause actions and running/unknown work; do not
   invent continuation, cancellation, notification or timing guarantees.
 - Keep roster, cap, assignments/ownership, worktrees, PRs, deadlines, audit coverage,
   pending-request/idle times, queue-launch evidence, next checks and pause/stop state

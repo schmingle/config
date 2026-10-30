@@ -15,6 +15,9 @@ The supervisor supplies:
 - Project/contract/ticket links, deliverable, constraints, decisions, authority
   sources, known findings and verification time/version where available, and this
   contract's absolute path.
+- Original human execution authorization and retrievable source, separately from
+  exception/amendment approvals, with the items each covers. Narrower exception
+  approvals do not replace standing authority unless the human explicitly narrows it.
 - Assigned supervisor's stable chat ID and host, with a verified link for redirects.
 - Stable slot/chat ID, verified repository/isolated worktree, ownership envelope
   and distinct ordered shortlist.
