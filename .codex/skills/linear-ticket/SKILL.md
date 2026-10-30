@@ -89,7 +89,8 @@ Order assessment by human direction, native priority, impact, urgency, and meani
 activity. Replies, due feedback, and interrupted work matter; `updatedAt` alone doesn't.
 Lightly refresh unchanged holds and queued PRs. Reopen completed assessments only on relevant
 new evidence; finish incomplete promising assessments. Use remaining slots for new candidates.
-Label inventory-only checks Not assessed; new deep investigation still consumes a slot.
+Report inventory-only or deferred assessments as Skipped with the actual reason;
+new deep investigation still consumes a slot.
 
 ### Reconcile Ownership
 
@@ -281,10 +282,15 @@ uncertainty alone doesn't justify leaving a supported owner inferred.
 An explicit commitment outside the assignee field still uses the inferred-source qualifier.
 Otherwise show `Unassigned`, or `unknown` if the field/evidence wasn't verified. Don't add
 an Unassigned prefix or separate commitment labels; reporting an owner doesn't assign the ticket.
-Sort Action alphabetically with Not assessed last, then native status order and oldest creation
+Sort Action alphabetically with Skipped last, then native status order and oldest creation
 (unknown last; ID breaks ties). Link tickets/PR states/evidence. Action is this run's work:
-observed merges are Assessed; inventory-only is Not assessed. Notes give disposition
-and next owner/action. Use unknown for unverified facts, — for verified none.
+observed merges are Assessed; inventory-only or deferred assessments are Skipped.
+Notes explain why the ticket is included when unclear, what was checked/changed, and its
+disposition or next action. For Skipped, state the concrete reason: owner actively working,
+ownership not yet stale, unchanged prior disposition, exhausted budget, or unavailable evidence.
+Distinguish verified routing from incomplete assessment; skipped work remains pending where
+checks are unfinished. An assignee alone doesn't establish activity or staleness.
+Use unknown for unverified facts, — for verified none.
 Keep tracked work until verified closure, creator-filter exclusion, or explicit tracking release; reassignment isn't
 release. Label carried-forward findings/incomplete recovery. Unrelated candidates aren't
 permanent watchlists. Do not collect closed-ticket or other-owner inventories solely for
