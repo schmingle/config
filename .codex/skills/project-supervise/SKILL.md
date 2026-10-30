@@ -28,11 +28,15 @@ flowchart TD
     F -->|Resolved| G{"Is Progress Misaligned With the Plan?"}
     F -->|Only user input remains| T{"Still Blocked on User Input After One Hour?"}
     F -->|Verified active wait| I["Keep Monitoring"]
-    F -->|Recovery unresolved| R["Report"]
+    F -->|Recovery unresolved| N{"Idle Recovery for One Hour?"}
+    N -->|Yes; pause safeguards hold| P
+    N -->|Yes; a safeguard prevents pausing| R
+    N -->|No| R["Report"]
     E -->|No| G
 
     T -->|No| I
-    T -->|Yes, no other useful work or active wait| P
+    T -->|Yes; pause safeguards hold| P
+    T -->|Yes; a safeguard prevents pausing| R
     G -->|Yes| J["Steer Worker Back to the Approved Plan"]
     G -->|No| K["Keep Pushing Toward Completion"]
     J --> K
@@ -52,9 +56,11 @@ flowchart TD
   pause the heartbeat through supported controls; inspect and report running/unknown
   work. Pausing does not prove settlement.
 - Otherwise recover contract, tickets, PRs and roster from this chat/current sources.
-  Inspect every recorded worker with compact snapshots and targeted output for
-  progress, drift, stalls, idle or unknown execution. Resolve missing reports and
-  uncertain ownership before overlap. Attempt authorized unblocks for each blocked or
+  Inspect active or uncertain assignments with compact snapshots and targeted output.
+  Once the final report is captured and owned commands/helpers/writes are verified
+  settled, retain the roster entry without routine polling. Recheck before reuse or
+  on new activity, contradictory evidence or recovery need. Resolve missing reports
+  and uncertain ownership before overlap. Attempt authorized unblocks for each blocked or
   stalled lane and prepare exact human requests even while others progress. Global
   blockage controls project-wide waiting/pausing, not attention to individual lanes.
 - Establish readiness through [project-audit](../project-audit/SKILL.md) before
@@ -64,6 +70,9 @@ flowchart TD
   verdict and coverage. Failed/incomplete coverage holds affected new dispatch without
   refreshing its timestamp; completed coverage may support independent ready work.
   Age or failed refresh alone does not interrupt still-supported active work.
+  Between due audits, refresh records relevant to active work, dependencies, pending
+  decisions and dispatch. Reuse still-supported contract evidence; supported change
+  indicators or uncertainty determine expanded reads, not chat silence.
   For lengthy cold-start audits, complete limited readiness for read-only audit or
   preparation: verify target, authority, ownership, deliverable and supported isolated
   setup before creation, actual worktree before repository dispatch. Delegate only
@@ -74,10 +83,10 @@ flowchart TD
 
 Create, activate or resume the supervisor heartbeat only for eligible execution, scoped
 preparation,
-verified active waits or the user-input grace period. Reuse the supervisor heartbeat:
+verified active waits or the first-hour user-input/idle-recovery grace periods. Reuse the supervisor heartbeat:
 nominally every 15 minutes, `kind=heartbeat`, exact prompt `$project-supervise`, bound to
-this chat; workers have no automation. Completion needs no new automation. The user-input
-grace period permits monitoring, not unready execution. Run the first cycle immediately.
+this chat; workers have no automation. Completion needs no new automation. Grace periods
+permit monitoring, not unready execution. Run the first cycle immediately.
 Verify binding/state, preserve
 partial setup and inspect uncertain results before retrying. Pause known superseded
 heartbeats without exhaustive history searches; stale ticks cannot reclaim ownership.
@@ -118,9 +127,10 @@ reconciliation/reopening; change records only with scoped user authority.
   request.
 - Monitor identified active owners/processes or concrete pending events. An assignee
   or Todo/Backlog status alone establishes no active wait.
-- If recovery remains unresolved with no useful human intervention or verified active wait,
-  report recovery owner/action and uncertainty. Preserve authorized supervision
-  without inventing a wait or approval request.
+- When bounded recovery is exhausted without useful human intervention or a credible
+  active wait, report the recovery owner/action and uncertainty. Start the idle clock
+  only when no useful authorized work can proceed and no owned execution is running
+  or unknown. Follow the grace and Pause rules; never invent a wait or approval ask.
 
 ### Steer Worker Back to the Approved Plan
 
@@ -145,7 +155,9 @@ approval requested; continue independent work.
   pending changes and runtime resources. Barrels, generated metadata, mocks and
   fixtures need one owner or serialized edits. Separate worktrees alone do not prove
   independence. Hold only collisions.
-- Bind stable roster slots to chat IDs. Titles are labels: `WORKER: <supervisor title>`
+- Bind each assignment to this supervisor's stable chat ID and host; verified user
+  direction can reassign that binding. Include it in every worker handoff. Bind stable
+  roster slots to worker chat IDs. Titles are labels: `WORKER: <supervisor title>`
   for one, or `WORKER 1: <supervisor title>`, etc. Inspect recorded IDs first; reuse
   verified compatible unbound workers or create eligible missing slots. Preserve
   active batches, deadlines and concurrent work. Resolve ownership ambiguity rather than
@@ -169,6 +181,23 @@ approval requested; continue independent work.
   handoff's owner, action, evidence and needed approval. Dispatch only useful work;
   create no workers merely to wait.
 
+Off hours, the user authorizes a separate queue chat when project-ready PRs have
+materially new actionable work or a verified unblock. Resolve the repository's saved,
+user-approved queue automation and current bounded invocation; use its timezone/window
+and parameters, not remembered defaults. If authority or target is unclear, report it.
+This is the normal repository-wide queue, including the user's other eligible PRs.
+Respect current user queue stops and scoped holds; a fresh chat resets no authority.
+
+Before launch, inspect recent native chats for an active same-repository queue run;
+link/monitor it rather than adding another prompt. Resolve inspection errors or hold.
+Otherwise use the native isolated setup above to create a fresh queue chat with
+the approved invocation; require it to verify its repository/worktree before work.
+Retain all queue risk/review/ownership/merge safeguards.
+Record the returned ID and triggering PR revisions/result here; reconcile uncertain
+creation before retrying. Admission is best effort, not an atomic lock. Do not
+relaunch unchanged held work each tick, commandeer project workers, or change the
+queue automation, schedule or limits. The queue remains responsible for its pipeline.
+
 ### Keep Monitoring
 
 Start each user-only blocker's clock at its first actionable Report request; recover
@@ -176,22 +205,29 @@ that timestamp later. Monitor until unresolved for over one hour. Repeats, parti
 or unrelated answers do not reset unresolved asks; sufficient answers resolve them.
 Continue independent work and verified active waits regardless of this timer.
 
+For nonhuman recovery, retain the first report establishing exhausted bounded
+recovery and continuous idleness. Repeated checks, failures or rewritten reports do
+not reset it. Useful work, a credible active wait, or running/unknown owned execution
+ends idle eligibility; start a new idle period only when those conditions clear.
+
 Monitor verified processes that can unblock work; investigate stalls. Do not pause solely
 because checks remain unchanged. Monitoring handoffs need an identified owner and
 verified supported resolution-detection mechanism.
 
 ### Pause
 
-Pause and verify the heartbeat for verified completion, explicit project stop, or
-user-only blockage over one hour when no useful work can proceed and no verified
-active wait remains. Stops
-apply immediately. Other blockers require recovery and an owner/action report, not
-invented waits.
+Pause and verify the heartbeat after verified completion or an explicit project
+stop (immediate), or after over one hour of user-only blockage or exhausted nonhuman
+idle recovery. Automatic idle pausing requires no useful work can proceed, no credible
+active wait and no running/unknown owned execution. Preserve every outstanding human
+request's full one-hour response window. Unknown status is not evidence of idleness.
+Explicit stops still apply immediately, with unsettled execution disclosed.
 
-Record the reason and resume condition. A sufficient answer permits blocker-paused resumption
-once ready; explicit stops require later human resume/invocation. Written conditions
-provide no wakeup: explain when the user must return here or authorize an answer
-relay from another chat.
+Record the reason, recovery owner/action and resume condition. A sufficient answer
+permits blocker-paused resumption once ready; explicit stops require later human
+resume/invocation. Pausing ends automatic recovery checks: explain that the user must
+return here or authorize a supported wakeup/answer relay. A written condition provides
+no wakeup; do not silently create another monitor.
 
 ### Report
 
@@ -258,7 +294,8 @@ inspect unknown execution next cycle rather than claiming settlement.
   transports. Report unsupported stop/pause actions and running/unknown work; do not
   invent continuation, cancellation, notification or timing guarantees.
 - Keep roster, cap, assignments/ownership, worktrees, PRs, deadlines, audit coverage,
-  pending-request times, next checks and pause/stop state in chat/native records.
+  pending-request/idle times, queue-launch evidence, next checks and pause/stop state
+  in chat/native records.
   Linear holds the approved plan and durable work evidence. Keep no local registry,
   memory, marker or project-management mirror; leave legacy coordination documents
   unchanged. Do not delete automations or archive chats as routine cleanup.
