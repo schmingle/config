@@ -68,7 +68,7 @@ class EntrypointRuntimeTests(unittest.TestCase):
                                'approvals': [], 'sources': [], 'verification': [], 'owned_paths': []})
             runner.dump(self.root / 'report.json', {'summary': 'Complete', 'complete': True,
                                                    'changes': [], 'verification': [], 'gaps': []})
-            return ['--assignment', str(task), '--checkout', str(self.checkout),
+            return ['--role', 'port-to-claude', '--assignment', str(task), '--checkout', str(self.checkout),
                     '--output', str(self.output), '--finish-by', self.deadline, '--max-turns', '7']
         self.git('init', '-q', '-b', 'main')
         self.git('-c', 'user.name=Developer', '-c', 'user.email=developer@example.invalid',

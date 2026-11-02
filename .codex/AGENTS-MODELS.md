@@ -78,7 +78,26 @@ supervision, and exact effort choices generally have weak comparative support.
 Use **GPT-6.1 Sol at medium** when classification or evidence is insufficient to
 justify another recommendation, subject to explicit requests and workflow settings.
 
-## Layer 2: approved PR reviewer mapping
+## Layer 2: approved agent mappings
+
+### Generic delegates
+
+| Agent | Model / effort | Routing |
+| --- | --- | --- |
+| `delegate-low` | GPT-6.1 Terra / medium | Mechanical work with a prescribed method and cheap verification. |
+| `delegate-medium` | GPT-6.1 Terra / xhigh | Bounded implementation, debugging, refactoring, and investigation within established patterns. |
+| `delegate-high` | GPT-6.1 Sol / xhigh | Difficult engineering, deep investigation, or consequential implementation. |
+| `delegate-xhigh` | GPT-6.1 Sol / max | Substantial design decisions, ambiguous investigations, independent critiques, or sensitive or critical work. |
+
+This generic ladder is an explicit user-approved default exception to Layer 1's
+nature-of-work rows. It does not rewrite those advisory recommendations or require
+a lower-tier attempt before selecting the appropriate role. All four roles execute
+natively in Codex; Claude counterparts forward to the canonical Codex role. Role
+descriptions retain routing boundaries, including dedicated PR specialists for
+review and queue repair. These defaults are approved preferences, not benchmark
+findings.
+
+### PR reviewers
 
 | Agent | Work type | Default task level | Model / effort | Routing |
 | --- | --- | --- | --- | --- |
@@ -97,8 +116,9 @@ demand, not a second coordinator risk route. Children supply analysis only; the
 primary validates, integrates, and deduplicates it into the single final review.
 These specialists are Codex-only and use native collaboration, with no nested CLI
 launcher fallback. Their approved PR-specific settings are an explicit exception
-to Layer 1's general-review row, rather than a remapping of that row. Other agents
-and common-task mappings remain unapproved proposals.
+to Layer 1's general-review row, rather than a remapping of that row. Other agent
+and common-task mappings remain unapproved proposals unless explicitly approved
+above.
 
 The review budget policy is $3 total model spend per review attempt, including
 reviewer subagents. Published average costs inform model selection but do not

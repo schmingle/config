@@ -1,7 +1,7 @@
 name = "delegate-low"
 description = "Use for mechanical work with a prescribed goal and method, little interpretation, and cheap verification. Examples include extraction, inventories, explicit repetitive edits, and running specified checks. Use delegate-medium when repository context requires routine adaptations or choices beyond the prescribed method."
-model = "gpt-6-luna"
-model_reasoning_effort = "high"
+model = "gpt-6.1-terra"
+model_reasoning_effort = "medium"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.

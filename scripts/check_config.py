@@ -172,9 +172,11 @@ def validate():
     check(isinstance(profile['allowed_tools'], list) and 'Bash' in profile['allowed_tools']
           and all(isinstance(tool, str) for tool in profile['allowed_tools']),
           'Claude profile needs a tool list with trusted shell access')
-    for name in ('delegate-xhigh',):
-        check('claude-review.toml' in agents[name]['developer_instructions'],
-              name + ': Claude wrapper must reference the shared execution profile')
+    for name in ('delegate-low', 'delegate-medium', 'delegate-high', 'delegate-xhigh'):
+        check(capabilities(name)['provider'] == 'codex', name + ': generic delegates execute natively')
+        check('claude-review.toml' not in agents[name]['developer_instructions']
+              and 'delegate-claude.md' not in agents[name]['developer_instructions'],
+              name + ': native delegate must not invoke a Claude wrapper')
     print(f'Validated {len(agents)} Codex agents, {len(claude_agents)} Claude agents, {skill_count} skills, YAML/TOML, Python, local links, and public-file checks.')
 
 

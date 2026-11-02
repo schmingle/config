@@ -71,11 +71,29 @@ else:
 
 
 class RoleSettingsTests(unittest.TestCase):
-    def test_claude_role_efforts(self):
-        for role, expected in (("delegate-xhigh", "high"), ("port-to-claude", "medium")):
+    def test_porter_retains_claude_profile_effort(self):
+        settings = launcher.role_settings(launcher.AGENTS, "port-to-claude")
+        self.assertEqual(agent_claude.execution(settings)["effort"], "medium")
+
+    def test_generic_delegate_ladder_uses_canonical_native_settings(self):
+        for role, model, effort in (
+                ('delegate-low', 'gpt-6.1-terra', 'medium'),
+                ('delegate-medium', 'gpt-6.1-terra', 'xhigh'),
+                ('delegate-high', 'gpt-6.1-sol', 'xhigh'),
+                ('delegate-xhigh', 'gpt-6.1-sol', 'max')):
             with self.subTest(role=role):
+                self.assertIn(role, launcher.NATIVE_ROLES)
+                self.assertNotIn(role, launcher.CLAUDE_ROLES)
                 settings = launcher.role_settings(launcher.AGENTS, role)
-                self.assertEqual(agent_claude.execution(settings)["effort"], expected)
+                self.assertEqual(settings['model'], model)
+                self.assertEqual(settings['model_reasoning_effort'], effort)
+                self.assertNotIn('delegate-claude.md', settings['developer_instructions'])
+                self.assertNotIn('claude-review.toml', settings['developer_instructions'])
+                self.assertEqual(launcher.capabilities(role), launcher.capabilities('delegate-high'))
+        high = launcher.role_settings(launcher.AGENTS, 'delegate-high')['developer_instructions']
+        self.assertEqual(launcher.role_settings(launcher.AGENTS, 'delegate-xhigh')['developer_instructions'], high)
+        profile = tomllib.loads(launcher.shared.PROFILE.read_text())
+        self.assertNotIn('delegate-xhigh', profile['role_efforts'])
 
     def test_review_tiers_use_canonical_native_settings_and_shared_contract(self):
         for role, effort in (('pr-review', 'high'), ('pr-review-high', 'max')):
@@ -245,7 +263,7 @@ class SharedLauncherTests(unittest.TestCase):
 
     def test_both_providers_preserve_incomplete_report_as_incomplete(self):
         self.env['MODE'] = 'incomplete'
-        for role in ('delegate-low', 'delegate-xhigh'):
+        for role in ('delegate-low', 'port-to-claude'):
             self.output = self.root / role
             result = self.run_role(role)
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -285,7 +303,7 @@ class SharedLauncherTests(unittest.TestCase):
     def test_both_providers_can_use_a_directory_without_a_git_repository(self):
         self.checkout = self.root / 'research'
         self.checkout.mkdir()
-        for role in ('delegate-low', 'delegate-xhigh'):
+        for role in ('delegate-low', 'port-to-claude'):
             with self.subTest(role=role):
                 self.output = self.root / role
                 result = self.run_role(role)
@@ -310,9 +328,9 @@ class SharedLauncherTests(unittest.TestCase):
         self.assertIn('task-system.md', command[command.index('--append-system-prompt-file') + 1])
 
     def test_provider_failures_and_missing_or_invalid_reports_fail_closed(self):
-        for role in ('delegate-low', 'delegate-xhigh'):
+        for role in ('delegate-low', 'port-to-claude'):
             modes = ['error', 'missing-report', 'invalid']
-            if role == 'delegate-xhigh':
+            if role == 'port-to-claude':
                 modes += ['wrong-model', 'no-transcript']
             for mode in modes:
                 with self.subTest(role=role, mode=mode):
@@ -326,7 +344,7 @@ class SharedLauncherTests(unittest.TestCase):
 
     def test_both_provider_auth_failures_prevent_executor_launch_and_save_final_state(self):
         self.env['AUTH_FAILURE'] = '1'
-        for role in ('delegate-low', 'delegate-xhigh'):
+        for role in ('delegate-low', 'port-to-claude'):
             self.output = self.root / role
             result = self.run_role(role)
             self.assertNotEqual(result.returncode, 0)
@@ -348,7 +366,7 @@ class SharedLauncherTests(unittest.TestCase):
 
     def test_inherited_recursion_guard_blocks_both_providers_before_artifacts(self):
         self.env[launcher.ACTIVE] = '1'
-        for role in ('delegate-low', 'delegate-xhigh'):
+        for role in ('delegate-low', 'port-to-claude'):
             result = self.run_role(role)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('Nested agent launch refused', result.stderr)
@@ -357,7 +375,7 @@ class SharedLauncherTests(unittest.TestCase):
 
     def test_child_cannot_reenter_shared_launcher(self):
         self.env['MODE'] = 'nested'
-        self.env['NESTED_ARGS'] = json.dumps(self.args('delegate-xhigh'))
+        self.env['NESTED_ARGS'] = json.dumps(self.args('port-to-claude'))
         result = self.run_role()
         self.assertEqual(result.returncode, 0, result.stderr)
         nested = launcher.shared.load(self.root / 'nested.json')
@@ -404,7 +422,7 @@ class SharedLauncherTests(unittest.TestCase):
         self.assertEqual(self.calls(), [])
 
     def test_both_provider_dry_runs_prepare_without_cli_calls(self):
-        for role in ('delegate-low', 'delegate-xhigh'):
+        for role in ('delegate-low', 'port-to-claude'):
             with self.subTest(role=role):
                 self.output = self.root / role
                 result = self.run_role(role, extra=('--dry-run',))
@@ -523,7 +541,7 @@ class SharedLauncherTests(unittest.TestCase):
         self.data['approvals'] = ['Commit and push the verified assigned change']
         self.data['constraints'] = ['No merge or deploy']
         self.write_task()
-        for role in ('delegate-low', 'delegate-medium', 'delegate-high', 'pr-resolve', 'pr-update', 'writer'):
+        for role in ('delegate-low', 'delegate-medium', 'delegate-high', 'delegate-xhigh', 'pr-resolve', 'pr-update', 'writer'):
             with self.subTest(role=role):
                 self.output = self.root / role
                 result = self.run_role(role, extra=('--sandbox', 'workspace-write'))
@@ -544,7 +562,7 @@ class SharedLauncherTests(unittest.TestCase):
 
     def test_both_provider_timeouts_settle_descendants(self):
         self.env['MODE'] = 'timeout'
-        for role in ('delegate-low', 'delegate-xhigh'):
+        for role in ('delegate-low', 'port-to-claude'):
             self.output = self.root / role
             result = self.run_role(role, seconds=11)
             self.assertNotEqual(result.returncode, 0)

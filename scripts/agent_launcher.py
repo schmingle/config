@@ -45,8 +45,8 @@ ROLE_CAPABILITIES = {
                      'requires_network_reads': False, 'approval_policy': 'never', 'external_actions': 'none'},
     'writer': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': True,
                'requires_network_reads': False, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
-    'delegate-xhigh': {'provider': 'claude', 'default_sandbox': 'read-only', 'source_writes': True,
-                       'requires_network_reads': False, 'approval_policy': 'provider-native', 'external_actions': 'task-authorized'},
+    'delegate-xhigh': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': True,
+                       'requires_network_reads': False, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
     'port-to-claude': {'provider': 'claude', 'default_sandbox': 'read-only', 'source_writes': False,
                       'requires_network_reads': False, 'approval_policy': 'provider-native', 'external_actions': 'none'},
 }

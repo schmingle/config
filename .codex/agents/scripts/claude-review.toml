@@ -7,5 +7,4 @@ effort = "medium"
 allowed_tools = ["Bash", "Read", "Glob", "Grep", "Edit", "Write", "ToolSearch", "WebFetch", "WebSearch", "mcp__claude_ai_Linear__get_issue", "mcp__claude_ai_Linear__list_comments", "mcp__claude_ai_Linear__get_user", "mcp__claude_ai_Linear__list_teams", "mcp__claude_ai_Linear__get_document", "mcp__claude_ai_Linear__get_project"]
 
 [role_efforts]
-delegate-xhigh = "high"
 claude-review = "high"

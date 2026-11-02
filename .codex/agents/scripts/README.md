@@ -3,9 +3,10 @@
 [The shared role launcher](../../../scripts/agent-launch.md) is the provider-neutral entry point for general assignments from either provider. It owns assignment handling, role dispatch, deadlines, execution records, and provider adapters. [The existing runtime](claude_runner.py) supplies process settlement and Claude-specific helpers to it and to specialized reviews. [The Claude handoff](../claude.md) defines provider-specific requirements.
 
 - General tasks: use the shared launcher with the assigned role. [claude_delegate.py](claude_delegate.py) remains a compatibility entry point, following
-  [the task handoff](../delegate-claude.md). It permits assigned source changes and
-  verification in the existing checkout, saves initial/final state, and has no
-  PR/risk/Linear requirement.
+  the canonical role even when its executor is Codex. Claude-backed roles follow
+  [the task handoff](../delegate-claude.md). The launcher permits assigned source
+  changes only for writable roles, records verification and initial/final checkout
+  state, and has no PR/risk/Linear requirement.
 - Explicit Claude review trials: [claude_review.py](claude_review.py), following
   [the review handoff](../pr-review-claude.md). It retains clean pinned snapshots,
   risk reports, required Linear reads, review output, and bounded recovery.
