@@ -174,11 +174,21 @@ approval requested; continue independent work.
   pending changes and runtime resources. Barrels, generated metadata, mocks and
   fixtures need one owner or serialized edits. Separate worktrees alone do not prove
   independence. Hold only collisions.
+- For future implementation assignments, prefer [coding-low](../../agents/coding-low.toml)
+  for prescribed edits, codemods and deterministic regeneration; [coding-medium](../../agents/coding-medium.toml)
+  for bounded judgment within established contracts; and [coding-high](../../agents/coding-high.toml)
+  for ambiguous contracts, difficult diagnosis, concurrency, migrations or recovery. Select
+  directly; no lower-tier attempt is required, and diff size alone does not determine the tier.
+  Generic delegates and explorers remain available for noncoding work; dedicated PR specialists
+  retain their roles. Agent descriptions are the routing authority.
 - Bind roster slots to stable subagent IDs and the verified parent/supervisor chat identity.
-  Use `spawn_agent` with `fork_turns="none"` and a compact assignment; reuse the same
-  worker with `followup_task` and steer with `send_message`. Inspect recorded agents
-  before spawning; a completed turn may mean blocked, not completed work. Missing IDs,
-  reports or uncertain execution require recovery before replacement or overlapping dispatch.
+  Use `spawn_agent` with `fork_turns="none"` and a compact assignment; reuse a settled worker
+  with `followup_task` when its role fits, and steer with `send_message`. At a safe completed
+  assignment boundary, if another role is warranted, settle helpers and verify the worktree and
+  PR handoff, preserving ownership and partial work before selecting a fresh worker. Do not
+  interrupt or reconfigure active workers or change current assignments for this routing.
+  Inspect recorded agents before spawning; a completed turn may mean blocked, not completed work.
+  Missing IDs, reports or uncertain execution require recovery before replacement or overlapping dispatch.
 - Verify a dedicated managed Git worktree for each repository execution slot. Reuse a
   suitable settled checkout or create one through supported `create_worktree` controls
   from the verified repository/ref; pass its absolute path to the subagent and verify
