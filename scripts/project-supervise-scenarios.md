@@ -83,7 +83,11 @@ other external actions require the applicable explicit authority.
   One valid non-author challenge suffices until coverage is invalidated. Completion
   yields an own-chat summary; it neither posts to Linear nor automatically asks to.
 - **Busy, steering and detach:** bounded waits keep useful coordination active without
-  redundant polls. Ordinary questions/steering preserve unaffected execution and deadlines.
+  redundant polls. An unchanged timeout re-enters waiting; service/status checks occur
+  for due checkpoints, suspected stalls, conflicting evidence or decisions. Worker
+  checkpoints carry expected times; routine progress is batched, actionable escalations
+  prompt, and required readiness/deadline checks retained. Ordinary questions/steering
+  preserve unaffected execution and deadlines.
   Explicit detach reconciles a pending parent operation, records IDs and pending asks,
   reports and yields without stopping subagents or pausing the heartbeat. It requires
   no worker settlement. Detach expires with that turn: the next heartbeat/user turn

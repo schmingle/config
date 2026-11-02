@@ -190,8 +190,12 @@ approval requested; continue independent work.
   Batches normally last 50 minutes including cleanup/reporting. Refresh exhausted or
   materially changed shortlists.
 - Verify the Start heartbeat and dispatch state. While work or a concrete event can
-  advance, coordinate through bounded native waits/status checks, process messages
-  promptly at supported boundaries, and report material changes without repetitive polls.
+  advance, stay attached using bounded, interruptible native waits across workers where
+  supported. A timeout alone calls for another wait, not fresh service reads, worker
+  messages or commentary. Check when a checkpoint/check is due, execution may be stalled,
+  evidence conflicts or a decision needs it; preserve deadline and readiness checks.
+  Send workers concrete steering or questions when needed; request status only when
+  current evidence is insufficient. Process actionable messages promptly.
   Ordinary steering changes only its stated scope; preserve unaffected execution/deadlines.
   Prepare the next handoff and dispatch useful work without routine batch approvals.
   Runtime subagent capacity is separate from the approved project assignment cap.
@@ -268,7 +272,9 @@ another monitor.
 
 ### Report
 
-Report meaningful changes and actionable escalations here during coordination. Finish
+Surface actionable blockers, decisions and material failures promptly; batch routine
+progress across workers rather than paraphrasing each worker update. Keep unchanged
+status quiet and answer user status requests from current evidence. Finish
 with a self-contained report on detach, completion, stop/pause or no useful execution/wait,
 including blocked or unverifiable state. Distinguish authored, merged, deployed and accepted
 work. Retain unresolved requests until evidence resolves them; uncertainty stays unknown.
