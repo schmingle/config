@@ -70,6 +70,13 @@ At the start of each task, read `~/.codex/AGENTS-PRIVATE.md` if present and appl
 
 For collaboration services such as Gmail, Google Drive, Google Calendar, Linear, Slack, Asana, Notion, and Fathom, prefer a suitable connected plugin or MCP tool for both work and personal activity, using the matching account and workspace. Use browser control when that connection or the required operation is unavailable. For engineering services such as GitHub (`gh`), Sentry (`sentry-cli`), AWS (`aws`), Heroku (`heroku`), and 1Password (`op`), prefer an installed CLI, then a connected plugin or MCP tool, then a browser. Follow an explicit tool request or a workflow's required tool when specified.
 
+For authenticated browser work, use the user's matching Chrome work or personal profile.
+Inspect available browser profiles and tabs first, verify the intended account, and reuse
+its existing signed-in session. Before requesting sign-in, verify that the correct Chrome
+profile's session actually needs it. Do not ask the user to sign in to a sandboxed or
+built-in browser; if the intended Chrome profile is unavailable, report that access issue.
+Use isolated browsers for work that does not require the user's authenticated session.
+
 When a CLI is preferred, check whether a suitable CLI is available before falling back. If the service has a CLI that is not installed, suggest installing it and explain the practical benefit. Use the next available interface to finish the current task when it can do so safely; do not silently install a CLI just to satisfy this preference.
 
 When using a CLI, check availability, authentication, and the intended target in the tool-run shell. Reuse verified identity evidence from the current task while the tool-shell authentication context remains unchanged; prefer available authentication metadata and make a live identity API call only when needed to resolve uncertainty or fulfill the task. Authentication in the app terminal, another shell, or a plugin does not establish authentication in this shell. Distinguish a missing executable, signed-out account, sandbox or network denial, and service authorization failure from their actual error messages.
