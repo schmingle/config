@@ -86,7 +86,10 @@ other external actions require the applicable explicit authority.
   redundant polls. Ordinary questions/steering preserve unaffected execution and deadlines.
   Explicit detach reconciles a pending parent operation, records IDs and pending asks,
   reports and yields without stopping subagents or pausing the heartbeat. It requires
-  no worker settlement. Explicit stop still reaches owned execution and verifies state.
+  no worker settlement. Detach expires with that turn: the next heartbeat/user turn
+  resumes busy coordination unless stopped/paused, and reports then keeps waiting while
+  useful execution or a credible event can advance. Explicit stop still reaches owned
+  execution and verifies state.
 - **Escalation and resumption:** worker sends decisions promptly, retains them in its
   result and holds affected work. Parent captures requests before reuse and relays exact
   answers to the same agent. Idle-parent wakeup is not assumed; next heartbeat/user status

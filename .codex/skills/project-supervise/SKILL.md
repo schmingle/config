@@ -243,8 +243,11 @@ operation, capture agent IDs/status, assignments, deadlines and pending requests
 briefly Report and end the turn without waiting for workers to finish. Leave work/subagents,
 scope, deadlines, timers and the existing heartbeat unchanged. This is neither stop nor
 pause and does not require worker settlement. A pending parent tool may delay yielding;
-detach is an instruction convention, not a native client command. A later user turn or
-heartbeat resumes coordination under existing authority unless stopped/paused.
+detach is an instruction convention, not a native client command. Detach applies only
+to the current turn and expires when it ends; never carry it forward as a persistent mode.
+Each later user turn or heartbeat resumes busy coordination under existing authority
+unless stopped/paused. After reporting, continue bounded waits while useful execution or
+a credible event can advance; a heartbeat report alone is not a reason to yield.
 
 ### Pause
 
