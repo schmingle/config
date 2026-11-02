@@ -87,6 +87,8 @@ class RoleSettingsTests(unittest.TestCase):
                 self.assertEqual(settings['model_reasoning_effort'], effort)
                 self.assertIn('~/.codex/agents/pr-review.md', settings['developer_instructions'])
                 self.assertIn('reviewer_attribution.py ' + role, settings['developer_instructions'])
+                self.assertEqual(agent_codex.execution(settings)['attribution'],
+                                 'Reviewed by GPT-6.1 Sol ' + effort + '.')
                 self.assertEqual(launcher.capabilities(role), launcher.capabilities('pr-review'))
 
     def test_explicit_claude_review_trial_keeps_its_execution_profile(self):
@@ -94,19 +96,40 @@ class RoleSettingsTests(unittest.TestCase):
         self.assertEqual(profile['effort'], 'high')
         self.assertNotIn('pr-review-high', tomllib.loads(launcher.shared.PROFILE.read_text())['role_efforts'])
 
+    def test_approach_roles_are_native_analysis_only_with_independent_tiers(self):
+        self.assertEqual(set(launcher.CODEX_ONLY_ROLES), {'pr-review-approach', 'pr-review-approach-high'})
+        for role, effort in (('pr-review-approach', 'high'), ('pr-review-approach-high', 'max')):
+            with self.subTest(role=role):
+                settings = launcher.role_settings(launcher.AGENTS, role)
+                self.assertEqual(settings['model'], 'gpt-6.1-sol')
+                self.assertEqual(settings['model_reasoning_effort'], effort)
+                self.assertIn('~/.codex/agents/pr-review-approach.md', settings['developer_instructions'])
+                self.assertIn('~/.codex/agents/pr-review.md', settings['developer_instructions'])
+                self.assertIn('reviewer_attribution.py ' + role, settings['developer_instructions'])
+                self.assertEqual(agent_codex.execution(settings)['attribution'],
+                                 'Approach analysis by GPT-6.1 Sol ' + effort + '.')
+                limits = launcher.capabilities(role)
+                self.assertEqual(limits['provider'], 'codex')
+                self.assertEqual(limits['default_sandbox'], 'read-only')
+                self.assertFalse(limits['source_writes'])
+                self.assertEqual(limits['external_actions'], 'none')
+                self.assertTrue(limits['requires_network_reads'])
+
     def test_public_counterparts_preserve_wrapper_and_executor_settings(self):
         roles = {path.stem for path in launcher.AGENTS.glob('*.toml')}
         counterparts = {path.stem for path in (ROOT / '.claude/agents').glob('*.md')}
-        self.assertEqual(roles, counterparts)
+        self.assertEqual(roles - set(launcher.CODEX_ONLY_ROLES), counterparts)
         profile = launcher.shared.execution_profile()
         for role in roles:
             with self.subTest(role=role):
-                text = (ROOT / '.claude/agents' / (role + '.md')).read_text()
+                text = ((ROOT / '.claude/agents' / (role + '.md')).read_text()
+                        if role not in launcher.CODEX_ONLY_ROLES else '')
                 fields = dict(re.findall(r'^(model|effort): (.+)$', text, re.MULTILINE))
                 settings = launcher.role_settings(launcher.AGENTS, role)
                 if role in launcher.NATIVE_ROLES:
-                    self.assertEqual(fields, {'model': 'haiku', 'effort': 'low'})
-                    self.assertIn('--role ' + role, text)
+                    if role not in launcher.CODEX_ONLY_ROLES:
+                        self.assertEqual(fields, {'model': 'haiku', 'effort': 'low'})
+                        self.assertIn('--role ' + role, text)
                     execution = agent_codex.execution(settings)
                     instructions = agent_codex.instructions(settings, role, launcher.executor_rules(role))
                     command = agent_codex.launch_args('codex', Path('/checkout'), Path('/private-output'),
@@ -417,7 +440,7 @@ class SharedLauncherTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('owned_paths', result.stderr)
             self.assertFalse(self.output.exists())
-        for role in ('pr-risk', 'port-to-claude', 'review-skill'):
+        for role in ('pr-risk', 'port-to-claude', 'review-skill', *launcher.CODEX_ONLY_ROLES):
             limits = launcher.capabilities(role)
             self.assertFalse(limits['source_writes'])
             self.assertEqual(limits['external_actions'], 'none')

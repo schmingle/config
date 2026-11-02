@@ -35,6 +35,10 @@ ROLE_CAPABILITIES = {
                   'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'comment-review'},
     'pr-review-high': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                        'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'comment-review'},
+    'pr-review-approach': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
+                           'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
+    'pr-review-approach-high': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
+                                'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
     'pr-risk': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                 'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
     'review-skill': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
@@ -46,6 +50,8 @@ ROLE_CAPABILITIES = {
     'port-to-claude': {'provider': 'claude', 'default_sandbox': 'read-only', 'source_writes': False,
                       'requires_network_reads': False, 'approval_policy': 'provider-native', 'external_actions': 'none'},
 }
+# Native queue specialists have no Claude orchestration counterparts.
+CODEX_ONLY_ROLES = ('pr-review-approach', 'pr-review-approach-high')
 NATIVE_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if limits['provider'] == 'codex')
 CLAUDE_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if limits['provider'] == 'claude')
 READ_ONLY_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if not limits['source_writes'])

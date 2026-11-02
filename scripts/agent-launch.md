@@ -53,6 +53,9 @@ network research by generic delegates.
   only. They reject writable filesystem requests and permit no external writes.
   `pr-risk` requires live evidence and can request approval for scoped network
   reads.
+- `pr-review-approach` and `pr-review-approach-high` are Codex-only, read-only
+  analysis roles with no external writes or further delegation. Their normal queue
+  entrypoint is a native child of a primary reviewer, not a Claude wrapper.
 
 Native roles that require network reads, can edit, or can perform a scoped external action use
 `approval_policy="on-request"` with `approvals_reviewer="auto_review"`. This allows
@@ -98,6 +101,10 @@ adapters handle their own CLI arguments, authentication, and output formats.
 Neither wrappers nor executors spawn further agents. Recursive launcher calls are
 rejected; executors perform their assigned work directly. Never substitute a
 provider, model, effort, or native replacement for the assigned executor.
+The primary review guide's optional Approach delegation applies only when running
+through native collaboration tools. This launcher keeps native delegation disabled;
+it provides no nested specialist path. A launcher-driven primary retains baseline
+Approach responsibility and returns Incomplete for any material unresolved gap.
 
 Use one owned session at a time and reserve cleanup time. Verify its process group
 is settled before another session or checkout release. SIGTERM follows the same

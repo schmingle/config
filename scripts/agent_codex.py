@@ -5,19 +5,16 @@ from pathlib import Path
 import shutil
 import subprocess
 
-from agent_launcher import capabilities, shared
+from agent_launcher import CODEX_ONLY_ROLES, capabilities, shared
+from reviewer_attribution import native_attribution
 
 PROVIDER = 'codex'
 
 
 def execution(settings):
-    model = settings['model']
-    label = model
-    if model.startswith('gpt-'):
-        _, version, *family = model.split('-')
-        label = 'GPT-' + version + (' ' + ' '.join(part.title() for part in family) if family else '')
-    return {'model': model, 'effort': settings['model_reasoning_effort'],
-            'attribution': 'Reviewed by ' + label + ' ' + settings['model_reasoning_effort'] + '.',
+    contribution = 'Approach analysis by' if settings['name'] in CODEX_ONLY_ROLES else 'Reviewed by'
+    return {'model': settings['model'], 'effort': settings['model_reasoning_effort'],
+            'attribution': native_attribution(settings, contribution),
             'capabilities': capabilities(settings['name'])}
 
 

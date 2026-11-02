@@ -9,7 +9,7 @@ import tomllib
 import yaml
 
 from check_privacy import inspect_blob
-from agent_launcher import ROLE_CAPABILITIES, capabilities
+from agent_launcher import CODEX_ONLY_ROLES, ROLE_CAPABILITIES, capabilities
 
 ROOT = Path(__file__).resolve().parents[1]
 EFFORTS = {'none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'}
@@ -56,7 +56,7 @@ def validate_capabilities(agents):
         else:
             check(limits['approval_policy'] == limits['approvals_reviewer'] == 'provider-native',
                   role + ': preserve native provider permissions')
-    for role in ('pr-risk', 'port-to-claude'):
+    for role in ('pr-risk', 'port-to-claude', *CODEX_ONLY_ROLES):
         check(not capabilities(role)['source_writes'] and capabilities(role)['external_actions'] == 'none',
               role + ': generic analysis must not write or publish')
     check(capabilities('pr-risk')['requires_network_reads'], 'pr-risk: live evidence requires network reads')
@@ -149,8 +149,10 @@ def validate():
                 destination = (path.parent / target.split('#')[0]).resolve()
                 check(destination.exists(), name + ': broken local link: ' + target)
     validate_capabilities(agents)
-    check(agents.keys() <= claude_agents.keys(),
-          'Missing Claude agent counterparts: ' + ', '.join(sorted(agents.keys() - claude_agents.keys())))
+    check(set(CODEX_ONLY_ROLES) <= agents.keys(), 'Missing Codex-only Approach agents')
+    missing_counterparts = agents.keys() - claude_agents.keys() - set(CODEX_ONLY_ROLES)
+    check(not missing_counterparts,
+          'Missing Claude agent counterparts: ' + ', '.join(sorted(missing_counterparts)))
     for source, front in skills.items():
         if not source.startswith('.codex/skills/'):
             continue
@@ -158,7 +160,7 @@ def validate():
         check(target in skills, source + ': missing Claude skill counterpart')
         check(skills[target].get('disable-model-invocation') == front.get('disable-model-invocation'),
               source + ': Claude invocation policy differs')
-    for name in ('pr-review', 'pr-review-high', 'pr-risk'):
+    for name in ('pr-review', 'pr-review-high', 'pr-risk', *CODEX_ONLY_ROLES):
         check('reviewer_attribution.py' in agents[name]['developer_instructions'],
               name + ': derive signoff from execution fields')
     profile_path = ROOT / '.codex/agents/scripts/claude-review.toml'
