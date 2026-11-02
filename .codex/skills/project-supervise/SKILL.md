@@ -158,10 +158,12 @@ approval requested; continue independent work.
 
 ### Keep Pushing Toward Completion
 
-- Default to one active assignment; higher caps need user approval. Active/unknown
-  execution occupies capacity until settled. Reductions drain batches unless
-  interruption is requested. Fill eligible idle slots without repeated permission
-  after prior execution and helpers settle.
+- Use up to three concurrent assignments when approved work can progress independently.
+  Choose concurrency by dependencies, ownership, collision risk and available capacity;
+  preserve explicit user limits. Each writing assignment needs its own verified worktree
+  and clear ownership. Serialize conflicts; active/unknown execution occupies capacity
+  until verified settled. Higher caps require user approval. Reductions drain batches
+  unless interruption is requested. Fill eligible idle slots without repeated permission.
 - Assign distinct ordered shortlists, normally five tickets, exceeding expected
   batch capacity when available. Respect priorities, dependencies, ownership and
   milestone review gates. Refresh shortlists and dispatch successive batches within

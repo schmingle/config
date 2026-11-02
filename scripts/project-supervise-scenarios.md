@@ -10,9 +10,9 @@ other external actions require the applicable explicit authority.
   IDs and actual execution over labels, an active heartbeat before dispatch, and no
   worker automation. Recover partial setup without duplicate agents, batches or changed deadlines. Stale ticks
   cannot resume stopped/paused work.
-- **Capacity and isolation:** default one active assignment, independent of runtime
-  subagent capacity; an approved higher project cap
-  fills independent slots and rejects excess. Uncertain execution occupies capacity;
+- **Capacity and isolation:** up to three independent assignments without renewed
+  concurrency approval, subject to explicit user limits and runtime capacity; higher
+  caps need approval. Serialize conflicting work and reject excess. Uncertain execution occupies capacity;
   reductions drain batches. Spawning inherits the parent's directory, not an isolated
   checkout. A shared checkout or uncertain managed-worktree setup holds repository
   work. Check entire shortlists, shared semantic/test files and runtime resources;
