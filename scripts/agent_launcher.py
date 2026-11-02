@@ -33,6 +33,8 @@ ROLE_CAPABILITIES = {
                   'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
     'pr-review': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                   'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'comment-review'},
+    'pr-review-high': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
+                       'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'comment-review'},
     'pr-risk': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                 'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
     'review-skill': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
@@ -41,8 +43,6 @@ ROLE_CAPABILITIES = {
                'requires_network_reads': False, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
     'delegate-xhigh': {'provider': 'claude', 'default_sandbox': 'read-only', 'source_writes': True,
                        'requires_network_reads': False, 'approval_policy': 'provider-native', 'external_actions': 'task-authorized'},
-    'pr-review-high': {'provider': 'claude', 'default_sandbox': 'read-only', 'source_writes': False,
-                       'requires_network_reads': True, 'approval_policy': 'provider-native', 'external_actions': 'none'},
     'port-to-claude': {'provider': 'claude', 'default_sandbox': 'read-only', 'source_writes': False,
                       'requires_network_reads': False, 'approval_policy': 'provider-native', 'external_actions': 'none'},
 }
@@ -173,9 +173,6 @@ def executor_rules(role):
         'ci-rerun': ' The only permitted external write is an explicitly authorized, specifically justified CI rerun under the canonical CI workflow; do not publish reviews or change repository files.',
         'task-authorized': ' Commits, pushes, publication, and other external writes require explicit task authorization and all applicable repository gates.',
     }[limits['external_actions']]
-    review_boundary = (' This generic launch is analysis only: do not publish a PR review or claim review sign-off. '
-                       'Use the specialized prepared Claude PR review workflow for its evidence, recovery, and publication gates.'
-                       if role == 'pr-review-high' else '')
     return (f'\nYou are the actual {role} executor. Perform the assigned work directly. '
             'Never spawn agents, invoke agent handoff scripts, or route this assignment to another provider. '
             'The shared launcher also rejects nested execution through its inherited environment. '
@@ -184,7 +181,7 @@ def executor_rules(role):
             'Do not commit, push, publish, or send external communications unless explicitly authorized. '
             'Never bypass hooks or sandbox permissions. Verify actual results and return evidence and gaps. '
             'A supervising agent must verify the report before claiming completion.'
-            + filesystem_boundary + escalation_boundary + network_boundary + action_boundary + review_boundary + '\n')
+            + filesystem_boundary + escalation_boundary + network_boundary + action_boundary + '\n')
 
 
 def checked_paths(args):

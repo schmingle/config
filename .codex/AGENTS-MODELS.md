@@ -1,6 +1,6 @@
 # Model selection reference
 
-Reviewed: 2026-10-28. These are provisional recommendations for engineering and
+Reviewed: 2026-11-02. These are provisional recommendations for engineering and
 knowledge work, prioritizing quality and low supervision, then speed and usage.
 They are not measured optima or a universal model ranking.
 
@@ -29,7 +29,7 @@ mean high reasoning demand.
 | Nature of work | Low | Medium | High | Xhigh |
 | --- | --- | --- | --- | --- |
 | Code generation — implement, fix, refactor, write tests | Sol · medium | Sol · medium | Sol · high | Sol · xhigh |
-| Code review — find defects, regressions, contract violations | Sol · high | Sol · high | Sol · xhigh | Opus 5.5 · medium |
+| Code review — find defects, regressions, contract violations | Sol · high | Sol · high | Sol · high | Sol · max |
 | Architecture / plan generation — design approaches, interfaces, execution plans | Sol · high | Sol · high | Sol · xhigh | Opus 5.5 · medium |
 | General review — challenge assumptions, feasibility, boundaries, alternatives in plans, architecture, or other material | Sol · xhigh | Sol · xhigh | Sol · xhigh | Opus 5.5 · medium |
 | Investigation and analysis — retrieve evidence, diagnose causes, reconcile findings | Sol · high | Sol · high | Sol · xhigh | Sol · xhigh |
@@ -77,8 +77,23 @@ supervision, and exact effort choices generally have weak comparative support.
 
 Use **GPT-6.1 Sol at medium** when classification or evidence is insufficient to
 justify another recommendation, subject to explicit requests and workflow settings.
-Layer 2 will map concrete tasks to work types, default levels, and execution modes,
-with conditions that change their classification; it is not defined here yet.
+
+## Layer 2: approved PR reviewer mapping
+
+| Agent | Work type | Default task level | Model / effort | Routing |
+| --- | --- | --- | --- | --- |
+| `pr-review` | Code review | High | GPT-6.1 Sol / high | Assessed risk Medium or below, without an explicit deep-review request. |
+| `pr-review-high` | Code review | Xhigh | GPT-6.1 Sol / max | Assessed risk Medium high or High, or an explicit deep-review request. |
+
+These are the approved reviewer defaults. Risk routing selects the role; it does
+not redefine the task-demand levels. Review coverage, independence, supplied risk
+assessment, publication requirements, and merge permissions still follow their
+owning workflow. Other agents and common-task mappings remain unapproved proposals.
+
+The review budget policy is $3 total model spend per review attempt, including
+reviewer subagents. Published average costs inform model selection but do not
+guarantee this ceiling. This reference and the selected model settings do not
+implement usage accounting or an enforced spending stop.
 
 ## Evidence and confidence
 
@@ -86,16 +101,25 @@ with conditions that change their classification; it is not defined here yet.
   positions Sol medium for complex technical work and coordinated deliverables,
   and Astra for demanding analysis. This is vendor guidance, not independent proof
   of these assignments.
-- **Review specialist: provisional.** [CodeRabbit's Opus 5.5 study](https://www.coderabbit.ai/blog/opus-5-5-model-review)
+- **PR reviewer selection: approved policy with provisional empirical support.**
+  [MacroscopeBench](https://macroscope.com/benchmark) reports Sol high at 66.2%
+  known-bug recall and 91.3% precision ($0.56 average API cost, 1m 52s median),
+  versus Sol max at 69.2% recall and 90.7% precision ($1.05, 3m 59s).
+  [Its methodology](https://macroscope.com/blog/macroscopebench) uses proprietary
+  real-defect tasks, three runs, and automated judges; transfer to another
+  repository and statistical significance of small differences remain uncertain.
+  The tier settings are a deliberate quality/cost/latency tradeoff, not proof
+  that either is optimal at its assigned risk level.
+- **Other review evidence: provisional.** [CodeRabbit's Opus 5.5 study](https://www.coderabbit.ai/blog/opus-5-5-model-review)
   evaluated 80 known bug patterns. Standard caught 51 and Max caught 50; Standard
   produced fewer comments and higher actionable precision. The settings combine
   multiple pipeline stages and cannot be translated into a single effort value.
   Its baseline was a production model mix, not a direct Sol comparison.
 - **Exact effort: generally low confidence.** [Anthropic's Opus guidance](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
   starts at medium and reports gains over an earlier Opus generation at higher
-  effort. Medium for xhigh review follows the selected policy, not a demonstrated
-  optimum for that task level. Effort
-  labels are not equivalent compute budgets across models or vendors.
+  effort. Opus medium in the remaining architecture/general-review rows follows
+  the selected policy, not a demonstrated optimum for those tasks. Effort labels
+  are not equivalent compute budgets across models or vendors.
 - **Environment matters.** [Databricks' adopter study](https://www.databricks.com/blog/benchmarking-coding-agents-databricks-multi-million-line-codebase)
   found more than twofold task-cost differences for the same model and effort
   across harnesses. Its July 2026 results predate the current models and do not

@@ -1,7 +1,7 @@
 # Claude PR review handoff
 
-Use this for `pr-review-high` and explicitly assigned Claude trials, together with
-[the shared review contract](pr-review.md) and [shared Claude execution contract](claude.md). The default `pr-review` runs natively.
+Use this for explicitly assigned Claude review trials, together with
+[the shared review contract](pr-review.md) and [shared Claude execution contract](claude.md). Both `pr-review` and `pr-review-high` run natively.
 Agent descriptions define routing; the shared contract defines review standards and handoff requirements.
 The wrapper prepares, verifies, and performs any authorized publication; one Claude
 session at a time supplies the independent analysis. [The launcher contract](../../scripts/agent-launch.md)

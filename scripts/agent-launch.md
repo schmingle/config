@@ -42,17 +42,17 @@ required network reads, and approval settings separately. `requires_network_read
 describes a role requirement; `false` does not prohibit optional, task-authorized
 network research by generic delegates.
 
-- `pr-review` and `pr-green` default to a `read-only` filesystem. Their external action
-  ceilings are a GitHub COMMENT review and a justified CI rerun, respectively,
+- `pr-review`, `pr-review-high`, and `pr-green` default to a `read-only` filesystem. The
+  reviewers' external action ceiling is a GitHub COMMENT review; `pr-green` permits a justified CI rerun,
   when the assignment explicitly authorizes that action and the role workflow's
   gates pass.
 - `pr-resolve` and `pr-update` default to `workspace-write` and require nonempty
   `owned_paths`. Generic delegates and `writer` default to `read-only`; select
   `--sandbox workspace-write` for explicitly assigned edits with owned paths.
-- `review-skill`, `pr-risk`, `port-to-claude`, and the generic `pr-review-high` launch are analysis
+- `review-skill`, `pr-risk`, and `port-to-claude` are analysis
   only. They reject writable filesystem requests and permit no external writes.
   `pr-risk` requires live evidence and can request approval for scoped network
-  reads. The specialized high-review workflow owns its publication path.
+  reads.
 
 Native roles that require network reads, can edit, or can perform a scoped external action use
 `approval_policy="on-request"` with `approvals_reviewer="auto_review"`. This allows
@@ -126,6 +126,6 @@ outcome, relevant file/PR links, verification, remaining risks, permission denia
 and concrete unblock actions. Missing access must not become a completion claim.
 
 The existing Codex/Claude handoff commands remain compatibility entry points. Legacy `--brief-file` input is read-only; writable tasks require the structured JSON assignment with explicit owned paths. The
-specialized [Claude PR review workflow](../.codex/agents/pr-review-claude.md) retains
+specialized [Claude review trial workflow](../.codex/agents/pr-review-claude.md) retains
 its evidence, publication, and recovery contract and shares process-settlement code;
 a generic role launch does not replace those checks or grant publication.

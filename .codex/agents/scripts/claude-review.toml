@@ -8,4 +8,4 @@ allowed_tools = ["Bash", "Read", "Glob", "Grep", "Edit", "Write", "ToolSearch", 
 
 [role_efforts]
 delegate-xhigh = "high"
-pr-review-high = "high"
+claude-review = "high"

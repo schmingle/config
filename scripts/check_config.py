@@ -56,11 +56,12 @@ def validate_capabilities(agents):
         else:
             check(limits['approval_policy'] == limits['approvals_reviewer'] == 'provider-native',
                   role + ': preserve native provider permissions')
-    for role in ('pr-risk', 'pr-review-high', 'port-to-claude'):
+    for role in ('pr-risk', 'port-to-claude'):
         check(not capabilities(role)['source_writes'] and capabilities(role)['external_actions'] == 'none',
               role + ': generic analysis must not write or publish')
     check(capabilities('pr-risk')['requires_network_reads'], 'pr-risk: live evidence requires network reads')
-    for role, action in (('pr-review', 'comment-review'), ('pr-green', 'ci-rerun')):
+    for role, action in (('pr-review', 'comment-review'), ('pr-review-high', 'comment-review'),
+                         ('pr-green', 'ci-rerun')):
         check(not capabilities(role)['source_writes'] and capabilities(role)['external_actions'] == action,
               role + ': preserve read-only source and narrowly scoped external action ceiling')
 
@@ -95,9 +96,8 @@ def validate():
                 check(bool(value.get('model')), name + ': missing model')
                 check(not EXECUTION_PROSE.search(value['description']),
                       name + ': keep routing descriptions free of model/effort settings')
-                if value['name'] != 'pr-review-high':
-                    check(not EXECUTION_PROSE.search(value['developer_instructions']),
-                          name + ': native execution values belong only in execution fields')
+                check(not EXECUTION_PROSE.search(value['developer_instructions']),
+                      name + ': native execution values belong only in execution fields')
                 agents[value['name']] = value
         if path.suffix in ('.yaml', '.yml'):
             yaml_mapping(text, name)
@@ -158,7 +158,7 @@ def validate():
         check(target in skills, source + ': missing Claude skill counterpart')
         check(skills[target].get('disable-model-invocation') == front.get('disable-model-invocation'),
               source + ': Claude invocation policy differs')
-    for name in ('pr-review', 'pr-risk'):
+    for name in ('pr-review', 'pr-review-high', 'pr-risk'):
         check('reviewer_attribution.py' in agents[name]['developer_instructions'],
               name + ': derive signoff from execution fields')
     profile_path = ROOT / '.codex/agents/scripts/claude-review.toml'
@@ -170,7 +170,7 @@ def validate():
     check(isinstance(profile['allowed_tools'], list) and 'Bash' in profile['allowed_tools']
           and all(isinstance(tool, str) for tool in profile['allowed_tools']),
           'Claude profile needs a tool list with trusted shell access')
-    for name in ('pr-review-high', 'delegate-xhigh'):
+    for name in ('delegate-xhigh',):
         check('claude-review.toml' in agents[name]['developer_instructions'],
               name + ': Claude wrapper must reference the shared execution profile')
     print(f'Validated {len(agents)} Codex agents, {len(claude_agents)} Claude agents, {skill_count} skills, YAML/TOML, Python, local links, and public-file checks.')

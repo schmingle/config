@@ -66,7 +66,7 @@ Each loop collects results, refreshes affected GitHub state, merges eligible PRs
 
 #### Capacity and Timing
 
-- Use up to five specialists within available capacity, with their configured roles/settings. No coordinator child, nested specialists, or silent substitutions. The `pr-review-high` wrapper alone may run its assigned Claude CLI review: one active session, at most one bounded infrastructure replacement under its handoff guide, no Claude delegation, and no extra concurrency slot.
+- Use up to five specialists within available capacity, with their configured roles/settings. No coordinator child, nested specialists, or silent substitutions.
 - Check elapsed and idle time at loop boundaries, after waits, and before dispatch/merge. Reserve `min(5 minutes, 10% of timeout)` for settlement. Give each worker an absolute finish-by before that cutoff; normally allow green two minutes, repairs/updates five, risk ten, and full reviews fifteen. These are agent-enforced deadlines, not a process watchdog.
 - When no immediate permitted action remains but an identified pending event could unblock an admitted PR, first reconsider other candidates and rolling admission below. If none can advance, recheck relevant state once per minute until work becomes actionable or the original idle limit, work cutoff, merge limit, or settlement reserve requires stopping. Respect worker deadlines. Polling, admission alone, and unrelated base movement do not reset the idle clock. Do not keep specialists alive solely to wait for CI.
 - Settle at the work cutoff, positive merge limit, idle limit, or exhaustion of permitted work. Polling, repeated failures, and unrelated base movement are not progress. Ready PRs do not keep a `count=0` run alive.
@@ -155,7 +155,7 @@ Use this concise final format:
 
 - Use the current chat, direct `gh`/git, Markdown instructions, and native chat/subagent tools. GitHub holds cross-run evidence; assignments/snapshots stay here. No custom queue scripts, schemas, validators, registries, persistent queue state, or locks. Temporary review-body files and existing runtime artifacts are allowed.
 - Review/repair stacks against their actual base. Merge only into verified `DEFAULT_BRANCH` after prerequisites land. Never enable auto-merge, bypass protections, deploy, or force-push.
-- Follow repository/domain/testing guidance without invoking repository PR skills. Specialists do not merge or delegate, except the bounded review wrapper above.
+- Follow repository/domain/testing guidance without invoking repository PR skills. Specialists do not merge or delegate.
 - Isolate writers, inspect checkout/branch/dirty state and ownership, and preserve others' work. Never reset/stash/delete unrelated or unpublished changes, shallow-fetch shared worktrees, or merge unrelated histories to conceal missing ancestry.
 - CI executes tests/builds. Do not install dependencies, repair environments, download browsers, or run local suites. Workers return after pushing; only the coordinator may perform bounded CI waits within the existing time and idle limits. Add focused regression coverage when useful; inspect diffs/conflict markers and run `git diff --check`. Never weaken protection; ask here for missing material behavior/test-contract decisions, reusing existing scoped approvals.
 - Before any write, refresh open/non-draft/non-`noautomerge` eligibility, head/base, and ownership. Read back pushes, reviews, replies, and resolutions; reconcile uncertainty before retry.

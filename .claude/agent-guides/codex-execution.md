@@ -13,8 +13,7 @@ checkout; `CODEX_HOME` selects the CLI environment, not the role-definition sour
 For review, use a clean detached checkout pinned to the assigned head with actual
 base and ancestry. Supply the full risk report, factual PR evidence, publication
 permissions, and accepted coverage without writer/coordinator conclusions. Follow
-the canonical [review contract](../../.codex/agents/pr-review.md); the generic
-launcher does not replace the specialized high-review workflow.
+the canonical [review contract](../../.codex/agents/pr-review.md) for both review tiers.
 
 ```sh
 <config-root>/scripts/agent-launch --role <assigned-role> --assignment <private-task.json> --checkout <absolute-checkout> --output <new-private-output> --finish-by <absolute-ISO-deadline> --sandbox <read-only-or-workspace-write>

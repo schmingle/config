@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -71,11 +72,27 @@ else:
 
 class RoleSettingsTests(unittest.TestCase):
     def test_claude_role_efforts(self):
-        for role, expected in (("delegate-xhigh", "high"), ("pr-review-high", "high"),
-                               ("port-to-claude", "medium")):
+        for role, expected in (("delegate-xhigh", "high"), ("port-to-claude", "medium")):
             with self.subTest(role=role):
                 settings = launcher.role_settings(launcher.AGENTS, role)
                 self.assertEqual(agent_claude.execution(settings)["effort"], expected)
+
+    def test_review_tiers_use_canonical_native_settings_and_shared_contract(self):
+        for role, effort in (('pr-review', 'high'), ('pr-review-high', 'max')):
+            with self.subTest(role=role):
+                self.assertIn(role, launcher.NATIVE_ROLES)
+                self.assertNotIn(role, launcher.CLAUDE_ROLES)
+                settings = launcher.role_settings(launcher.AGENTS, role)
+                self.assertEqual(settings['model'], 'gpt-6.1-sol')
+                self.assertEqual(settings['model_reasoning_effort'], effort)
+                self.assertIn('~/.codex/agents/pr-review.md', settings['developer_instructions'])
+                self.assertIn('reviewer_attribution.py ' + role, settings['developer_instructions'])
+                self.assertEqual(launcher.capabilities(role), launcher.capabilities('pr-review'))
+
+    def test_explicit_claude_review_trial_keeps_its_execution_profile(self):
+        profile = launcher.shared.execution_profile('claude-review')
+        self.assertEqual(profile['effort'], 'high')
+        self.assertNotIn('pr-review-high', tomllib.loads(launcher.shared.PROFILE.read_text())['role_efforts'])
 
     def test_public_counterparts_preserve_wrapper_and_executor_settings(self):
         roles = {path.stem for path in launcher.AGENTS.glob('*.toml')}
@@ -400,7 +417,7 @@ class SharedLauncherTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('owned_paths', result.stderr)
             self.assertFalse(self.output.exists())
-        for role in ('pr-risk', 'pr-review-high', 'port-to-claude', 'review-skill'):
+        for role in ('pr-risk', 'port-to-claude', 'review-skill'):
             limits = launcher.capabilities(role)
             self.assertFalse(limits['source_writes'])
             self.assertEqual(limits['external_actions'], 'none')
@@ -408,7 +425,8 @@ class SharedLauncherTests(unittest.TestCase):
         self.assertEqual(self.calls(), [])
 
     def test_review_and_ci_have_approval_paths_without_source_write_permission(self):
-        for role, action in (('pr-review', 'COMMENT review'), ('pr-green', 'CI rerun')):
+        for role, action in (('pr-review', 'COMMENT review'), ('pr-review-high', 'COMMENT review'),
+                             ('pr-green', 'CI rerun')):
             with self.subTest(role=role):
                 self.output = self.root / role
                 self.data['approvals'] = ['Explicit authorization for one assigned ' + action]

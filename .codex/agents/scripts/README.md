@@ -6,18 +6,18 @@
   [the task handoff](../delegate-claude.md). It permits assigned source changes and
   verification in the existing checkout, saves initial/final state, and has no
   PR/risk/Linear requirement.
-- PR reviews: [claude_review.py](claude_review.py), following
+- Explicit Claude review trials: [claude_review.py](claude_review.py), following
   [the review handoff](../pr-review-claude.md). It retains clean pinned snapshots,
   risk reports, required Linear reads, review output, and bounded recovery.
 
-The review helper runs the Claude-backed `pr-review-high`; the default reviewer runs
-natively. Review definitions and the posted template remain in
+The review helper runs only explicitly assigned Claude trials; both configured PR
+reviewer roles run natively. Review definitions and the posted template remain in
 [the shared review contract](../pr-review.md). Common privacy, process settlement,
 and verification belong to [the launcher contract](../../../scripts/agent-launch.md);
 profile, authentication, and persistence belong to [Claude specifics](../claude.md).
 Prepared reviews include the common contract in their hashed guidance snapshot.
-Native signoffs come from `reviewer_attribution.py pr-review` or
-`reviewer_attribution.py pr-risk`, which reads
+Native signoffs come from `reviewer_attribution.py pr-review`,
+`reviewer_attribution.py pr-review-high`, or `reviewer_attribution.py pr-risk`, which reads
 the native agent's `model` and `model_reasoning_effort` fields.
 
 Claude runners require Python 3.11+ with POSIX `waitid`/`WNOWAIT` support
