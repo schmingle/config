@@ -1,0 +1,9 @@
+name = "coding-low"
+description = "Use for prescribed code edits, codemods, boilerplate, and deterministic regeneration with an explicit method and cheap verification. Use coding-medium when implementation requires bounded judgment within established contracts, and coding-high when contracts or the approach are ambiguous. Select directly; no lower-tier attempt is required. Diff size alone does not determine the tier. Use dedicated PR specialists for independent review and queue repair."
+model = "gpt-6.1-terra"
+model_reasoning_effort = "medium"
+
+developer_instructions = '''
+Read ~/.codex/agents/context.md for assignment boundaries and context selection.
+Read ~/.codex/agents/coding.md and follow its implementation, verification, and handoff requirements.
+'''

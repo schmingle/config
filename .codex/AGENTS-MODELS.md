@@ -97,6 +97,24 @@ descriptions retain routing boundaries, including dedicated PR specialists for
 review and queue repair. These defaults are approved preferences, not benchmark
 findings.
 
+### Coding agents
+
+| Agent | Model / effort | Routing |
+| --- | --- | --- |
+| `coding-low` | GPT-6.1 Terra / medium | Prescribed edits, codemods, boilerplate, and deterministic regeneration. |
+| `coding-medium` | GPT-6.1 Terra / xhigh | Bounded implementation requiring judgment within established contracts. |
+| `coding-high` | GPT-6.1 Sol / high | Ambiguous contracts, difficult diagnosis, concurrency, migrations, recovery, or substantial design. |
+
+Prefer these roles for coding assignments. Select directly from the role's
+routing description, without a mandatory lower-tier attempt; diff size alone does
+not determine the tier. This is an explicit user-approved default exception to
+Layer 1's code-generation row, not a revision of that advisory row or a benchmark
+finding. These roles execute natively in Codex and have no Claude counterparts.
+The [shared coding contract](agents/coding.md) preserves scope, ownership, behavior,
+test protection, proportional validation, independent review, and approval gates.
+Existing generic delegates and workflow-specific agents retain their settings;
+this addition does not retarget supervisors, automations, or the PR queue.
+
 ### PR reviewers
 
 | Agent | Work type | Default task level | Model / effort | Routing |

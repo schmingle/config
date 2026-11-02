@@ -95,6 +95,32 @@ class RoleSettingsTests(unittest.TestCase):
         profile = tomllib.loads(launcher.shared.PROFILE.read_text())
         self.assertNotIn('delegate-xhigh', profile['role_efforts'])
 
+    def test_coding_roles_use_native_settings_and_writable_task_capabilities(self):
+        self.assertEqual(launcher.CODING_ROLES, ('coding-low', 'coding-medium', 'coding-high'))
+        self.assertEqual(set(launcher.CODEX_ONLY_ROLES),
+                         set(launcher.APPROACH_ROLES) | set(launcher.CODING_ROLES))
+        for role, model, effort in (
+                ('coding-low', 'gpt-6.1-terra', 'medium'),
+                ('coding-medium', 'gpt-6.1-terra', 'xhigh'),
+                ('coding-high', 'gpt-6.1-sol', 'high')):
+            with self.subTest(role=role):
+                self.assertIn(role, launcher.NATIVE_ROLES)
+                self.assertNotIn(role, launcher.CLAUDE_ROLES)
+                self.assertNotIn(role, launcher.APPROACH_ROLES)
+                self.assertFalse((ROOT / '.claude/agents' / (role + '.md')).exists())
+                settings = launcher.role_settings(launcher.AGENTS, role)
+                self.assertEqual(settings['model'], model)
+                self.assertEqual(settings['model_reasoning_effort'], effort)
+                self.assertIn('~/.codex/agents/coding.md', settings['developer_instructions'])
+                self.assertEqual(launcher.capabilities(role), launcher.capabilities('delegate-high'))
+                self.assertTrue(launcher.capabilities(role)['source_writes'])
+                self.assertEqual(launcher.filesystem_sandbox(role, 'workspace-write',
+                                                            {'owned_paths': ['source.txt']}),
+                                 'workspace-write')
+                self.assertEqual(agent_codex.execution(settings)['attribution'],
+                                 'Reviewed by ' + ('GPT-6.1 Sol ' if role == 'coding-high'
+                                                   else 'GPT-6.1 Terra ') + effort + '.')
+
     def test_review_tiers_use_canonical_native_settings_and_shared_contract(self):
         for role, effort in (('pr-review', 'high'), ('pr-review-high', 'max')):
             with self.subTest(role=role):
@@ -115,7 +141,7 @@ class RoleSettingsTests(unittest.TestCase):
         self.assertNotIn('pr-review-high', tomllib.loads(launcher.shared.PROFILE.read_text())['role_efforts'])
 
     def test_approach_roles_are_native_analysis_only_with_independent_tiers(self):
-        self.assertEqual(set(launcher.CODEX_ONLY_ROLES), {'pr-review-approach', 'pr-review-approach-high'})
+        self.assertEqual(set(launcher.APPROACH_ROLES), {'pr-review-approach', 'pr-review-approach-high'})
         for role, effort in (('pr-review-approach', 'high'), ('pr-review-approach-high', 'max')):
             with self.subTest(role=role):
                 settings = launcher.role_settings(launcher.AGENTS, role)
@@ -282,7 +308,7 @@ class SharedLauncherTests(unittest.TestCase):
         self.data['owned_paths'] = ['source.txt']
         self.data['scope'] = 'Edit source.txt; preserve existing.txt'
         self.write_task()
-        for role in ('delegate-low', 'delegate-xhigh'):
+        for role in ('delegate-low', 'delegate-xhigh', *launcher.CODING_ROLES):
             with self.subTest(role=role):
                 self.output = self.root / role
                 source = self.checkout / 'source.txt'
@@ -441,7 +467,7 @@ class SharedLauncherTests(unittest.TestCase):
         self.assertEqual(self.calls(), [])
 
     def test_role_defaults_and_action_ceilings_are_explicit(self):
-        for role in ('delegate-low', 'delegate-medium', 'delegate-high', 'writer', 'delegate-xhigh'):
+        for role in ('delegate-low', 'delegate-medium', 'delegate-high', 'writer', 'delegate-xhigh', *launcher.CODING_ROLES):
             with self.subTest(role=role):
                 limits = launcher.capabilities(role)
                 self.assertEqual(limits['default_sandbox'], 'read-only')
@@ -458,7 +484,7 @@ class SharedLauncherTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('owned_paths', result.stderr)
             self.assertFalse(self.output.exists())
-        for role in ('pr-risk', 'port-to-claude', 'review-skill', *launcher.CODEX_ONLY_ROLES):
+        for role in ('pr-risk', 'port-to-claude', 'review-skill', *launcher.APPROACH_ROLES):
             limits = launcher.capabilities(role)
             self.assertFalse(limits['source_writes'])
             self.assertEqual(limits['external_actions'], 'none')
@@ -541,7 +567,8 @@ class SharedLauncherTests(unittest.TestCase):
         self.data['approvals'] = ['Commit and push the verified assigned change']
         self.data['constraints'] = ['No merge or deploy']
         self.write_task()
-        for role in ('delegate-low', 'delegate-medium', 'delegate-high', 'delegate-xhigh', 'pr-resolve', 'pr-update', 'writer'):
+        for role in ('delegate-low', 'delegate-medium', 'delegate-high', 'delegate-xhigh',
+                     'pr-resolve', 'pr-update', 'writer', *launcher.CODING_ROLES):
             with self.subTest(role=role):
                 self.output = self.root / role
                 result = self.run_role(role, extra=('--sandbox', 'workspace-write'))

@@ -1,0 +1,9 @@
+name = "coding-high"
+description = "Use directly for coding work with ambiguous contracts, difficult diagnosis, concurrency, migrations, recovery, or substantial design. Use coding-medium for bounded implementation within established contracts and coding-low for prescribed edits. No lower-tier attempt is required. Diff size alone does not determine the tier. Use dedicated PR specialists for independent review and queue repair."
+model = "gpt-6.1-sol"
+model_reasoning_effort = "high"
+
+developer_instructions = '''
+Read ~/.codex/agents/context.md for assignment boundaries and context selection.
+Read ~/.codex/agents/coding.md and follow its implementation, verification, and handoff requirements.
+'''

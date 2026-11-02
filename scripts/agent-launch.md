@@ -47,12 +47,16 @@ network research by generic delegates.
   when the assignment explicitly authorizes that action and the role workflow's
   gates pass.
 - `pr-resolve` and `pr-update` default to `workspace-write` and require nonempty
-  `owned_paths`. Generic delegates and `writer` default to `read-only`; select
+  `owned_paths`. Generic delegates, coding roles, and `writer` default to `read-only`; select
   `--sandbox workspace-write` for explicitly assigned edits with owned paths.
 - `review-skill`, `pr-risk`, and `port-to-claude` are analysis
   only. They reject writable filesystem requests and permit no external writes.
   `pr-risk` requires live evidence and can request approval for scoped network
   reads.
+- `coding-low`, `coding-medium`, and `coding-high` are Codex-only implementation
+  roles following the [shared coding contract](../.codex/agents/coding.md). They
+  support assigned source edits under the same capability ceilings as generic
+  delegates and have no Claude wrappers.
 - `pr-review-approach` and `pr-review-approach-high` are Codex-only, read-only
   analysis roles with no external writes or further delegation. Their normal queue
   entrypoint is a native child of a primary reviewer, not a Claude wrapper.

@@ -5,14 +5,14 @@ from pathlib import Path
 import shutil
 import subprocess
 
-from agent_launcher import CODEX_ONLY_ROLES, capabilities, shared
+from agent_launcher import APPROACH_ROLES, capabilities, shared
 from reviewer_attribution import native_attribution
 
 PROVIDER = 'codex'
 
 
 def execution(settings):
-    contribution = 'Approach analysis by' if settings['name'] in CODEX_ONLY_ROLES else 'Reviewed by'
+    contribution = 'Approach analysis by' if settings['name'] in APPROACH_ROLES else 'Reviewed by'
     return {'model': settings['model'], 'effort': settings['model_reasoning_effort'],
             'attribution': native_attribution(settings, contribution),
             'capabilities': capabilities(settings['name'])}
