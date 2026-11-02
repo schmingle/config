@@ -79,10 +79,11 @@ establish completeness or exclude competing work.
 Shared semantic/test regions, contracts, barrels, generated metadata, fixtures and
 runtime resources require ownership or serialized edits. Hold/report overlaps.
 Steering retains the original deadline. Settle execution before skipping blocked work.
-At acceptance, identify the next meaningful checkpoint and expected time; update it if
-materially delayed. Report checkpoint outcomes, PR handoff, completion, stalls and material
-scope/dependency/validation changes; batch routine intermediate progress. Send a concise
-delta with evidence links rather than logs, repeated status or acknowledgement-only replies.
+Between required assignment acceptance and ticket/assignment completion reports, send
+only actionable blockers/escalations or replies to parent questions. Escalate threats to
+scope, approach, correctness or deadline, ownership collisions, unexpected execution
+state and failures beyond your authority. Resolve routine recoverable failures locally.
+Use concise evidence-linked deltas; leave routine progress for completion reports.
 Send actionable decisions promptly to the parent through supported agent messaging:
 question, recommendation, affected work and settlement state. Hold affected work while
 independent assigned work continues. Retain unresolved requests in the final result;

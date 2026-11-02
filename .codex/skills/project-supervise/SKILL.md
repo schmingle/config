@@ -192,7 +192,7 @@ approval requested; continue independent work.
 - Verify the Start heartbeat and dispatch state. While work or a concrete event can
   advance, stay attached using bounded, interruptible native waits across workers where
   supported. A timeout alone calls for another wait, not fresh service reads, worker
-  messages or commentary. Check when a checkpoint/check is due, execution may be stalled,
+  messages or commentary. Check when a required check is due, execution may be stalled,
   evidence conflicts or a decision needs it; preserve deadline and readiness checks.
   Send workers concrete steering or questions when needed; request status only when
   current evidence is insufficient. Process actionable messages promptly.
@@ -272,9 +272,10 @@ another monitor.
 
 ### Report
 
-Surface actionable blockers, decisions and material failures promptly; batch routine
-progress across workers rather than paraphrasing each worker update. Keep unchanged
-status quiet and answer user status requests from current evidence. Finish
+During execution, report only actionable blockers/escalations and completion; routine
+progress stays quiet. Escalate threats to scope, approach, correctness or deadlines,
+ownership collisions and unexpected execution state. Answer user status requests from
+current evidence. Worker silence alone proves neither a stall nor completion. Finish
 with a self-contained report on detach, completion, stop/pause or no useful execution/wait,
 including blocked or unverifiable state. Distinguish authored, merged, deployed and accepted
 work. Retain unresolved requests until evidence resolves them; uncertainty stays unknown.
@@ -315,8 +316,8 @@ holds are not human blockers: own resolution in Next Steps or explain delivery i
 Report only grounded concerns and recommendations.
 
 Retain the full report in the supported heartbeat response, respecting its quiet
-envelope and saved notification preferences. Notify on meaningful changes, actionable
-requests, failures or completion; retain unchanged asks without redundant notifications.
+envelope and saved notification preferences. Notify only on actionable blockers/escalations
+or completion; retain unchanged asks without redundant notifications.
 Disclose unavailable delivery/missing output. Interruption may prevent reporting;
 inspect unknown execution next cycle rather than claiming settlement.
 

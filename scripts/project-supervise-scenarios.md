@@ -84,9 +84,10 @@ other external actions require the applicable explicit authority.
   yields an own-chat summary; it neither posts to Linear nor automatically asks to.
 - **Busy, steering and detach:** bounded waits keep useful coordination active without
   redundant polls. An unchanged timeout re-enters waiting; service/status checks occur
-  for due checkpoints, suspected stalls, conflicting evidence or decisions. Worker
-  checkpoints carry expected times; routine progress is batched, actionable escalations
-  prompt, and required readiness/deadline checks retained. Ordinary questions/steering
+  for required checks, suspected stalls, conflicting evidence or decisions. Between
+  required acceptance and completion reports, workers send actionable escalations or
+  requested answers only. Routine progress stays quiet; silence alone proves neither
+  stall nor completion. Readiness/deadline checks remain. Ordinary questions/steering
   preserve unaffected execution and deadlines.
   Explicit detach reconciles a pending parent operation, records IDs and pending asks,
   reports and yields without stopping subagents or pausing the heartbeat. It requires
