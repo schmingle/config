@@ -20,7 +20,7 @@ input is needed, ownership is redirected, or another meaningful exception warran
   and unique tickets changed, shared across stages/delegates. Metadata discovery is uncapped.
 - `size=m`: Maximum implementation estimate, including Draft-and-clarify. Accept short/full
   names case-insensitively: XS/Extra Small, S/Small, M/Medium, L/Large, XL/Extra Large.
-  Resolve to the team's live estimate option and numeric value; larger work is triage-only.
+  Resolve to the team's live estimate option and order; larger work is triage-only.
 
 ## Flow
 
@@ -53,9 +53,12 @@ Verify the intended Linear user/account/workspace
 through live lookup or confirmed identity, not OS/Git identity. Read `team`, `repository`, and
 the required nonempty `creatorIds` allowlist from `~/.codex/private/linear-ticket-workflows.json`;
 verify creator identities in the intended workspace, and stop if the allowlist is missing or invalid.
-Before assessment/writes, normalize
-`size` aliases and resolve the live estimate option/order/value; reject unsupported or
-ambiguous mappings. Use numeric Linear values, not hardcoded M=3 or alphabetical comparisons.
+Normalize `size` aliases and reject unsupported values. Resolve the team's live estimate
+options and order to compare sizes; a verified ordered label scale suffices. Never infer
+order alphabetically or hardcode numeric values. If the scale is unavailable or ambiguous,
+continue independent discovery, routing, ownership and triage; hold only size-dependent
+actions and report the gap. Verify the live numeric mapping only when the write interface
+requires a number; if unavailable, hold that estimate write without blocking unrelated work.
 Legacy `maxEstimate`/`mediumEstimateLabel` don't override `size`.
 
 Verify team/statuses; discover configured-team Triage/Backlog and Todo/In Progress/In Review
@@ -239,7 +242,9 @@ requests, preserve the outcome while independently choosing implementation/size.
 
 The complete outcome must fit **`size` and one or two coherent PRs**. Don't omit essential
 behavior, compatibility, permissions, or test protection to fit. Update estimates from
-evidence without claiming oversized work or removing its assignee. Above `size` is triage-only;
+evidence when the write value is verified; otherwise report the pending write. Only implement
+when the independently assessed complete size and ceiling can be compared on the verified
+live scale. Do not claim oversized work or remove its assignee. Above `size` is triage-only;
 no automatic children or oversized parent execution. Splits/project changes need approval.
 
 Before requesting split approval, investigate the complete decomposition. Each implementation
