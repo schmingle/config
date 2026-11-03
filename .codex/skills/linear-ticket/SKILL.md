@@ -26,7 +26,8 @@ Compare actionable tickets before choosing one; report critical questions withou
 flowchart TD
     Start[Start Run] -->|Checks Pass| Find[Find Candidates]
     Start -->|Invalid Count, Active Run, or Inspection Error| Report[Report]
-    Find --> Filter[Reconcile Ownership]
+    Find --> Project[Route Matching Tickets to Project]
+    Project --> Filter[Reconcile Ownership]
     Filter -->|Retained Set| Triage[Triage Tickets]
     Filter -->|None Retained| Report
     Triage -->|Set Triaged: Actionable Tickets| Deliver[Select and Deliver]
@@ -65,11 +66,13 @@ hold creator eligibility rather than assuming a match or excluding the ticket.
 
 Use supported server-side team/status filters and metadata
 field selection; inspect the current interface rather than inventing arguments. Collect ID/URL,
-team, assignee, status, actual creator, priority, estimate, parent, and creation/update times.
+team, assignee, status, actual creator, labels, project, priority, estimate, parent, and creation/update times.
 Do not use a server-side direct-creator filter that would omit eligible descendants;
 discover team/status metadata first, then resolve ancestry, including parents outside the
-candidate team/status scope. Paginate each query independently and deduplicate; verify
-effective creators against `creatorIds` before deep assessment or writes. Parent metadata
+candidate team/status scope. Paginate each query independently and deduplicate; retain
+direct-creator matches for project routing even when effective creator eligibility fails.
+Verify effective creators against `creatorIds` before deep assessment or other writes;
+the project-routing write below is the only exception. Parent metadata
 lookups alone do not consume assessment slots.
 
 Reuse existing private checkpoints/current automation memory as caches for metadata and
@@ -80,7 +83,8 @@ unassessed work. Refresh tracked IDs regardless of current team/status to detect
 reopening, moves, reassignment, and creator or parent changes. Refresh relevant ancestor
 metadata and recompute descendant eligibility when ancestry or an ancestor's creator changes;
 a child's timestamp alone does not cover those changes. Recover tracked work from history/live
-sources; apply the creator filter to inventory/execution eligibility. Excluded tickets may
+sources; apply the effective-creator filter to inventory/execution eligibility after project
+routing. Excluded tickets may
 appear as decision/dependency context under Report. Release nonmatching tickets only
 from this workflow's inventory, without ticket/PR writes. Parents outside the candidate scope
 remain ancestry/dependency context, not automatically executable work.
@@ -106,6 +110,22 @@ Lightly refresh unchanged holds and queued PRs. Reopen completed assessments onl
 new evidence; finish incomplete promising assessments. Use remaining slots for new candidates.
 When shown, label inventory-only or deferred assessments Skipped with the actual reason;
 new deep investigation still consumes a slot.
+
+### Route Matching Tickets to Project
+
+For discovered tickets whose **actual creator** is in `creatorIds` and whose label matches
+the private `bugProjectRouting.labelId`, route to `bugProjectRouting.projectId` before any
+other ticket activity. Verify workspace, label, target project, current creator, labels and
+project live; add an unprojected ticket and verify the result. Count each changed ticket
+toward `count`. Already-targeted tickets need no write. Preserve a different existing project;
+hold other activity and report it for the user rather than moving it. If routing is unverified,
+fails, or a required routing write would exceed the unique-ticket change budget, hold all other
+activity on that ticket and report why. A previously counted changed ticket can still be
+updated within its existing slot. Missing/invalid
+routing settings or unavailable label/project metadata hold potentially matching tickets,
+not verified nonmatches. Never infer creator from a parent
+for this routing rule. Refresh matching metadata when reopening cached inventory; changes to
+this filter require a full discovery.
 
 ### Reconcile Ownership
 
@@ -332,7 +352,8 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
 - Honor read-only/report-only limits. Normal runs authorize Linear assessment/updates,
   eligible stale cancellations, and one ticket's implementation/commits/pushes/Draft/ready
   handoff. Exclude merging, auto-merge, deployment, production writes, project creation/
-  reorganization, email/SMS/Slack messages, and automation changes. Readiness/silence isn't
+  reorganization except the configured bug-project routing above, email/SMS/Slack messages,
+  and automation changes. Readiness/silence isn't
   authorization; follow applicable approvals.
 - `count` limits assessed tickets and, separately, changed tickets—not API calls. Count
   each deeply read ticket once across ownership/triage/delegates, including holds and parents.
