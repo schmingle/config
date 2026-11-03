@@ -372,6 +372,9 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
   Add a later Draft PR link by editing the initial implementation comment. Route other
   proposed comments to the user here and await explicit instruction before publishing.
   Use the user's voice and [canonical writing guide](../../agents/writer.md#guide-location).
+  State the user's decisions directly as their own; mention approval or feedback only when
+  requesting it from another person. Keep the user's approvals and provenance in chat or
+  private checkpoints.
   Keep comments within 100 words, lead with important requests in bold, and address recipients
   using verified native mentions: `@person: question`. Consolidate related information into
   the applicable comment; technical detail belongs in specifications/PRs.
