@@ -140,24 +140,23 @@ class RoleSettingsTests(unittest.TestCase):
         self.assertEqual(profile['effort'], 'high')
         self.assertNotIn('pr-review-high', tomllib.loads(launcher.shared.PROFILE.read_text())['role_efforts'])
 
-    def test_approach_roles_are_native_analysis_only_with_independent_tiers(self):
-        self.assertEqual(set(launcher.APPROACH_ROLES), {'pr-review-approach', 'pr-review-approach-high'})
-        for role, effort in (('pr-review-approach', 'high'), ('pr-review-approach-high', 'max')):
-            with self.subTest(role=role):
-                settings = launcher.role_settings(launcher.AGENTS, role)
-                self.assertEqual(settings['model'], 'gpt-6.1-sol')
-                self.assertEqual(settings['model_reasoning_effort'], effort)
-                self.assertIn('~/.codex/agents/pr-review-approach.md', settings['developer_instructions'])
-                self.assertIn('~/.codex/agents/pr-review.md', settings['developer_instructions'])
-                self.assertIn('reviewer_attribution.py ' + role, settings['developer_instructions'])
-                self.assertEqual(agent_codex.execution(settings)['attribution'],
-                                 'Approach analysis by GPT-6.1 Sol ' + effort + '.')
-                limits = launcher.capabilities(role)
-                self.assertEqual(limits['provider'], 'codex')
-                self.assertEqual(limits['default_sandbox'], 'read-only')
-                self.assertFalse(limits['source_writes'])
-                self.assertEqual(limits['external_actions'], 'none')
-                self.assertTrue(limits['requires_network_reads'])
+    def test_approach_role_is_native_analysis_only(self):
+        self.assertEqual(set(launcher.APPROACH_ROLES), {'pr-review-approach'})
+        role = 'pr-review-approach'
+        settings = launcher.role_settings(launcher.AGENTS, role)
+        self.assertEqual(settings['model'], 'gpt-6.1-sol')
+        self.assertEqual(settings['model_reasoning_effort'], 'xhigh')
+        self.assertIn('~/.codex/agents/pr-review-approach.md', settings['developer_instructions'])
+        self.assertIn('~/.codex/agents/pr-review.md', settings['developer_instructions'])
+        self.assertIn('reviewer_attribution.py ' + role, settings['developer_instructions'])
+        self.assertEqual(agent_codex.execution(settings)['attribution'],
+                         'Approach analysis by GPT-6.1 Sol xhigh.')
+        limits = launcher.capabilities(role)
+        self.assertEqual(limits['provider'], 'codex')
+        self.assertEqual(limits['default_sandbox'], 'read-only')
+        self.assertFalse(limits['source_writes'])
+        self.assertEqual(limits['external_actions'], 'none')
+        self.assertTrue(limits['requires_network_reads'])
 
     def test_public_counterparts_preserve_wrapper_and_executor_settings(self):
         roles = {path.stem for path in launcher.AGENTS.glob('*.toml')}

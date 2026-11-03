@@ -46,10 +46,9 @@ For targeted escalation, distinguish a question-specific conclusion from whole-P
 Both primary reviewer tiers always perform baseline Approach analysis and own the complete
 review. Select a specialist only for a material architectural question, such as interacting
 ownership boundaries, persistent-state/recovery design, or credible alternatives with
-consequential maintenance tradeoffs. The primary chooses `pr-review-approach` for a bounded
-question or `pr-review-approach-high` for broad ambiguity and interacting design decisions,
-independently of correctness risk and its own tier. Do not routinely run both specialists,
-launch a second opinion merely to change a verdict, or delegate ordinary review coverage.
+consequential maintenance tradeoffs. The primary may select `pr-review-approach` for such
+questions independently of correctness risk and its own tier. Do not launch a second opinion
+merely to change a verdict or delegate ordinary review coverage.
 
 Use native collaboration tools only, with `fork_turns=none`, at most one active child,
 and an explicitly supplied capacity allowance. Follow the [specialist contract](pr-review-approach.md)

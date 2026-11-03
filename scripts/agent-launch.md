@@ -57,9 +57,9 @@ network research by generic delegates.
   roles following the [shared coding contract](../.codex/agents/coding.md). They
   support assigned source edits under the same capability ceilings as generic
   delegates and have no Claude wrappers.
-- `pr-review-approach` and `pr-review-approach-high` are Codex-only, read-only
-  analysis roles with no external writes or further delegation. Their normal queue
-  entrypoint is a native child of a primary reviewer, not a Claude wrapper.
+- `pr-review-approach` is a Codex-only, read-only analysis role with no external
+  writes or further delegation. Its normal queue entrypoint is a native child of a
+  primary reviewer, not a Claude wrapper.
 
 Native roles that require network reads, can edit, or can perform a scoped external action use
 `approval_policy="on-request"` with `approvals_reviewer="auto_review"`. This allows

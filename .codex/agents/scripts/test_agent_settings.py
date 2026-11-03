@@ -22,7 +22,7 @@ class AttributionTests(unittest.TestCase):
         self.assertEqual(attribution.native_attribution(settings), 'Reviewed by example-model medium.')
 
     def test_native_reviewer_entrypoints_derive_their_own_settings(self):
-        for role in ('pr-review', 'pr-review-high', 'pr-risk', 'pr-review-approach', 'pr-review-approach-high'):
+        for role in ('pr-review', 'pr-review-high', 'pr-risk', 'pr-review-approach'):
             with self.subTest(role=role):
                 settings = tomllib.loads((attribution.AGENTS / (role + '.toml')).read_text())
                 result = subprocess.run([sys.executable, str(Path(attribution.__file__)), role],

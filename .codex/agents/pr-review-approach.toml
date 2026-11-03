@@ -1,7 +1,7 @@
 name = "pr-review-approach"
-description = "Analysis-only Approach specialist for a primary PR reviewer: bounded architectural choices, ownership, alternatives, and maintenance tradeoffs. Use pr-review-approach-high for broad ambiguity or interacting architectural decisions. Neither role owns whole-PR review or publication."
+description = "Analysis-only Approach specialist for a primary PR reviewer assessing material architectural questions, including ownership, alternatives, interacting design decisions, and maintenance tradeoffs. Does not own whole-PR review or publication; selection is independent of correctness risk."
 model = "gpt-6.1-sol"
-model_reasoning_effort = "high"
+model_reasoning_effort = "xhigh"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md and ~/.codex/agents/pr-review-approach.md before starting.

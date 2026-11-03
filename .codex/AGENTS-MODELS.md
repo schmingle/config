@@ -121,19 +121,18 @@ this addition does not retarget supervisors, automations, or the PR queue.
 | --- | --- | --- | --- | --- |
 | `pr-review` | Code review | High | GPT-6.1 Sol / high | Assessed risk Medium or below, without an explicit deep-review request. |
 | `pr-review-high` | Code review | Xhigh | GPT-6.1 Sol / max | Assessed risk Medium high or High, or an explicit deep-review request. |
-| `pr-review-approach` | Code review: Approach analysis | High | GPT-6.1 Sol / high | Optional native child for a bounded architectural question, selected by either primary reviewer. |
-| `pr-review-approach-high` | Code review: Approach analysis | Xhigh | GPT-6.1 Sol / max | Optional native child for broad ambiguity or interacting design decisions, selected by either primary reviewer. |
+| `pr-review-approach` | Code review: Approach analysis | High | GPT-6.1 Sol / xhigh | Optional native child for material architectural questions, selected by either primary reviewer. |
 
 These are the approved reviewer defaults. Risk routing selects the role; it does
 not redefine the task-demand levels. Review coverage, independence, supplied risk
 assessment, publication requirements, and merge permissions still follow their
 owning workflow. Both primary tiers retain complete review ownership and baseline
-Approach analysis. They select at most one active Approach child independently of
-correctness risk or primary tier; specialist selection is based on architectural
-demand, not a second coordinator risk route. Children supply analysis only; the
-primary validates, integrates, and deduplicates it into the single final review.
-These specialists are Codex-only and use native collaboration, with no nested CLI
-launcher fallback. Their approved PR-specific settings are an explicit exception
+Approach analysis. Either may select at most one active Approach child for a material
+architectural question, independently of correctness risk or primary tier, rather than
+through a second coordinator risk route. The child supplies analysis only; the primary
+validates, integrates, and deduplicates it into the single final review. The specialist
+is Codex-only and uses native collaboration, with no nested CLI launcher fallback. Its
+approved PR-specific settings are an explicit exception
 to Layer 1's general-review row, rather than a remapping of that row. Other agent
 and common-task mappings remain unapproved proposals unless explicitly approved
 above.

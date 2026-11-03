@@ -43,8 +43,6 @@ ROLE_CAPABILITIES = {
                        'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'comment-review'},
     'pr-review-approach': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                            'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
-    'pr-review-approach-high': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
-                                'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
     'pr-risk': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                 'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
     'review-skill': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
@@ -57,7 +55,7 @@ ROLE_CAPABILITIES = {
                       'requires_network_reads': False, 'approval_policy': 'provider-native', 'external_actions': 'none'},
 }
 # Counterpart availability is separate from a role's write authority and attribution.
-APPROACH_ROLES = ('pr-review-approach', 'pr-review-approach-high')
+APPROACH_ROLES = ('pr-review-approach',)
 CODING_ROLES = ('coding-low', 'coding-medium', 'coding-high')
 CODEX_ONLY_ROLES = APPROACH_ROLES + CODING_ROLES
 NATIVE_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if limits['provider'] == 'codex')
