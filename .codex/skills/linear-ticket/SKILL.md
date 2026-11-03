@@ -11,6 +11,8 @@ disable-model-invocation: true
 
 Find work for the current user, handle staleness, and deliver one bounded outcome.
 Compare actionable tickets before choosing one; report critical questions without an interview.
+Triage and deliver efficiently with minimal necessary communication. Comment when participant
+input is needed, ownership is redirected, or another meaningful exception warrants an update.
 
 ## Parameters
 
