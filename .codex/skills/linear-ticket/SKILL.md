@@ -261,9 +261,11 @@ isn't readiness. If none qualify, report instead of forcing a build. Assign sele
 work to the user before implementation; ownership reconciliation alone doesn't select a build.
 
 Before implementing, trace the reported case through relevant acceptance behavior to surface
-likely questions, policy conflicts, and material approach differences. Combine the proposed
-approach and known participant questions in the first implementation comment; native status
-records routine starts. Ask user-directed questions/approvals in this chat. State the choice,
+likely questions, policy conflicts, and material approach differences. Post an optional start
+comment only for meaningful information to the ticket creator; required participant questions
+are posted even when directed elsewhere. Combine relevant approach details and questions.
+Native status records routine starts.
+Ask user-directed questions/approvals in this chat. State the choice,
 recommendation, and whether safe Draft work can proceed or affected work needs an answer.
 Route later discoveries and proposed follow-up comments to the user here before publishing.
 
@@ -274,7 +276,7 @@ Confirm plan/assignment; new work enters Todo then In Progress, while resumed wo
 its lifecycle. Create Draft PRs with ticket links, behavior, approach, acceptance, and validation.
 
 For Draft-and-clarify, publish participant questions in the initial implementation comment
-before implementation; edit it to add the Draft PR link when available. Keep affected PRs
+before implementation; add a Draft PR link only when useful to ticket participants. Keep affected PRs
 Draft until substantive feedback is applied or **48 hours from the questions' original ticket
 server publication** expire and documented safe defaults are used. User-directed questions
 go in this chat and require an answer or explicit direction before affected PRs become ready;
@@ -286,8 +288,10 @@ human Draft holds, ownership, relevance, prerequisites, permission, or tests.
 While feedback is pending, keep Draft/appropriate active ticket status and report without
 waiting. Once gates clear, recheck answers/validation and resolve in-scope feedback. Without
 a feedback wait, verified complete work can be ready. Only on ready handoff, request review
-under repository policy, move to In Review, and post one delivery comment linking PRs,
-verification, and remaining steps. The merge queue owns ready PRs: observe/report without
+under repository policy and move to In Review. Post a delivery comment only when it conveys
+meaningful new information to the ticket creator; PR readiness, CI and review handoff alone
+do not qualify. PR review follows the user's review workflow; never imply the creator is asked
+to review unless explicitly requested. The merge queue owns ready PRs: observe/report without
 competing pushes, Draft reversions, or review/CI/merge work unless explicitly directed.
 Distinguish merged, deployed, and operationally accepted.
 
@@ -369,7 +373,9 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
   Otherwise, ticket comments are limited to ownership assignments/handoffs and takeover
   offers/completion; stale cancellation reasons and reopening invitations; the first
   implementation update with the approach and known participant questions; and ready delivery.
-  Add a later Draft PR link by editing the initial implementation comment. Route other
+  Apply creator relevance to optional start and ready-delivery comments as specified above;
+  required participant questions remain mandatory. Add a useful later Draft PR link by editing
+  the initial implementation comment when one exists. Route other
   proposed comments to the user here and await explicit instruction before publishing.
   Use the user's voice and [canonical writing guide](../../agents/writer.md#guide-location).
   State the user's decisions directly as their own; mention approval or feedback only when
