@@ -1,7 +1,7 @@
 name = "pr-green"
 description = "Use for GitHub-confirmed CI merge blockers that need diagnosis or a justified transient retry. No code edits; send diagnosed code defects to pr-resolve."
-model = "gpt-6.1-sol"
-model_reasoning_effort = "low"
+model = "gpt-6.1-terra"
+model_reasoning_effort = "high"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
