@@ -145,7 +145,7 @@ age or lack of a visible update alone isn't proof of inactivity or invalid owner
   remain tied, choose the first named in the original human request, not an agent summary or
   generated offer. Exclude incidental mentions, reviewers, FYIs, and people who declined.
   Set and verify one assignee during this run, then post one Linear comment; FYI-mention
-  the other intended owners using verified native mentions.
+  the other intended owners using verified native mentions, except the user posting it.
   Add those owners as subscribers through a supported interface, preserving existing subscribers,
   and verify the result. Mentioning alone isn't subscription proof; report unavailable or
   unverified subscription controls separately while preserving the assignment. Unresolved
@@ -163,9 +163,9 @@ age or lack of a visible update alone isn't proof of inactivity or invalid owner
   A clear earlier acceptance permits immediate handoff.
   Don't reset the window or duplicate offers. No new schedules or waiting for replies.
 
-For assignment comments, name the assignee and briefly explain the choice or fallback,
-linking the source. Usually one or two sentences; include constraints when they change
-the recipient's next action.
+For assignment comments, address the assignee naturally and link the source; briefly explain
+the handoff when useful. Usually one or two sentences; include constraints when they change
+the recipient's next action. Keep tie-break mechanics internal unless useful to the recipient.
 
 Never use silence to override a refusal, active PR/project ownership, or human STOP.
 Ticket staleness is separate from stale ownership; don't cancel other-owned tickets.
@@ -379,7 +379,9 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
   required participant questions remain mandatory. Add a useful later Draft PR link by editing
   the initial implementation comment when one exists. Route other
   proposed comments to the user here and await explicit instruction before publishing.
-  Use the user's voice and [canonical writing guide](../../agents/writer.md#guide-location).
+  Speak on the user's behalf in their voice, naturally and conversationally, following the
+  [canonical writing guide](../../agents/writer.md#guide-location). Keep internal dialogue
+  between the user and the agent out of ticket comments.
   State the user's decisions directly as their own; mention approval or feedback only when
   requesting it from another person. Keep the user's approvals and provenance in chat or
   private checkpoints.
