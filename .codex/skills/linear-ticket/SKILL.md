@@ -29,9 +29,14 @@ flowchart TD
     Start[Start Run] -->|Checks Pass| Find[Find Candidates]
     Start -->|Invalid Count, Active Run, or Inspection Error| Report[Report]
     Find --> Project[Route Matching Tickets to Project]
-    Project --> Filter[Reconcile Ownership]
-    Filter -->|Retained Set| Triage[Triage Tickets]
-    Filter -->|None Retained| Report
+    Project --> Owner{Current Assignee}
+    Owner -->|Unassigned| Assign[Determine Intended Owner]
+    Owner -->|Someone Else| Handoff[Check for Dropped Work]
+    Owner -->|User| Triage[Triage Tickets]
+    Assign -->|User or No Intended Owner| Triage
+    Assign -->|Assigned Elsewhere or Unclear| Report
+    Handoff -->|Transferred to User| Triage
+    Handoff -->|Active Owner, Waiting, or Unclear| Report
     Triage -->|Set Triaged: Actionable Tickets| Deliver[Select and Deliver]
     Triage -->|None Actionable| Report
     Deliver -->|At Most One Implementation Ticket| Report
@@ -132,7 +137,7 @@ not verified nonmatches. Never infer creator from a parent
 for this routing rule. Refresh matching metadata when reopening cached inventory; changes to
 this filter require a full discovery.
 
-### Reconcile Ownership
+### Determine Intended Owner
 
 Check current assignment, description/full discussion, linked PRs, and relevant Slack for
 ticket-specific ownership evidence and later completion, withdrawal, refusal, or superseding direction.
@@ -141,22 +146,28 @@ that the person owns this work, independently of full relevance, completion, siz
 implementation-readiness investigation. Deep reads consume the assessment budget;
 age or lack of a visible update alone isn't proof of inactivity or invalid ownership.
 
-- **Unassigned:** A ticket-specific human request, acknowledgement, or commitment is
+A ticket-specific human request, acknowledgement, or commitment is
   sufficient when no later evidence contradicts it or establishes completed work.
   Among owners established by that human evidence, choose the strongest-supported:
   explicit commitment, current investigation, then responsibility for the affected area. If multiple intended owners
   remain tied, choose the first named in the original human request, not an agent summary or
   generated offer. Exclude incidental mentions, reviewers, FYIs, and people who declined.
-  Set and verify one assignee during this run, then post one Linear comment; FYI-mention
+  When an intended owner is established, set and verify one assignee, then post one Linear comment; FYI-mention
   the other intended owners using verified native mentions, except the user posting it.
   Add those owners as subscribers through a supported interface, preserving existing subscribers,
   and verify the result. Mentioning alone isn't subscription proof; report unavailable or
   unverified subscription controls separately while preserving the assignment. Unresolved
   identity or applicability of the ownership evidence to this ticket blocks assignment;
-  tie-breaking resolves routing, not acceptance or progress.
-- **Assigned:** Verify current ownership and later human handoffs; reconcile clear superseding
-  direction with a reasoned comment. Don't overwrite assignments from weak inference.
-- **Apparently inactive, assigned to someone else:** Confirm the work remains relevant and
+  tie-breaking resolves routing, not acceptance or progress. Retain unassigned work without an
+  intended owner and work assigned to the user for triage; report unresolved ownership.
+
+### Check for Dropped Work
+
+For other-owned tickets, use lightweight metadata to identify a plausible dropped commitment or
+explicit handoff. Reconcile verified superseding handoffs first; otherwise, if the owner is
+active or no takeover signal exists, stop and omit the ticket. Age, silence, or routine PR activity alone
+doesn't establish dropped work. Investigate credible signals and later human handoffs without
+overwriting ownership from weak inference. For a plausible takeover, confirm work remains relevant and
   inspect discussion, PRs, and project/worker activity. Post one Linear handoff offer in the
   user's voice: "Are you still working on this? I can take it if not. Unless you'd prefer to
   keep it, I'll pick it up after [date/time]." Mention the owner and set a deadline two business
@@ -313,13 +324,20 @@ Then use these sections in order, placing each ticket once:
   owner after investigation. Include proposed outreach with its audience. Retain unanswered
   consequential asks with original links; silence never resolves them. Workflow exclusions
   such as size or creator filters can merit a decision here; exclusion doesn't imply low value.
-- **Active Work:** A Markdown table for ready candidates, implementation or PR delivery
-  actively progressing, and material scope/size comparisons. Keep decision-only tickets above.
+- **Active Work:** A Markdown table for the user's or unassigned ready candidates,
+  implementation or PR delivery, and material scope/size comparisons. Keep decision-only tickets above.
 - **Waiting:** A compact list or sentence for passive feedback, prerequisites or handoffs;
   give each ticket's next event/owner and deadline when applicable.
 
-Omit unchanged work needing no user attention, including other-owned or inventory-only
-tickets. Report material actions in the outcome sentence without repeating ticket details.
+Show other-owned tickets only for assignee-flow activity: a new assignment, takeover offer,
+meaningful handoff response/change, accepted transfer, or ownership decision needing input.
+Omit actively owned work without qualifying assignee-flow activity or a pending ownership
+decision, even if its PR changes; routing to the Bugs project alone doesn't qualify. Keep
+unresolved handoffs in Waiting with their original deadlines. Report project
+routing as a concise count when useful. If reporting counts, call creator matches
+`creator-matching`, not eligible or ready; distinguish assessed and implementation-ready.
+Apply the same inclusion rules to inbox summaries. Omit inventory-only work needing no input.
+Report material actions in the outcome sentence without repeating ticket details.
 Sort each section by explicit human direction, priority/impact, then oldest creation
 (unknown last; ID breaks ties), not by Action. Omit empty sections and routine execution receipts.
 
@@ -338,8 +356,8 @@ an Unassigned prefix or separate commitment labels; reporting an owner doesn't a
 Link tickets/PR states/evidence. Action is this run's work:
 observed merges are Assessed; inventory-only or deferred assessments are Skipped.
 Notes explain why the ticket is included when unclear, what was checked/changed, and its
-disposition or next action. For Skipped, state the concrete reason: owner actively working,
-ownership not yet stale, unchanged prior disposition, exhausted budget, or unavailable evidence.
+disposition or next action. For Skipped, state the concrete reason, such as unchanged prior
+disposition, exhausted budget, or unavailable evidence.
 Distinguish verified routing from incomplete assessment; skipped work remains pending where
 checks are unfinished. An assignee alone doesn't establish activity or staleness.
 Use unknown for unverified facts, — for verified none.
