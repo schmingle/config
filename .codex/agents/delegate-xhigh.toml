@@ -1,7 +1,7 @@
 name = "delegate-xhigh"
 description = "Use directly for substantial design decisions, ambiguous investigations, independent critiques, or sensitive or critical work. Use delegate-high for difficult engineering, deep investigation, or consequential implementation. No prior attempt at another tier is required. Use the dedicated PR specialists for PR review and queue repair work."
 model = "gpt-6.1-sol"
-model_reasoning_effort = "max"
+model_reasoning_effort = "xhigh"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
