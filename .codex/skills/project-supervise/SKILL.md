@@ -150,7 +150,7 @@ reconciliation/reopening; change records only with scoped user authority.
 ### Steer Worker Back to the Approved Plan
 
 Compare actual progress and artifacts with ticket criteria and project contract. Send
-in-scope draft corrections through supported messaging, inspect their evidence and retain
+in-scope corrections before PR handoff through supported messaging, inspect their evidence and retain
 the original deadline.
 After readiness, report issues for the queue or user to handle without competing changes.
 Keep necessary amendments as proposals in Report with reasoning, impact and exact
@@ -176,7 +176,7 @@ approval requested; continue independent work.
   independence. Hold only collisions.
 - An open prerequisite PR alone does not block starting the next ticket. Identify which
   step needs its source, merge, or deployment. If authoring needs the prerequisite's
-  source and the dependency can be represented safely, stack the draft on the verified
+  source and the dependency can be represented safely, stack the branch on the verified
   parent with actual branch ancestry and the matching GitHub base. Dispatch independent
   implementation, preparation, or validation that can proceed under existing authority.
   Preserve merge and final verification gates. For steps that must wait, record the
@@ -352,7 +352,7 @@ inspect unknown execution next cycle rather than claiming settlement.
   Relay actual user authority with its source and scope; reuse exact approvals.
   Verify authorized writes and recover uncertain outcomes before retrying.
 - Follow [PR ownership](../../AGENTS.md#pr-delivery-ownership-in-project-workflows):
-  workers author/validate/ready drafts; the queue owns ready PRs. The supervisor
+  workers author and validate changes before opening PRs ready for review; the queue owns eligible PRs. The supervisor
   steers and evaluates alignment without editing PRs or taking over their pipeline.
 - Execution stays within approved tickets and scoped preparation. Missing scope
   needs a proposal. Deployment, production mutations, operational acceptance,

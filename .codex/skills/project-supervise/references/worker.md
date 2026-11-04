@@ -94,15 +94,16 @@ directions and the original deadline retain their scope. Tool approvals use nati
 ### Deliver
 
 For approved discovery/planning, report source-linked findings, limits and proposals;
-preparation authorizes no implementation/amendment. For implementation, author a
-draft with ticket/dependency links and meaningful local validation. Choose checks
+preparation authorizes no implementation/amendment. Complete implementation and meaningful
+local validation on the branch. Open only review-ready PRs with ticket/dependency links.
+Choose checks
 for concrete correctness questions; reuse fixtures, baselines and results only while
 code, inputs, environment and coverage remain applicable. Repeat affected checks after
 relevant changes/failures; preserve required final-candidate/parity checks and protected
 test contracts. Before readiness, check actual
 implementation against ticket/project criteria and execution against this contract.
 Correct in-scope deviations while authorized; disclose unresolved limits. Only this
-author readies the PR, handing risk/reviews/findings/CI/conflicts/merging to the queue.
+author opens or readies the PR, handing risk/reviews/findings/CI/conflicts/merging to the queue.
 Report later problems without competing pushes. Source/PR delivery does not prove
 deployment or project acceptance.
 

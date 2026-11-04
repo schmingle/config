@@ -2,7 +2,7 @@
 name: linear-ticket
 description: >-
     Triage the Linear queue and deliver one ticket within a configurable estimate
-    ceiling, including safe Draft work while clarifying. Report outstanding work
+    ceiling, including safe work while clarifying. Report outstanding work
     and critical questions. Explicit invocation only; no merging or deployment.
 disable-model-invocation: true
 ---
@@ -18,7 +18,7 @@ input is needed, ownership is redirected, or another meaningful exception warran
 
 - `count=20`: Positive integer; separate per-run caps on unique tickets deeply assessed
   and unique tickets changed, shared across stages/delegates. Metadata discovery is uncapped.
-- `size=m`: Maximum implementation estimate, including Draft-and-clarify. Accept short/full
+- `size=m`: Maximum implementation estimate, including Review-and-clarify. Accept short/full
   names case-insensitively: XS/Extra Small, S/Small, M/Medium, L/Large, XL/Extra Large.
   Resolve to the team's live estimate option and order; larger work is triage-only.
 
@@ -209,7 +209,7 @@ workflow triage. Dispositions:
 - **Stale:** Apply the age policy, recheck, post a first-person reasoned comment, then set
   native Canceled. Distinguish stale/unprioritized from fixed; invite reopening with current
   impact/example. Verify both writes and reconcile partial failures before retrying.
-- **Actionable:** Ready or safe for Draft-and-clarify. Technical uncertainty may proceed
+- **Actionable:** Ready or safe for Review-and-clarify. Technical uncertainty may proceed
   with safe defaults, clarification questions, or a material approach-difference notice.
 - **Hold:** Unresolved intended behavior/essential scope, unsafe unknowns, ownership,
   dependencies, access, or
@@ -274,7 +274,7 @@ or earlier omission and propose one consolidated revision, not successive unasse
 Compare the assessed set's actionable tickets by human direction, native priority, impact,
 urgency, dependencies, readiness, and meaningful activity. Recommend priority-field changes;
 don't silently apply them. Select **one** authorized outcome within `size`, including safe
-Draft-and-clarify; leave others queued without invented blockers. Incomplete assessment
+Review-and-clarify; leave others queued without invented blockers. Incomplete assessment
 isn't readiness. If none qualify, report instead of forcing a build. Assign selected unassigned
 work to the user before implementation; ownership reconciliation alone doesn't select a build.
 
@@ -284,32 +284,36 @@ comment only for meaningful information to the ticket creator; required particip
 are posted even when directed elsewhere. Combine relevant approach details and questions.
 Native status records routine starts.
 Ask user-directed questions/approvals in this chat. State the choice,
-recommendation, and whether safe Draft work can proceed or affected work needs an answer.
+recommendation, and whether safe work can proceed or affected work needs an answer.
 Route later discoveries and proposed follow-up comments to the user here before publishing.
 
 Follow repository isolation/authoring/testing guidance and protected-test approvals. Once
 selected, a new blocker doesn't permit choosing another implementation. Preserve/reuse
 existing branches/PRs; two-PR outcomes share acceptance, feedback timing, and combined validation.
 Confirm plan/assignment; new work enters Todo then In Progress, while resumed work keeps
-its lifecycle. Create Draft PRs with ticket links, behavior, approach, acceptance, and validation.
+its lifecycle. Open only review-ready PRs with ticket links, behavior, approach, acceptance,
+and validation. Keep work in progress on the branch.
 
-For Draft-and-clarify, publish participant questions in the initial implementation comment
-before implementation; add a Draft PR link only when useful to ticket participants. Keep affected PRs
-Draft until substantive feedback is applied or **48 hours from the questions' original ticket
-server publication** expire and documented safe defaults are used. User-directed questions
-go in this chat and require an answer or explicit direction before affected PRs become ready;
-chat silence doesn't start or satisfy that window. Safe Draft work may continue.
-Edits, reruns, and other PRs don't reset the window. Changed intended behavior/
-essential scope or unsafe unknowns still need approval before affected work; time never bypasses
-human Draft holds, ownership, relevance, prerequisites, permission, or tests.
+For Review-and-clarify, publish participant questions before implementation. When safe work
+is reviewable, open it ready with `noautomerge` applied at creation. If the tool cannot
+create the PR with the label, keep the work on the branch and report the blocker. Verify
+the label, record why it was applied, and link the PR in the comment if useful.
 
-While feedback is pending, keep Draft/appropriate active ticket status and report without
-waiting. Once gates clear, recheck answers/validation and resolve in-scope feedback. Without
-a feedback wait, verified complete work can be ready. Only on ready handoff, request review
+Remove only the clarification hold applied by this workflow, after applying substantive
+feedback or a documented safe default and validating the result. The default is allowed
+after **48 hours from the questions' original ticket server publication**. Edits, reruns,
+and other PRs don't reset the window. User-directed questions go in this chat and require
+an answer or explicit direction before releasing affected work to the queue. Chat silence
+doesn't start or satisfy that window. Preserve separate holds, ownership, relevance,
+prerequisites, permissions, and test requirements. Changed intended behavior, essential
+scope, or unsafe unknowns still require approval before affected work.
+
+While feedback is pending, keep the appropriate active ticket status and report without
+waiting. At queue handoff, request review
 under repository policy and move to In Review. Post a delivery comment only when it conveys
 meaningful new information to the ticket creator; PR readiness, CI and review handoff alone
 do not qualify. PR review follows the user's review workflow; never imply the creator is asked
-to review unless explicitly requested. The merge queue owns ready PRs: observe/report without
+to review unless explicitly requested. The merge queue owns eligible PRs: observe/report without
 competing pushes, Draft reversions, or review/CI/merge work unless explicitly directed.
 Distinguish merged, deployed, and operationally accepted.
 
@@ -378,7 +382,7 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
   validation details in the PR. Keep Codex chat links, approval provenance, and workflow
   bookkeeping in chat or private checkpoints, not Linear.
 - Honor read-only/report-only limits. Normal runs authorize Linear assessment/updates,
-  eligible stale cancellations, and one ticket's implementation/commits/pushes/Draft/ready
+  eligible stale cancellations, and one ticket's implementation/commits/pushes/PR
   handoff. Exclude merging, auto-merge, deployment, production writes, project creation/
   reorganization except the configured bug-project routing above, email/SMS/Slack messages,
   and automation changes. Readiness/silence isn't
@@ -399,7 +403,7 @@ replenish budgets, or permit a second implementation. Don't revive completed/wit
   offers/completion; stale cancellation reasons and reopening invitations; the first
   implementation update with the approach and known participant questions; and ready delivery.
   Apply creator relevance to optional start and ready-delivery comments as specified above;
-  required participant questions remain mandatory. Add a useful later Draft PR link by editing
+  required participant questions remain mandatory. Add a useful later PR link by editing
   the initial implementation comment when one exists. Route other
   proposed comments to the user here and await explicit instruction before publishing.
   Speak on the user's behalf in their voice, naturally and conversationally, following the

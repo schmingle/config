@@ -29,7 +29,7 @@ other external actions require the applicable explicit authority.
   through supported review controls before retrying. A continuing denial holds affected
   dispatch without transport bypass; independent authorized work continues.
 - **Readiness and alignment:** failed/incomplete coverage holds affected new dispatch
-  without stopping supported active/independent work. Drift is corrected in drafts;
+  without stopping supported active/independent work. Drift is corrected before PR handoff;
   user-owned plan changes stay proposals. Readiness age alone cannot resume a pause.
 - **Partial blockage:** one worker needs recovery or a user decision while another
   progresses. Attempt the lane's authorized unblocks and prepare its exact request;
@@ -44,7 +44,7 @@ other external actions require the applicable explicit authority.
   from any stage goes to settlement/report; unknown execution prevents another ticket.
 - **Authority and delivery:** generic supervision makes no manual Linear writes;
   scoped user authority permits only the named writes with provenance/readback.
-  Draft self-check precedes readiness; queue owns ready PRs. Preserve protected tests,
+  Author self-check precedes opening a review-ready PR; queue owns eligible PRs. Preserve protected tests,
   deployment and human acceptance boundaries.
 - **Wait and stop:** monitor an identified active process despite unchanged checks.
   A Todo assignee alone is not active. User-only waits retain the first actionable
