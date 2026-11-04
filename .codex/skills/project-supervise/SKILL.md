@@ -174,6 +174,10 @@ approval requested; continue independent work.
   pending changes and runtime resources. Barrels, generated metadata, mocks and
   fixtures need one owner or serialized edits. Separate worktrees alone do not prove
   independence. Hold only collisions.
+- Before declaring work blocked by a prerequisite, identify exactly what needs it to land.
+  Check for independent authoring, a justified stack with verified ancestry, or bounded
+  preparation or validation. Dispatch what can proceed under existing authority; for work
+  that must wait, record the blocker, its owner, and the next event to check.
 - For future implementation assignments, prefer [coding-low](../../agents/coding-low.toml)
   for prescribed edits, codemods and deterministic regeneration; [coding-medium](../../agents/coding-medium.toml)
   for bounded judgment within established contracts; and [coding-high](../../agents/coding-high.toml)
@@ -208,6 +212,12 @@ approval requested; continue independent work.
   current evidence is insufficient. Process actionable messages promptly.
   Ordinary steering changes only its stated scope; preserve unaffected execution/deadlines.
   Prepare the next handoff and dispatch useful work without routine batch approvals.
+  Before ending any turn, including a heartbeat or a reply to the user, reconcile worker
+  results and refill eligible settled slots. If workers are active or uncertain, or approved
+  work or a concrete wait can advance, return to bounded native waits and repeat the loop.
+  Posting a report, dispatching a worker, or asking a question does not end supervision while
+  independent work can proceed. Yield only on explicit detach, stop or pause, verified
+  completion, or when no useful execution or credible wait remains.
   Runtime subagent capacity is separate from the approved project assignment cap.
 
 Off hours, the user authorizes a separate queue chat when project-ready PRs have
