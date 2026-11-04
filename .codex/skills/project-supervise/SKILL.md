@@ -174,10 +174,13 @@ approval requested; continue independent work.
   pending changes and runtime resources. Barrels, generated metadata, mocks and
   fixtures need one owner or serialized edits. Separate worktrees alone do not prove
   independence. Hold only collisions.
-- Before declaring work blocked by a prerequisite, identify exactly what needs it to land.
-  Check for independent authoring, a justified stack with verified ancestry, or bounded
-  preparation or validation. Dispatch what can proceed under existing authority; for work
-  that must wait, record the blocker, its owner, and the next event to check.
+- An open prerequisite PR alone does not block starting the next ticket. Identify which
+  step needs its source, merge, or deployment. If authoring needs the prerequisite's
+  source and the dependency can be represented safely, stack the draft on the verified
+  parent with actual branch ancestry and the matching GitHub base. Dispatch independent
+  implementation, preparation, or validation that can proceed under existing authority.
+  Preserve merge and final verification gates. For steps that must wait, record the
+  blocker, its owner, and the next event to check.
 - For future implementation assignments, prefer [coding-low](../../agents/coding-low.toml)
   for prescribed edits, codemods and deterministic regeneration; [coding-medium](../../agents/coding-medium.toml)
   for bounded judgment within established contracts; and [coding-high](../../agents/coding-high.toml)
