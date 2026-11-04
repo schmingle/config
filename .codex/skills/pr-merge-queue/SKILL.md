@@ -16,27 +16,10 @@ Automate the PR pipeline to deliver high-quality code to `main` or the verified 
 
 ## Flow
 
-```mermaid
-flowchart TD
-    subgraph Start[Start Run]
-        Validate[Validate Parameters] -->|Valid|Concurrent{Another Active Queue Run?}
-    end
-    Validate -->|Invalid Input| Report[Settle and Report]
-    Concurrent -->|Yes or Inspection Error| Report
-    Concurrent -->|None Found| Discover[Discover Candidates]
-    Discover -->|Error or No Candidates| Report
-    Discover -->|Candidates Remain| Coordinate[Coordinate Work]
-    Coordinate --> Continue{Within Limits and Useful Work Remains?}
-    Continue -->|No| Report
-    Continue -->|Yes| Ready{Eligible Merge Available and Count Allows?}
-    Ready -->|Yes| Merge[Merge and Reconcile Dependencies]
-    Merge --> Coordinate
-    Ready -->|Risk or Review Needed| Review[Assess Risk and Review]
-    Review --> Coordinate
-    Ready -->|Repair, Disposition, or Bounded Wait| Coordinate
-```
+Follow **Start Run** and **Discover Candidates** once, then repeat:
 
-Branches represent concurrent jobs, not queue-wide phases. Merge eligible PRs before filling specialist slots.
+1. **Refresh the Queue.** Collect finished results, refresh affected PRs, and check run limits. Settle if a limit is reached. If all five slots are occupied or reserved, wait for a worker result within the run limits and repeat this step. With spare capacity, scan for work that fits. If nothing can advance, follow the discovery and bounded wait rules below. Repeat this step after waiting, or settle once permitted work is exhausted.
+2. **Advance the Queue.** Merge eligible PRs when the count allows, then dispatch the next useful independent action that fits the available slots and time. Dispatch asynchronously and return immediately to step 1.
 
 ### Start Run
 
@@ -62,7 +45,7 @@ Use `--repo HOST/OWNER/REPO` wherever supported. For `gh api`, use `--hostname H
 
 ### Coordinate Work
 
-Each loop collects results, refreshes affected GitHub state, merges eligible PRs, then fills slots. Use direct `gh pr view`, `gh api`, and `gh run view`; batch independent reads and reuse unchanged evidence. Closed/merged PRs are history only. Reuse definitions and guides already read by this coordinator unless incomplete or changed; fresh specialists still load their own guidance.
+Use direct `gh pr view`, `gh api`, and `gh run view`; batch independent reads and reuse unchanged evidence. Closed/merged PRs are history only. Reuse definitions and guides already read by this coordinator unless incomplete or changed; fresh specialists still load their own guidance.
 
 #### Capacity and Timing
 
@@ -99,7 +82,7 @@ When slots are scarce, prioritize actions that can enable a merge this run, incl
 
 Choose actions that advance safe delivery or unblock dependent work while reusing settled evidence. Set an integration order and serialize repairs that materially invalidate one another; continue independent source reviews and other candidates while integration or CI waits. Refresh affected siblings after a merge. After settlement, review the remaining integration delta against accepted source coverage rather than restarting unchanged review work.
 
-When capacity opens, reconsider untouched and deferred admitted candidates. Before otherwise waiting or stopping for exhaustion, if enough working time remains for a useful action, refresh the lightweight List and Filter inventory once and admit newly eligible PRs under the same gates. Rescan admitted work when a slot opens or new evidence changes what can advance. Refresh discovery again only when candidate eligibility may have changed. Preserve original limits and deadlines, count each PR once across discovery/refreshes, and remove its earlier exclusion if later admitted. Before waiting, scan all admitted PRs for independent actions that fit available capacity and remaining time. Dispatch them while slots remain. If none can advance, identify the pending event and the constraints on further dispatch. A merge hold, including above-ceiling risk, does not itself prevent useful permitted repair, disposition, or review.
+When capacity opens, reconsider untouched and deferred admitted candidates. Before otherwise waiting or stopping for exhaustion, if enough working time remains for a useful action, refresh the lightweight List and Filter inventory once and admit newly eligible PRs under the same gates. Rescan admitted work when a slot opens or new evidence changes what can advance. Refresh discovery again only when candidate eligibility may have changed. Preserve original limits and deadlines, count each PR once across discovery/refreshes, and remove its earlier exclusion if later admitted. Before waiting, scan all admitted PRs for independent actions that fit available capacity and remaining time. If one fits, advance the queue. Otherwise identify the pending event and the constraints on further dispatch. A merge hold, including above-ceiling risk, does not itself prevent useful permitted repair, disposition, or review.
 
 #### Repairs
 
