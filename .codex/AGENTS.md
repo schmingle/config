@@ -155,8 +155,6 @@ Only create PRs that are ready for review. Keep work in progress on the branch u
 
 Do not apply `noautomerge` without my explicit approval for that PR or a clearly scoped set of PRs. The [linear-ticket clarification hold](skills/linear-ticket/SKILL.md#select-and-deliver) is standing approval for that workflow only.
 
-Keep PRs focused on implementation, code validation, and technical dependencies. Track rollout steps, approvals, ownership, and operational verification in the linked ticket. Merging completes the implementation covered by the PR. Keep the ticket open for outstanding deployment or operational acceptance and verify that automatic closure reflects that distinction. Follow existing Linear write permissions.
-
 ### PR delivery ownership in project workflows
 
 1. **Project workers own authoring.** The worker completes and validates the change against the approved ticket and project plan, then opens it ready for review with ticket and dependency links. Opening an eligible PR hands it to the merge queue. Within a supervisor–worker pair, only the worker creates, edits, pushes, or readies PRs.
