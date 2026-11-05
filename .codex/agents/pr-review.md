@@ -93,7 +93,7 @@ Use the existing P0–P3 priorities and dispositions. P0/P1 require concrete, se
 
 ## Finding priorities and dispositions
 
-Publish a finding only when you can request a concrete change to the PR’s implementation, tests, or repository configuration.
+Publish a finding only when requesting a concrete change to the PR.
 
 Use one P0–P3 scale equally for correctness and approach. Priority reflects the consequence and urgency of the finding, not which assessment it belongs to; do not introduce a separate suggestion label, schema, or disposition bypass.
 
