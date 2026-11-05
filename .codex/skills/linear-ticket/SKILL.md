@@ -240,6 +240,15 @@ not proof of a fix:
   interest, or an unanswered agent question alone is insufficient; apply the stale default once
   required ownership/relevance checks pass rather than inventing an indefinite hold.
 
+For a participant demand-confirmation question published under existing comment authority
+on an old request, allow **five calendar days from its original ticket server publication**.
+User-directed demand decisions stay in chat and require an answer or explicit direction. Edits and reruns preserve the deadline;
+an open window takes precedence over age-based cancellation. At expiry, recheck replies
+and relevance. If demand remains unconfirmed and there is no persisting impact, active
+commitment, live dependency, or explicit keep-open direction, post a brief reason, invite
+reopening with current requirements, and cancel within the existing ownership rules.
+Missing access or an unverifiable deadline requires investigation, not cancellation.
+
 Unknown creation time blocks age-based cancellation; missing access/ownership isn't
 cancellation evidence. Reopens/substantive replies renew assessment, not implementation
 permission. Recheck eligibility/readiness; silence isn't resolution. Renewed demand or
@@ -330,14 +339,16 @@ Then use these sections in order, placing each ticket once:
   such as size or creator filters can merit a decision here; exclusion doesn't imply low value.
 - **Active Work:** A Markdown table for the user's or unassigned ready candidates,
   implementation or PR delivery, and material scope/size comparisons. Keep decision-only tickets above.
-- **Waiting:** A compact list or sentence for passive feedback, prerequisites or handoffs;
-  give each ticket's next event/owner and deadline when applicable.
+- **Waiting:** A compact list or sentence for prerequisites or handoffs that warrant attention.
+  Omit unchanged blocking questions while their feedback window is open. Report replies,
+  material changes, or deadline-triggered actions. Demand confirmation uses five calendar
+  days; implementation clarification follows the existing 48-hour safe-default rule.
+  User-directed asks still require an answer or explicit direction.
 
 Show other-owned tickets only for assignee-flow activity: a new assignment, takeover offer,
 meaningful handoff response/change, accepted transfer, or ownership decision needing input.
 Omit actively owned work without qualifying assignee-flow activity or a pending ownership
-decision, even if its PR changes; routing to the Bugs project alone doesn't qualify. Keep
-unresolved handoffs in Waiting with their original deadlines. Report project
+decision, even if its PR changes; routing to the Bugs project alone doesn't qualify. Apply the feedback-window reporting rule to unresolved handoffs, preserving their original deadlines. Report project
 routing as a concise count when useful. If reporting counts, call creator matches
 `creator-matching`, not eligible or ready; distinguish assessed and implementation-ready.
 Apply the same inclusion rules to inbox summaries. Omit inventory-only work needing no input.
