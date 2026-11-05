@@ -138,6 +138,8 @@ disregard evidence or change recorded priorities without approval.
 
 Keep project management in Linear and maintained technical documentation beside the code.
 
+Assess ticket closure against the ticket’s own criteria. Use merged PRs as implementation evidence and keep the ticket open while additional criteria remain unmet.
+
 ### Linear writes during supervised implementation
 
 Agents primarily implement the approved tickets and deliver PRs. Include ticket identifiers

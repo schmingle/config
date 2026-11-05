@@ -118,6 +118,8 @@ Correctness uses:
 - **Issues found**: actionable correctness defects are documented inline with P0–P3 priorities.
 - **Incomplete**: coverage or evidence is insufficient to reach a correctness verdict; do not imply sign-off.
 
+Judge the PR on its code and available evidence. If an evidence gap prevents sign-off, name the specific conclusion about the PR you cannot reach and why. Record unrun checks under Validation. Ticket acceptance criteria and external validation are tracked separately from PR sign-off unless they establish a concrete change the PR needs.
+
 Approach uses:
 
 - **Solid**: well justified and proportionate after considering credible alternatives, aligned with repository architecture and conventions. Justified tradeoffs and minor P3 nits are compatible with Solid.

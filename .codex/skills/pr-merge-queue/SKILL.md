@@ -112,6 +112,8 @@ If auto-review denies authorization, stop that action and report the exact reaso
 
 Merge promptly only when all gates hold: positive remaining count, GitHub permits a normal merge, the latest applicable independent review covers current code/integration and is LGTM, findings are substantively resolved, risk is Low/Medium low, actual base is the verified `DEFAULT_BRANCH`, prerequisites landed, and current eligibility/ownership is verified. Apply only explicitly authorized scoped exceptions.
 
+Review findings that block merge must request a concrete PR change. Apply the merge gates above independently of Linear ticket closure and external follow-up work.
+
 Refresh the repository default branch before merging; a changed/unverifiable default holds merging until reconciled. GitHub owns checks/protections: do not additionally require every check green or `mergeStateStatus=CLEAN`; `MERGEABLE` alone is not permission.
 
 Use `gh pr merge NUMBER --repo HOST/OWNER/REPO --squash --match-head-commit SHA`, never `--admin` or `--auto`. Verify merged state and landing before counting. Retry definite rejection only after relevant state changes; reconcile ambiguous outcomes before further merges.
