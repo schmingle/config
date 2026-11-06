@@ -59,11 +59,7 @@ through live lookup or confirmed identity, not OS/Git identity. Read `team`, `re
 the required nonempty `creatorIds` allowlist from `~/.codex/private/linear-ticket-workflows.json`;
 verify creator identities in the intended workspace, and stop if the allowlist is missing or invalid.
 Normalize `size` aliases and reject unsupported values. Use the workflow size order for
-selection. Verify the team’s live estimate mapping before using numeric values. If the
-connector cannot verify the mapping, use the authenticated work Chrome profile’s native
-Linear estimate selector to set the independently assessed size by label. Verify the issue,
-team, and saved label. If neither route is available, report the assessed size and the write
-blocker, and continue triage.
+selection.
 Legacy `maxEstimate`/`mediumEstimateLabel` don't override `size`.
 
 Verify team/statuses; discover configured-team Triage/Backlog and Todo/In Progress/In Review
@@ -262,9 +258,16 @@ Revise the approach and estimate when new evidence changes them. Obtain approval
 to approved scope or behavior.
 
 The complete outcome must fit **`size` and one or two coherent PRs**. Don't omit essential
-behavior, compatibility, permissions, or test protection to fit. Set the evidence-supported estimate during triage using the verified write route above. Compare the independently assessed size of the
-complete work directly with `size` using the workflow order. Preserve its assignee. Above `size` is triage-only;
+behavior, compatibility, permissions, or test protection to fit. Compare the independently
+assessed size directly with `size` using the workflow order. Preserve its assignee.
+Above `size` is triage-only;
 no automatic children or oversized parent execution. Splits/project changes need approval.
+
+Save the independently assessed estimate during triage. Verify the team’s live estimate
+mapping before writing a numeric value. If the connector cannot verify it, use the native
+estimate selector in the authenticated work Chrome profile. Verify the issue, team, and
+saved estimate. If the write cannot be completed or verified, report the assessed size and
+exact write blocker. Continue otherwise eligible implementation using the assessed size.
 
 Before requesting split approval, investigate the complete decomposition. Each implementation
 leaf needs an evidence-supported estimate within `size`, a coherent outcome, dependencies,
@@ -276,6 +279,15 @@ If missing evidence prevents credible sizing, finish obtainable investigation or
 before proposing children. Approved children still need execution readiness checks; tracking
 approval isn't implementation approval. If later evidence changes sizing, explain the new facts
 or earlier omission and propose one consolidated revision, not successive unassessed splits.
+
+#### Verify Triage Outcomes
+
+Before selection or reporting, check each deeply assessed ticket for a verified assignee or
+exact ownership blocker, a disposition, and a concrete next action where work remains. For
+tickets needing implementation triage, also check for an independent size and verified saved
+estimate. Distinguish missing sizing evidence from an estimate write failure. Finish
+obtainable steps this run within existing authority and budgets. If blocked or interrupted,
+record the exact next check.
 
 ### Select and Deliver
 
@@ -370,8 +382,9 @@ an Unassigned prefix or separate commitment labels; reporting an owner doesn't a
 Link tickets/PR states/evidence. Action is this run's work:
 observed merges are Assessed; inventory-only or deferred assessments are Skipped.
 Notes explain why the ticket is included when unclear, what was checked/changed, and its
-disposition or next action. For Skipped, state the concrete reason, such as unchanged prior
-disposition, exhausted budget, or unavailable evidence.
+disposition or next action. For Skipped, give the specific reason. If a limit was reached,
+name the limit and the operation it prevented. The assessment cap does not stop checks on
+already-counted tickets, and the change cap does not stop read-only investigation.
 Distinguish verified routing from incomplete assessment; skipped work remains pending where
 checks are unfinished. An assignee alone doesn't establish activity or staleness.
 Use unknown for unverified facts, — for verified none.
