@@ -255,9 +255,11 @@ explicit human keep-open direction prevents repeat cancellation without new evid
 
 #### Approach and Size
 
-For bugs, extract observations, expected behavior, reproduction facts, and constraints;
-investigate independently before comparing implementation suggestions/estimates. For
-requests, preserve the outcome while independently choosing implementation/size.
+Identify the issue, intended outcome, constraints, and evidence, including reproduction
+steps when available. Disregard suggested implementations and estimates. Always investigate
+independently, choose the implementation best supported by the evidence, and size it yourself.
+Revise the approach and estimate when new evidence changes them. Obtain approval for changes
+to approved scope or behavior.
 
 The complete outcome must fit **`size` and one or two coherent PRs**. Don't omit essential
 behavior, compatibility, permissions, or test protection to fit. Set the evidence-supported estimate during triage using the verified write route above. Compare the independently assessed size of the
