@@ -59,9 +59,11 @@ through live lookup or confirmed identity, not OS/Git identity. Read `team`, `re
 the required nonempty `creatorIds` allowlist from `~/.codex/private/linear-ticket-workflows.json`;
 verify creator identities in the intended workspace, and stop if the allowlist is missing or invalid.
 Normalize `size` aliases and reject unsupported values. Use the workflow size order for
-selection. Verify Linear's estimate mapping only when interpreting or writing a value that
-requires it. If the mapping is unavailable, leave that field unverified or skip the estimate
-write and continue the workflow.
+selection. Verify the team’s live estimate mapping before using numeric values. If the
+connector cannot verify the mapping, use the authenticated work Chrome profile’s native
+Linear estimate selector to set the independently assessed size by label. Verify the issue,
+team, and saved label. If neither route is available, report the assessed size and the write
+blocker, and continue triage.
 Legacy `maxEstimate`/`mediumEstimateLabel` don't override `size`.
 
 Verify team/statuses; discover configured-team Triage/Backlog and Todo/In Progress/In Review
@@ -156,8 +158,9 @@ A ticket-specific human request, acknowledgement, or commitment is
   and verify the result. Mentioning alone isn't subscription proof; report unavailable or
   unverified subscription controls separately while preserving the assignment. Unresolved
   identity or applicability of the ownership evidence to this ticket blocks assignment;
-  tie-breaking resolves routing, not acceptance or progress. Retain unassigned work without an
-  intended owner and work assigned to the user for triage; report unresolved ownership.
+  tie-breaking resolves routing, not acceptance or progress. When the ownership check finds no other intended owner, assign an eligible unassigned
+  ticket to the user and verify it during triage. Preserve existing holds and write limits.
+  Report ambiguous ownership separately.
 
 ### Check for Dropped Work
 
@@ -186,8 +189,7 @@ private checkpoints; include relevant evidence in permitted ownership comments. 
 unverified offer or deadline cannot justify takeover. No assignment implies a start,
 deadline commitment, or implementation approval.
 
-Retain user-owned tickets and unassigned work with no intended owner for implementation
-triage. Retain unresolved ownership/handoffs internally; surface consequential decisions or
+Retain user-owned tickets for implementation triage. Retain unresolved ownership/handoffs internally; surface consequential decisions or
 passive waits under Report while independent work continues. Other-owned work isn't
 executable by this workflow. Reviews on the user's PR
 aren't competing ownership. Assignment changes don't override scope, size, or readiness gates.
@@ -212,8 +214,7 @@ workflow triage. Dispositions:
 - **Hold:** Unresolved intended behavior/essential scope, unsafe unknowns, ownership,
   dependencies, access, or
   permission block affected work. Investigate obtainable facts; otherwise report blocker,
-  owner, resumption condition, and critical user questions. Don't claim held work for
-  implementation. Route follow-up questions and split/project approval requests to the user
+  owner, resumption condition, and critical user questions. Keep held work out of implementation. Route follow-up questions and split/project approval requests to the user
   in this chat. Above `size`, recommend a split/project and report needed approval.
 
 Judge complete outcomes, including rollout/acceptance. Multi-phase/multi-owner work may
@@ -259,9 +260,8 @@ investigate independently before comparing implementation suggestions/estimates.
 requests, preserve the outcome while independently choosing implementation/size.
 
 The complete outcome must fit **`size` and one or two coherent PRs**. Don't omit essential
-behavior, compatibility, permissions, or test protection to fit. Update estimates from
-evidence when the write value is verified. Compare the independently assessed size of the
-complete work directly with `size` using the workflow order. Do not claim oversized work or remove its assignee. Above `size` is triage-only;
+behavior, compatibility, permissions, or test protection to fit. Set the evidence-supported estimate during triage using the verified write route above. Compare the independently assessed size of the
+complete work directly with `size` using the workflow order. Preserve its assignee. Above `size` is triage-only;
 no automatic children or oversized parent execution. Splits/project changes need approval.
 
 Before requesting split approval, investigate the complete decomposition. Each implementation
@@ -281,8 +281,8 @@ Compare the assessed set's actionable tickets by human direction, native priorit
 urgency, dependencies, readiness, and meaningful activity. Recommend priority-field changes;
 don't silently apply them. Select **one** authorized outcome within `size`, including safe
 Review-and-clarify; leave others queued without invented blockers. Incomplete assessment
-isn't readiness. If none qualify, report instead of forcing a build. Assign selected unassigned
-work to the user before implementation; ownership reconciliation alone doesn't select a build.
+isn't readiness. If none qualify, report instead of forcing a build. Verify user ownership
+before implementation.
 
 Before implementing, trace the reported case through relevant acceptance behavior to surface
 likely questions, policy conflicts, and material approach differences. Post an optional start
