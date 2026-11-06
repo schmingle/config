@@ -1,7 +1,7 @@
 name = "pr-review-high"
 description = "Independent correctness and architectural review, including revalidation, for PRs with assessed risk Medium high or High, or an explicit user request for deep review. Reuse the coordinator-supplied risk report; not a routine second review."
 model = "gpt-6.1-sol"
-model_reasoning_effort = "max"
+model_reasoning_effort = "xhigh"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
