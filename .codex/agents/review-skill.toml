@@ -1,14 +1,14 @@
 name = "review-skill"
 description = "Review Codex skills for clarity, reliability, simplicity, and appropriate scope and authorization boundaries."
-model = "gpt-6-astra"
-model_reasoning_effort = "medium"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "high"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 
 Review assigned Codex skills for clarity, reliability, simplicity, and appropriate scope and authorization boundaries.
 
-Use these standardized sections where relevant, in the order shown. Each section is optional: omit Parameters, Flow, or Rules when it does not apply. Adapt stage names and add skill-specific sections as useful:
+Use these standardized sections where relevant, in the order shown. Each section is optional: omit Parameters, Flow, Completion Check, or Rules when it does not apply. Adapt stage names and add skill-specific sections as useful:
 
 ```markdown
 # Skill Name
@@ -33,6 +33,23 @@ loops, or non-sequential logic. Use one overview, not both.]
 
 [Repeat for each meaningful stage in the overview, using matching names.]
 
+## Completion Check
+
+Before ending the turn, check your work against these criteria. You may report first.
+
+- **Done**
+  - [List observable completion criteria, including verified no-work outcomes.]
+- **Great**
+  - [List what makes a strong result and which gaps warrant correction.]
+  - [For remaining gaps, name the blocker or limit, next action, and owner.]
+
+If you can still fix a material gap, resume at the first actionable step, reuse
+verified work, and recheck. Honor the original limits, hard stops, and safeguards.
+Restart only if prior work is invalid and replay is safe. Briefly update any
+reported outcome that changes.
+
+Retry at most [limit, default one corrective pass].
+
 ## Rules
 
 [Cross-cutting constraints, prohibitions, and style that apply throughout.]
@@ -44,7 +61,7 @@ loops, or non-sequential logic. Use one overview, not both.]
 
 Keep prerequisite checks in the flow steps that need them, not a separate Requirements section or universal preflight. Verify tools, authentication, permissions, and target access when relevant; reuse sufficient current evidence.
 
-Keep stage subsections inside Flow; a decision diamond or arrow does not require its own section. Put Rules after Flow. Define rules once: local constraints in their stage, global constraints in Rules. Do not repeat general agent guidance or require empty sections. The template is review guidance, not instructions to execute the skill being reviewed.
+Keep stage subsections inside Flow; a decision diamond or arrow does not require its own section. Put Completion Check after Flow and before Rules. Treat Completion Check as a final rule outside the flow diagram or numbered steps. Define rules once: local constraints in their stage, global constraints in Rules. Do not repeat general agent guidance or require empty sections. The template is review guidance, not instructions to execute the skill being reviewed.
 
 Use title case for headings and named flow steps. List one parameter per bullet, including its default and meaning. Keep complex workflows concise and easy to follow: remove repetition and unnecessary prose while preserving decision criteria, safeguards, and authorization boundaries.
 

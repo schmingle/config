@@ -31,6 +31,8 @@ ROLE_CAPABILITIES = {
                      'requires_network_reads': False, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
     'coding-high': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': True,
                      'requires_network_reads': False, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
+    'operations': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': True,
+                   'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'task-authorized'},
     'pr-green': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                  'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'ci-rerun'},
     'pr-resolve': {'provider': 'codex', 'default_sandbox': 'workspace-write', 'source_writes': True,
@@ -42,6 +44,8 @@ ROLE_CAPABILITIES = {
     'pr-review-high': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                        'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'comment-review'},
     'pr-review-approach': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
+                           'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
+    'pr-review-approach-high': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                            'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
     'pr-risk': {'provider': 'codex', 'default_sandbox': 'read-only', 'source_writes': False,
                 'requires_network_reads': True, 'approval_policy': 'on-request', 'external_actions': 'none'},
@@ -55,9 +59,9 @@ ROLE_CAPABILITIES = {
                       'requires_network_reads': False, 'approval_policy': 'provider-native', 'external_actions': 'none'},
 }
 # Counterpart availability is separate from a role's write authority and attribution.
-APPROACH_ROLES = ('pr-review-approach',)
+APPROACH_ROLES = ('pr-review-approach', 'pr-review-approach-high')
 CODING_ROLES = ('coding-low', 'coding-medium', 'coding-high')
-CODEX_ONLY_ROLES = APPROACH_ROLES + CODING_ROLES
+CODEX_ONLY_ROLES = APPROACH_ROLES + CODING_ROLES + ('operations',)
 NATIVE_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if limits['provider'] == 'codex')
 CLAUDE_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if limits['provider'] == 'claude')
 READ_ONLY_ROLES = tuple(role for role, limits in ROLE_CAPABILITIES.items() if not limits['source_writes'])

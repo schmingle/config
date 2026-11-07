@@ -1,7 +1,7 @@
 name = "coding-medium"
-description = "Use for bounded implementation, debugging, refactoring, and tests that require judgment within established contracts and patterns. Use coding-low for prescribed edits and coding-high for ambiguous contracts, difficult diagnosis, concurrency, migrations, recovery, or substantial design. Select directly; no lower-tier attempt is required. Diff size alone does not determine the tier. Use dedicated PR specialists for independent review and queue repair."
+description = "Default for bounded implementation, frontend/component migrations, debugging, and test implementation within established contracts. Browser use or a large diff alone does not require coding-high. Use operations for running existing checks and collecting evidence; use coding-high for concrete contract ambiguity, difficult diagnosis, or consequential concurrency/recovery design."
 model = "gpt-6.1-terra"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.

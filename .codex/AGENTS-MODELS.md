@@ -85,9 +85,9 @@ justify another recommendation, subject to explicit requests and workflow settin
 | Agent | Model / effort | Routing |
 | --- | --- | --- |
 | `delegate-low` | GPT-6.1 Terra / medium | Mechanical work with a prescribed method and cheap verification. |
-| `delegate-medium` | GPT-6.1 Terra / xhigh | Bounded implementation, debugging, refactoring, and investigation within established patterns. |
-| `delegate-high` | GPT-6.1 Sol / xhigh | Difficult engineering, deep investigation, or consequential implementation. |
-| `delegate-xhigh` | GPT-6.1 Sol / max | Substantial design decisions, ambiguous investigations, independent critiques, or sensitive or critical work. |
+| `delegate-medium` | GPT-6.1 Sol / medium | Bounded noncoding analysis and investigation within established patterns. |
+| `delegate-high` | GPT-6.1 Sol / high | Deep noncoding investigation and consequential engineering analysis. |
+| `delegate-xhigh` | GPT-6.1 Sol / xhigh | Substantial design decisions, ambiguous investigations, independent critiques, or sensitive or critical work. |
 
 This generic ladder is an explicit user-approved default exception to Layer 1's
 nature-of-work rows. It does not rewrite those advisory recommendations or require
@@ -97,12 +97,21 @@ descriptions retain routing boundaries, including dedicated PR specialists for
 review and queue repair. These defaults are approved preferences, not benchmark
 findings.
 
+### Operations
+
+| Agent | Model / effort | Routing |
+| --- | --- | --- |
+| `operations` | GPT-6.1 Terra / high | Browser workflows, screenshots, existing test execution, evidence collection, and bounded operational troubleshooting. |
+
+This Codex-only role follows existing task authorization. Use coding roles for source/test
+changes, generic delegates for analysis, and dedicated PR roles for queue work.
+
 ### Coding agents
 
 | Agent | Model / effort | Routing |
 | --- | --- | --- |
 | `coding-low` | GPT-6.1 Terra / medium | Prescribed edits, codemods, boilerplate, and deterministic regeneration. |
-| `coding-medium` | GPT-6.1 Terra / xhigh | Bounded implementation requiring judgment within established contracts. |
+| `coding-medium` | GPT-6.1 Terra / high | Bounded implementation, frontend migrations, and test changes within established contracts. |
 | `coding-high` | GPT-6.1 Sol / high | Ambiguous contracts, difficult diagnosis, concurrency, migrations, recovery, or substantial design. |
 
 Prefer these roles for coding assignments. Select directly from the role's
@@ -119,21 +128,14 @@ this addition does not retarget supervisors, automations, or the PR queue.
 
 | Agent | Work type | Default task level | Model / effort | Routing |
 | --- | --- | --- | --- | --- |
-| `pr-review` | Code review | High | GPT-6.1 Sol / high | Assessed risk Medium or below, without an explicit deep-review request. |
-| `pr-review-high` | Code review | Xhigh | GPT-6.1 Sol / max | Assessed risk Medium high or High, or an explicit deep-review request. |
-| `pr-review-approach` | Code review: Approach analysis | High | GPT-6.1 Sol / xhigh | Optional native child for material architectural questions, selected by either primary reviewer. |
+| `pr-review` | Correctness review | High | GPT-6.1 Terra / high | Medium risk or below without a deep-review request. |
+| `pr-review-high` | Correctness review | High | GPT-6.1 Sol / high | Medium high or High risk, or explicit deep-review request. |
+| `pr-review-approach` | Approach review | High | GPT-6.1 Terra / high | Default child for either primary reviewer. |
+| `pr-review-approach-high` | Approach review | High | GPT-6.1 Sol / high | Consequential cross-layer guarantees, costly-to-reverse choices with materially different failure modes, or focused escalation. |
 
-These are the approved reviewer defaults. Risk routing selects the role; it does
-not redefine the task-demand levels. Review coverage, independence, supplied risk
-assessment, publication requirements, and merge permissions still follow their
-owning workflow. Both primary tiers retain complete review ownership and baseline
-Approach analysis. Either may select at most one active Approach child for a material
-architectural question, independently of correctness risk or primary tier, rather than
-through a second coordinator risk route. The child supplies analysis only; the primary
-validates, integrates, and deduplicates it into the single final review. The specialist
-is Codex-only and uses native collaboration, with no nested CLI launcher fallback. Its
-approved PR-specific settings are an explicit exception
-to Layer 1's general-review row, rather than a remapping of that row. Other agent
+The primary integrates independently routed Approach analysis into one final review.
+These are an exception to Layer 1's general-review mapping.
+Other agent
 and common-task mappings remain unapproved proposals unless explicitly approved
 above.
 

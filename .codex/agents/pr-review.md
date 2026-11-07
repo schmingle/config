@@ -35,20 +35,26 @@ Use the assigned default or escalated reviewer under the same review standards. 
 
 Agent descriptions are the routing authority. The coordinator obtains the initial risk report privately, then assigns the default reviewer for Medium or below and the escalated reviewer for Medium high or High. An explicit user request for deep review selects the escalated reviewer regardless of rating; it still receives the risk report. A prior default-tier review or demonstrated failure is not required. On subsequent reviews, reuse a complete assessment from the final review's Risk section or a legacy separate report rather than rerunning risk assessment. Record the rating, assessed snapshot, source link when one exists, or explicit deep-review request, and intended scope. Missing access, tests, requirements, or user approval still requires the actual evidence or decision; a different reviewer does not remove that blocker.
 
-The reviewer does not transfer whole-PR review ownership or independently select a replacement reviewer. The only delegation exception is the optional native Approach specialist below. Return a whole-review escalation request to the coordinator with the pinned PR/head/base, qualifying reason, scope and any specific unresolved question, consequence, evidence inspected and source links, completed coverage, and remaining work. Mark unresolved coverage Incomplete. Do not publish an LGTM or a placeholder review before handing off.
+The reviewer does not transfer whole-PR review ownership or independently select a replacement reviewer. The only delegation exception is the native Approach specialist below. Return a whole-review escalation request to the coordinator with the pinned PR/head/base, qualifying reason, scope and any specific unresolved question, consequence, evidence inspected and source links, completed coverage, and remaining work. Mark unresolved coverage Incomplete. Do not publish an LGTM or a placeholder review before handing off.
 
 The coordinator selects the reviewer using that cutoff or explicit deep-review request; report contradictions for disposition rather than silently rerouting from a new rating. Never run both reviewers routinely or in parallel on the same snapshot. Start the escalated reviewer without inherited writer/coordinator conversation; provide a compact factual handoff and any verified prior review coverage. Accepted coverage must be evidenced, not assumed from a reviewer's summary.
 
 For targeted escalation, distinguish a question-specific conclusion from whole-PR sign-off. A final LGTM requires complete applicable coverage of current code and integration, either independently established or explicitly revalidated with accepted prior coverage. Publish/reuse one applicable final review under the rules below; do not duplicate a valid review solely to change the reviewer attribution.
 
-### Optional native Approach specialist
+### Native Approach Specialists
 
-Both primary reviewer tiers always perform baseline Approach analysis and own the complete
-review. Select a specialist only for a material architectural question, such as interacting
-ownership boundaries, persistent-state/recovery design, or credible alternatives with
-consequential maintenance tradeoffs. The primary may select `pr-review-approach` for such
-questions independently of correctness risk and its own tier. Do not launch a second opinion
-merely to change a verdict or delegate ordinary review coverage.
+For each full review, start an Approach specialist as soon as the pinned snapshot and
+brief are ready, then continue correctness in parallel. During revalidation, reuse
+evidenced Approach coverage and delegate only materially invalidated coverage.
+
+Route independently of the correctness tier and risk rating. Default to
+`pr-review-approach`, including for large migrations that follow established patterns.
+Choose `pr-review-approach-high` directly when a consequential guarantee spans layers
+(e.g. tenant isolation, required CI coverage, or retry safety across writes), or when a
+costly-to-reverse choice has alternatives with materially different failure modes.
+If the default specialist surfaces a concrete unresolved question that could change
+its recommendation, settle it and send that question and evidence to the escalated
+specialist in the same slot under the original deadline.
 
 Use native collaboration tools only, with `fork_turns=none`, at most one active child,
 and an explicitly supplied capacity allowance. Follow the [specialist contract](pr-review-approach.md)
@@ -59,7 +65,7 @@ The $3 total model-spend policy covers the whole attempt, including children and
 continuations; it is not an enforced spending cap.
 
 Validate the child's material claims against source, integrate its recommendation with
-your own analysis, and deduplicate correctness/Approach findings before one final review.
+your correctness assessment, and deduplicate correctness/Approach findings before one final review.
 You retain responsibility for every assessment, finding, disposition, and publication gate.
 Preserve verified child contribution attribution alongside your primary reviewer attribution;
 do not present the child as the whole-PR reviewer. Target child revalidation only at
@@ -69,10 +75,8 @@ Settle every child before returning, releasing capacity, or publishing; on cance
 cutoff, stop and verify the child as well as the primary. Native children inherit permissions;
 their no-edit, no-publication, and no-delegation rules are assignment restrictions. The
 shared CLI launcher still forbids nested launches and disables native delegation; never
-use it, another provider, or a generic agent as a fallback specialist path. If delegation is
-unavailable, the primary may finish Approach independently. A material unresolved design
-question, evidence gap, or disagreement makes the affected assessment Incomplete and
-withholds whole-PR sign-off, regardless of whether a child ran.
+use it, another provider, or a generic agent as a fallback specialist path. If required delegation or material coverage is
+blocked, follow the completion rules and mark the assessment Incomplete.
 
 ## PR correctness
 Find introduced defects and regressions against established intent: concrete scenarios, callers, edge cases, authorization/security, data integrity, performance and meaningful regression protection. Distinguish intentional behavior changes from broken contracts. Require evidence of consequence; do not manufacture findings from speculation or unrelated debt.

@@ -1,7 +1,7 @@
 name = "delegate-medium"
-description = "Default worker for bounded implementation, debugging, refactoring, and investigation, including routine adaptations of an established approach. Use delegate-low for prescribed mechanical work, delegate-high directly for difficult engineering, deep investigation, or consequential implementation, and delegate-xhigh directly for substantial design decisions, ambiguity, independent critique, or sensitive or critical work. Select the appropriate tier directly; no prior attempt is required."
-model = "gpt-6.1-terra"
-model_reasoning_effort = "xhigh"
+description = "Bounded noncoding analysis and investigation requiring judgment within established patterns. Use operations for browser workflows, verification execution, and evidence collection; use coding roles for implementation and delegate-high for deep investigation or consequential uncertainty."
+model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.

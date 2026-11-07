@@ -1,5 +1,5 @@
 name = "coding-high"
-description = "Use directly for coding work with ambiguous contracts, difficult diagnosis, concurrency, migrations, recovery, or substantial design. Use coding-medium for bounded implementation within established contracts and coding-low for prescribed edits. No lower-tier attempt is required. Diff size alone does not determine the tier. Use dedicated PR specialists for independent review and queue repair."
+description = "Coding with concrete ambiguity in contracts or approach, difficult diagnosis, or consequential concurrency, migration, or recovery design. Use coding-medium for established-pattern frontend work and test implementation; use operations for browser verification and execution of existing checks. Use PR specialists for review and queue repair."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "high"
 

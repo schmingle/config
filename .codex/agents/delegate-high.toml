@@ -1,5 +1,5 @@
 name = "delegate-high"
-description = "Use directly for difficult engineering, deep investigation, or consequential implementation. Use delegate-medium for bounded work and routine adaptations, and delegate-xhigh for substantial design decisions, ambiguity, independent critique, or sensitive or critical work. No prior delegate-medium attempt is required. Use the dedicated PR specialists for PR review and queue repair work."
+description = "Deep noncoding investigation and consequential engineering analysis. Use operations for established operational workflows and bounded troubleshooting, coding roles for source changes, and dedicated PR specialists for reviews and queue repair. Select directly when the task warrants it."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "high"
 

@@ -25,8 +25,7 @@ The supervisor supplies:
 - Assigned parent agent identity and supervisor chat ID/host, with authority sources.
 - Stable slot/subagent ID, verified repository/isolated worktree, ownership envelope
   and distinct ordered shortlist.
-- Absolute start/deadline with timezone, normally 50 minutes including cleanup/
-  reporting, and relevant corrections/temporary limits.
+- Absolute start/deadline with timezone, cleanup/reporting reserve, and relevant corrections/temporary limits.
 
 ## Flow
 
@@ -71,11 +70,10 @@ attempted unblocks and exact input/refreshed shortlist needed.
 ### Execute or Unblock
 
 Resolve routine blockers within scope. Distinguish source dependencies from required
-merge/deployment behavior under stacking rules. Before each ticket, refresh complete
-lightweight metadata for relevant open work, following pagination. Inspect files/diffs
-as needed for overlap; reuse detail only for unchanged head and integration-base
-revisions. Refresh changed/uncertain coverage; titles or a fixed result limit cannot
-establish completeness or exclude competing work.
+merge/deployment behavior under stacking rules. Reuse verified readiness and ownership
+evidence; refresh affected coverage when relevant facts change or become uncertain,
+and before actions requiring live verification. Check relevant open work for collisions,
+following pagination where needed; titles or a fixed result limit cannot exclude competing work.
 Shared semantic/test regions, contracts, barrels, generated metadata, fixtures and
 runtime resources require ownership or serialized edits. Hold/report overlaps.
 Steering retains the original deadline. Settle execution before skipping blocked work.
@@ -96,11 +94,10 @@ directions and the original deadline retain their scope. Tool approvals use nati
 For approved discovery/planning, report source-linked findings, limits and proposals;
 preparation authorizes no implementation/amendment. Complete implementation and meaningful
 local validation on the branch. Open only review-ready PRs with ticket/dependency links.
-Choose checks
-for concrete correctness questions; reuse fixtures, baselines and results only while
-code, inputs, environment and coverage remain applicable. Repeat affected checks after
-relevant changes/failures; preserve required final-candidate/parity checks and protected
-test contracts. Before readiness, check actual
+Choose checks for concrete correctness questions. Record what each check proves,
+the tested revision, and its evidence link. When code or the integration base changes,
+inspect the relevant delta. Reuse applicable validation evidence and rerun affected
+coverage plus required final integration/parity checks. Preserve protected test contracts. Before readiness, check actual
 implementation against ticket/project criteria and execution against this contract.
 Correct in-scope deviations while authorized; disclose unresolved limits. Only this
 author opens or readies the PR, handing risk/reviews/findings/CI/conflicts/merging to the queue.

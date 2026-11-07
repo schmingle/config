@@ -37,7 +37,7 @@ flowchart TD
     Assign -->|Assigned Elsewhere or Unclear| Report
     Handoff -->|Transferred to User| Triage
     Handoff -->|Active Owner, Waiting, or Unclear| Report
-    Triage -->|Set Triaged: Actionable Tickets| Deliver[Select and Deliver]
+    Triage -->|Shortlist Triaged: Actionable Tickets| Deliver[Select and Deliver]
     Triage -->|None Actionable| Report
     Deliver -->|At Most One Implementation Ticket| Report
 ```
@@ -85,8 +85,10 @@ Reuse existing private checkpoints/current automation memory as caches for metad
 unassessed work. With a trustworthy checkpoint matching the verified workspace/user/team,
 repository, creator allowlist, and query scope, prefer metadata-first updated-since deltas
 with a boundary overlap and ID deduplication. Merge with prior candidates; don't drop older
-unassessed work. Refresh tracked IDs regardless of current team/status to detect closure,
-reopening, moves, reassignment, and creator or parent changes. Refresh relevant ancestor
+unassessed work. Compare likely candidates from this inventory first. Verify their current
+eligibility and relevant context live. Reconcile unrelated tracked IDs after delivery or
+independently, checking across team/status for closure, reopening, moves, reassignment,
+and creator or parent changes. Refresh relevant ancestor
 metadata and recompute descendant eligibility when ancestry or an ancestor's creator changes;
 a child's timestamp alone does not cover those changes. Recover tracked work from history/live
 sources; apply the effective-creator filter to inventory/execution eligibility after project
@@ -98,8 +100,9 @@ remain ancestry/dependency context, not automatically executable work.
 Use full discovery when the checkpoint is missing/untrusted, scope/filter semantics change,
 or the interface cannot cover new/reopened/moved-in/status/creator/ancestry changes reliably. Repeat
 full discovery at least every seven days. This backstop is metadata discovery, not unlimited
-assessment. Record scan start; advance the checkpoint no later than that time only after all
-queries are fully paginated and the result is saved successfully. On partial/error/blocked
+assessment. Keep due reconciliation separate from delivery when the available coverage
+supports a sound selection. Record scan start and advance the checkpoint no later than that
+time only after all required queries are fully paginated and reconciliation is saved. On partial/error/blocked
 saves, retain the previous checkpoint and unresolved inventory; report actual scan coverage
 and any save failure. Absence from partial results is never closure. Don't invent a checkpoint.
 
@@ -120,8 +123,7 @@ new deep investigation still consumes a slot.
 ### Route Matching Tickets to Project
 
 For discovered tickets whose **actual creator** is in `creatorIds` and whose label matches
-the private `bugProjectRouting.labelId`, route to `bugProjectRouting.projectId` before any
-other ticket activity. Verify workspace, label, target project, current creator, labels and
+the private `bugProjectRouting.labelId`, route to `bugProjectRouting.projectId` before other activity on that ticket. Verify workspace, label, target project, current creator, labels and
 project live; add an unprojected ticket and verify the result. Count each changed ticket
 toward `count`. Already-targeted tickets need no write. Preserve a different existing project;
 hold other activity and report it for the user rather than moving it. If routing is unverified,
@@ -192,26 +194,24 @@ aren't competing ownership. Assignment changes don't override scope, size, or re
 
 ### Triage Tickets
 
-Build and triage the bounded set incrementally, reserving slots for required parents
-before admitting more candidates. Give every retained ticket a disposition or documented
-assessment limitation **before selection**; don't build the first actionable ticket found.
-Read relevant attachments, relations, and PR evidence. Resolve current relevance/priority
-before scope/implementation details; then check context/access, essential behavior,
-dependencies/permission, independent size, acceptance criteria, and verification.
-Finish obtainable readiness checks for counted tickets; the unique-ticket cap limits admitting
-additional tickets, not inspection of those already counted. Human-prepared work needs no prior
-workflow triage. Dispositions:
+Compare a prioritized shortlist before selecting work. Use metadata to rank candidates and
+deeply assess enough to make a sound choice, starting with likely ready user-owned tickets.
+Treat `count` as a ceiling. Reserve assessment slots for required parents and a change
+slot for likely implementation before discretionary writes on other tickets. Give assessed
+tickets a disposition and keep unassessed inventory queued. Check relevant attachments, dependencies,
+PRs, access, intended behavior, size, and verification. Finish obtainable checks that could
+change selection or unblock delivery. Human-prepared work needs no prior workflow triage.
+Use these dispositions.
 
 - **Stale:** Apply the age policy, recheck, post a first-person reasoned comment, then set
   native Canceled. Distinguish stale/unprioritized from fixed; invite reopening with current
   impact/example. Verify both writes and reconcile partial failures before retrying.
 - **Actionable:** Ready or safe for Review-and-clarify. Technical uncertainty may proceed
   with safe defaults, clarification questions, or a material approach-difference notice.
-- **Hold:** Unresolved intended behavior/essential scope, unsafe unknowns, ownership,
-  dependencies, access, or
-  permission block affected work. Investigate obtainable facts; otherwise report blocker,
-  owner, resumption condition, and critical user questions. Keep held work out of implementation. Route follow-up questions and split/project approval requests to the user
-  in this chat. Above `size`, recommend a split/project and report needed approval.
+- **Hold.** Identify the specific requirement, prerequisite, access issue, or authorization
+  that prevents safe progress. Resolve technical questions from available evidence or safe
+  validation in the current run. Ask a human only for a specific input, decision, or action
+  they must provide. Above `size`, propose a split or project here for approval.
 
 Judge complete outcomes, including rollout/acceptance. Multi-phase/multi-owner work may
 need project framing; a bounded approved-project leaf can qualify independently. Recheck
@@ -252,18 +252,17 @@ explicit human keep-open direction prevents repeat cancellation without new evid
 #### Approach and Size
 
 Identify the issue, intended outcome, constraints, and evidence, including reproduction
-steps when available. Disregard suggested implementations and estimates. Always investigate
-independently, choose the implementation best supported by the evidence, and size it yourself.
-Revise the approach and estimate when new evidence changes them. Obtain approval for changes
-to approved scope or behavior.
+steps when available. Investigate independently and choose the implementation best supported by
+the evidence. Verify and use an estimate set or explicitly approved by the user. Independently
+size implementation candidates only when they lack such an estimate. If the verified scope
+exceeds the ceiling, hold implementation and preserve the user's estimate pending approval. Obtain approval for changes to approved scope or behavior.
 
 The complete outcome must fit **`size` and one or two coherent PRs**. Don't omit essential
-behavior, compatibility, permissions, or test protection to fit. Compare the independently
-assessed size directly with `size` using the workflow order. Preserve its assignee.
+behavior, compatibility, permissions, or test protection to fit. Compare the applicable size directly with `size` using the workflow order. Preserve its assignee.
 Above `size` is triage-only;
 no automatic children or oversized parent execution. Splits/project changes need approval.
 
-Save the independently assessed estimate during triage. Verify the team’s live estimate
+Save a new or changed estimate during triage. Verify the team’s live estimate
 mapping before writing a numeric value. If the connector cannot verify it, use the native
 estimate selector in the authenticated work Chrome profile. Verify the issue, team, and
 saved estimate. If the write cannot be completed or verified, report the assessed size and
@@ -284,19 +283,19 @@ or earlier omission and propose one consolidated revision, not successive unasse
 
 Before selection or reporting, check each deeply assessed ticket for a verified assignee or
 exact ownership blocker, a disposition, and a concrete next action where work remains. For
-tickets needing implementation triage, also check for an independent size and verified saved
-estimate. Distinguish missing sizing evidence from an estimate write failure. Finish
-obtainable steps this run within existing authority and budgets. If blocked or interrupted,
-record the exact next check.
+implementation candidates, verify the user's estimate or independently assess and save the
+size. If saving fails, follow Approach and Size. Resolve actionable gaps that affect the
+choice or delivery within the current run.
 
 ### Select and Deliver
 
 Compare the assessed set's actionable tickets by human direction, native priority, impact,
 urgency, dependencies, readiness, and meaningful activity. Recommend priority-field changes;
 don't silently apply them. Select **one** authorized outcome within `size`, including safe
-Review-and-clarify; leave others queued without invented blockers. Incomplete assessment
-isn't readiness. If none qualify, report instead of forcing a build. Verify user ownership
-before implementation.
+Review-and-clarify. Verify user ownership before implementing. Resolve remaining technical
+questions through code inspection and safe validation before or during implementation.
+Continue until a review-ready handoff, a concrete blocker that prevents further safe progress,
+or a reached limit. If no candidate qualifies, state the comparison coverage and reason.
 
 Before implementing, trace the reported case through relevant acceptance behavior to surface
 likely questions, policy conflicts, and material approach differences. Post an optional start
@@ -306,6 +305,12 @@ Native status records routine starts.
 Ask user-directed questions/approvals in this chat. State the choice,
 recommendation, and whether safe work can proceed or affected work needs an answer.
 Route later discoveries and proposed follow-up comments to the user here before publishing.
+
+For automated runs, use a suitable settled managed worktree or `create_worktree` for each
+isolated checkout and give workers its verified path. When its owner settles, use
+`archive_worktree` where supported, preserving needed ignored files first. Report unavailable
+managed creation or cleanup; keep active, primary, shared, protected, and otherwise unarchivable
+checkouts intact rather than bypassing native protection.
 
 Follow repository isolation/authoring/testing guidance and protected-test approvals. Once
 selected, a new blocker doesn't permit choosing another implementation. Preserve/reuse
@@ -328,8 +333,8 @@ doesn't start or satisfy that window. Preserve separate holds, ownership, releva
 prerequisites, permissions, and test requirements. Changed intended behavior, essential
 scope, or unsafe unknowns still require approval before affected work.
 
-While feedback is pending, keep the appropriate active ticket status and report without
-waiting. At queue handoff, request review
+While feedback is pending, finish authorized safe work and keep the appropriate active ticket
+status. Report once safe work is complete or a limit is reached. At queue handoff, request review
 under repository policy and move to In Review. Post a delivery comment only when it conveys
 meaningful new information to the ticket creator; PR readiness, CI and review handoff alone
 do not qualify. PR review follows the user's review workflow; never imply the creator is asked
@@ -394,9 +399,26 @@ offers/deadlines and incomplete checks privately; label carried-forward findings
 Do not collect closed/other-owner inventories solely for reporting. Surfacing excluded work
 as a decision or dependency grants no eligibility exception or execution authority.
 
-Finish after reporting: no interview or waiting for replies. Later answers update the
+Finish after reporting and applying the [Completion Check](#completion-check) when applicable. Skip interviews and waiting for replies. Later answers update the
 relevant disposition within remaining authority/budget; they don't restart discovery,
 replenish budgets, or permit a second implementation. Don't revive completed/withdrawn proposals.
+
+## Completion Check
+
+Before ending the turn, check your work against these criteria.
+
+- **Done**
+  - Verify the shortlist comparison and readiness of any selected ticket.
+  - Apply the sizing and estimate verification rules.
+  - Verify the review-ready handoff, the blocker or reached limit, or why no candidate qualified.
+- **Great**
+  - Back the selection and dispositions with evidence.
+  - For each gap, name the blocker or limit, next action, and owner.
+  - Keep investigation with the automation. Ask people only for facts or decisions they can provide.
+
+If a material gap still has a feasible next step, take it and recheck. Honor existing limits, retries, hard stops, and write safeguards. Keep the selected ticket and respect merge queue ownership.
+
+Retry up to 2 times.
 
 ## Rules
 

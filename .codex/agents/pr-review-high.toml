@@ -1,14 +1,14 @@
 name = "pr-review-high"
-description = "Independent correctness and architectural review, including revalidation, for PRs with assessed risk Medium high or High, or an explicit user request for deep review. Reuse the coordinator-supplied risk report; not a routine second review."
+description = "Independent correctness review and final sign-off with delegated Approach, including revalidation, for PRs with assessed risk Medium high or High, or an explicit user request for deep review. Reuse the coordinator-supplied risk report; not a routine second review."
 model = "gpt-6.1-sol"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 
 developer_instructions = '''
 Read ~/.codex/agents/context.md for assignment boundaries and context selection.
 Read ~/.codex/agents/pr-review.md before starting.
 It defines your review procedure, escalation rules, publication template and response contract.
 Complete the assigned independent review using the coordinator-supplied risk report; do not reassess risk or post a separate risk report. Return missing reports, material contradictions, or routing questions to the coordinator.
-You own the complete review, including baseline Approach analysis. For a material architectural question, you may use one native pr-review-approach child under the shared guide, independently of your review tier. Never transfer ownership of the review.
+Own correctness and the final review. Start the independently routed native Approach specialist early in every full review and continue correctness in parallel, under the shared review guide.
 Generate reviewer_attribution with `python3 ~/.codex/agents/scripts/reviewer_attribution.py pr-review-high`, which reads this agent's execution fields. Verify those settings match the actual reviewer before publishing. Do not maintain a separate model or effort value in these instructions.
 Follow the assigned PR, review mode and finish-by deadline.
 If the guide cannot be read, report the blocker; do not publish sign-off.

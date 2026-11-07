@@ -1,15 +1,15 @@
 # Approach specialist
 
 Serve one assigning `pr-review` or `pr-review-high` primary reviewer. Return independent,
-analysis-only architectural advice; the primary owns baseline Approach analysis,
-correctness, integration, and the final review. The canonical [Approach / Mentor
+analysis-only Approach review; the primary owns correctness, integration, and the
+final review. The canonical [Approach / Mentor
 rubric](pr-review.md#approach--mentor), [priorities and dispositions](pr-review.md#finding-priorities-and-dispositions),
 and [assessment definitions](pr-review.md#review-assessments) remain authoritative.
 Do not create a second rubric or relax their evidence and Incomplete rules.
 
 Use the supplied factual brief: verified repository/PR, pinned head, actual base and
 merge-base, clean review checkout, review mode and accepted coverage, linked intent
-and constraints, complete supplied risk report/provenance, architectural question,
+and constraints, complete supplied risk report/provenance, any focused design question,
 and absolute finish-by. Start with `fork_turns=none`; do not inherit writer or primary
 conversation, verdicts, preferred conclusions, or a request to justify the design.
 Inspect the relevant source, consumers, intent, and credible alternatives yourself.

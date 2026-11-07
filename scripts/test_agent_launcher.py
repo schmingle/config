@@ -78,9 +78,9 @@ class RoleSettingsTests(unittest.TestCase):
     def test_generic_delegate_ladder_uses_canonical_native_settings(self):
         for role, model, effort in (
                 ('delegate-low', 'gpt-6.1-terra', 'medium'),
-                ('delegate-medium', 'gpt-6.1-terra', 'xhigh'),
-                ('delegate-high', 'gpt-6.1-sol', 'xhigh'),
-                ('delegate-xhigh', 'gpt-6.1-sol', 'max')):
+                ('delegate-medium', 'gpt-6.1-sol', 'medium'),
+                ('delegate-high', 'gpt-6.1-sol', 'high'),
+                ('delegate-xhigh', 'gpt-6.1-sol', 'xhigh')):
             with self.subTest(role=role):
                 self.assertIn(role, launcher.NATIVE_ROLES)
                 self.assertNotIn(role, launcher.CLAUDE_ROLES)
@@ -95,13 +95,23 @@ class RoleSettingsTests(unittest.TestCase):
         profile = tomllib.loads(launcher.shared.PROFILE.read_text())
         self.assertNotIn('delegate-xhigh', profile['role_efforts'])
 
+    def test_operations_uses_native_execution_and_task_authorized_capabilities(self):
+        settings = launcher.role_settings(launcher.AGENTS, 'operations')
+        self.assertEqual(settings['model'], 'gpt-6.1-terra')
+        self.assertEqual(settings['model_reasoning_effort'], 'high')
+        self.assertIn('operations', launcher.CODEX_ONLY_ROLES)
+        limits = launcher.capabilities('operations')
+        self.assertEqual(limits['external_actions'], 'task-authorized')
+        self.assertEqual(limits['approval_policy'], 'on-request')
+        self.assertTrue(limits['requires_network_reads'])
+
     def test_coding_roles_use_native_settings_and_writable_task_capabilities(self):
         self.assertEqual(launcher.CODING_ROLES, ('coding-low', 'coding-medium', 'coding-high'))
         self.assertEqual(set(launcher.CODEX_ONLY_ROLES),
-                         set(launcher.APPROACH_ROLES) | set(launcher.CODING_ROLES))
+                         set(launcher.APPROACH_ROLES) | set(launcher.CODING_ROLES) | {'operations'})
         for role, model, effort in (
                 ('coding-low', 'gpt-6.1-terra', 'medium'),
-                ('coding-medium', 'gpt-6.1-terra', 'xhigh'),
+                ('coding-medium', 'gpt-6.1-terra', 'high'),
                 ('coding-high', 'gpt-6.1-sol', 'high')):
             with self.subTest(role=role):
                 self.assertIn(role, launcher.NATIVE_ROLES)
@@ -141,22 +151,25 @@ class RoleSettingsTests(unittest.TestCase):
         self.assertNotIn('pr-review-high', tomllib.loads(launcher.shared.PROFILE.read_text())['role_efforts'])
 
     def test_approach_role_is_native_analysis_only(self):
-        self.assertEqual(set(launcher.APPROACH_ROLES), {'pr-review-approach'})
-        role = 'pr-review-approach'
-        settings = launcher.role_settings(launcher.AGENTS, role)
-        self.assertEqual(settings['model'], 'gpt-6.1-sol')
-        self.assertEqual(settings['model_reasoning_effort'], 'xhigh')
-        self.assertIn('~/.codex/agents/pr-review-approach.md', settings['developer_instructions'])
-        self.assertIn('~/.codex/agents/pr-review.md', settings['developer_instructions'])
-        self.assertIn('reviewer_attribution.py ' + role, settings['developer_instructions'])
-        self.assertEqual(agent_codex.execution(settings)['attribution'],
-                         'Approach analysis by GPT-6.1 Sol xhigh.')
-        limits = launcher.capabilities(role)
-        self.assertEqual(limits['provider'], 'codex')
-        self.assertEqual(limits['default_sandbox'], 'read-only')
-        self.assertFalse(limits['source_writes'])
-        self.assertEqual(limits['external_actions'], 'none')
-        self.assertTrue(limits['requires_network_reads'])
+        for role, model, label in (
+            ('pr-review-approach', 'gpt-6.1-terra', 'Terra'),
+            ('pr-review-approach-high', 'gpt-6.1-sol', 'Sol'),
+        ):
+            with self.subTest(role=role):
+                settings = launcher.role_settings(launcher.AGENTS, role)
+                self.assertEqual(settings['model'], model)
+                self.assertEqual(settings['model_reasoning_effort'], 'high')
+                self.assertIn('~/.codex/agents/pr-review-approach.md', settings['developer_instructions'])
+                self.assertIn('~/.codex/agents/pr-review.md', settings['developer_instructions'])
+                self.assertIn('reviewer_attribution.py ' + role, settings['developer_instructions'])
+                self.assertEqual(agent_codex.execution(settings)['attribution'],
+                                 f'Approach analysis by GPT-6.1 {label} high.')
+                limits = launcher.capabilities(role)
+                self.assertEqual(limits['provider'], 'codex')
+                self.assertEqual(limits['default_sandbox'], 'read-only')
+                self.assertFalse(limits['source_writes'])
+                self.assertEqual(limits['external_actions'], 'none')
+                self.assertTrue(limits['requires_network_reads'])
 
     def test_public_counterparts_preserve_wrapper_and_executor_settings(self):
         roles = {path.stem for path in launcher.AGENTS.glob('*.toml')}

@@ -78,27 +78,23 @@ flowchart TD
   stalled lane and prepare exact human requests even while others progress. Global
   blockage controls project-wide waiting/pausing, not attention to individual lanes.
 - Establish readiness through [project-audit](../project-audit/SKILL.md) before
-  activation/resume, worker creation or dispatch. Reuse completed applicable coverage
-  under one hour old if current Linear/PR deltas support it; refresh at one hour or
-  after an earlier consequential change. Chat silence is insufficient. Record completion time,
-  verdict and coverage. Failed/incomplete coverage holds affected new dispatch without
-  refreshing its timestamp; completed coverage may support independent ready work.
-  Age or failed refresh alone does not interrupt still-supported active work.
-  Between due audits, refresh records relevant to active work, dependencies, pending
-  decisions and dispatch. Reuse still-supported contract evidence; supported change
-  indicators or uncertainty determine expanded reads, not chat silence.
+  activation/resume, worker creation or dispatch. Reuse verified readiness and ownership
+  evidence. Refresh affected coverage when relevant facts change or become uncertain,
+  and before actions requiring live verification. Record the verdict and coverage.
+  Failed/incomplete coverage holds affected new dispatch; continue independent work
+  supported by current evidence.
   For lengthy cold-start audits, complete limited readiness for read-only audit or
   preparation: verify target, authority, ownership, deliverable and supported isolated
   setup before creation, actual worktree before repository dispatch. Delegate only
   that scope; implementation needs its own completed current assessment. Limited
-  preparation coverage neither verifies broader readiness nor refreshes a full audit.
+  preparation coverage does not establish broader implementation readiness.
 - Assess apparent completion against approved criteria. A finished batch, Done status
   or merged PR is insufficient. Challenge completion when warranted, not every tick.
 
 Create, activate or resume the supervisor heartbeat only for eligible execution, scoped
 preparation,
 verified active waits or the first-hour user-input/idle-recovery grace periods. Reuse the supervisor heartbeat:
-nominally every 15 minutes, `kind=heartbeat`, exact prompt `$project-supervise`, bound to
+every 20 minutes, `kind=heartbeat`, exact prompt `$project-supervise`, bound to
 this chat; workers have no automation. Completion needs no new automation. Grace periods
 permit monitoring, not unready execution. Run the first cycle immediately.
 Verify binding/state, preserve
@@ -164,13 +160,12 @@ approval requested; continue independent work.
   and clear ownership. Serialize conflicts; active/unknown execution occupies capacity
   until verified settled. Higher caps require user approval. Reductions drain batches
   unless interruption is requested. Fill eligible idle slots without repeated permission.
-- Assign distinct ordered shortlists, normally five tickets, exceeding expected
-  batch capacity when available. Respect priorities, dependencies, ownership and
+- Assign distinct prioritized work. Respect priorities, dependencies, ownership and
   milestone review gates. Refresh shortlists and dispatch successive batches within
   standing execution authority without renewed permission. Obtain still-required
   plan/execution approvals; phase completion neither expands authority nor creates
   a new approval gate within already-authorized scope.
-- Check entire shortlists for collisions: shared semantic/test regions, queue-owned
+- Check work being dispatched against active ownership for collisions: shared semantic/test regions, queue-owned
   pending changes and runtime resources. Barrels, generated metadata, mocks and
   fixtures need one owner or serialized edits. Separate worktrees alone do not prove
   independence. Hold only collisions.
@@ -186,14 +181,13 @@ approval requested; continue independent work.
   for bounded judgment within established contracts; and [coding-high](../../agents/coding-high.toml)
   for ambiguous contracts, difficult diagnosis, concurrency, migrations or recovery. Select
   directly; no lower-tier attempt is required, and diff size alone does not determine the tier.
-  Generic delegates and explorers remain available for noncoding work; dedicated PR specialists
-  retain their roles. Agent descriptions are the routing authority.
+  Use [operations](../../agents/operations.toml) for browser workflows, existing check execution,
+  evidence collection, and bounded operational troubleshooting. Generic delegates cover
+  noncoding analysis; dedicated PR specialists retain queue work. Agent descriptions govern routing.
 - Bind roster slots to stable subagent IDs and the verified parent/supervisor chat identity.
-  Use `spawn_agent` with `fork_turns="none"` and a compact assignment; reuse a settled worker
-  with `followup_task` when its role fits, and steer with `send_message`. At a safe completed
-  assignment boundary, if another role is warranted, settle helpers and verify the worktree and
-  PR handoff, preserving ownership and partial work before selecting a fresh worker. Do not
-  interrupt or reconfigure active workers or change current assignments for this routing.
+  Use `spawn_agent` with `fork_turns="none"` and a compact assignment. Before replacement,
+  settle owned execution and verify the worktree and PR handoff, preserving ownership,
+  partial work, and unresolved decisions.
   Inspect recorded agents before spawning; a completed turn may mean blocked, not completed work.
   Missing IDs, reports or uncertain execution require recovery before replacement or overlapping dispatch.
 - Verify a dedicated managed Git worktree for each repository execution slot. Reuse a
@@ -204,13 +198,12 @@ approval requested; continue independent work.
 - Read [the worker contract](references/worker.md) and assignment checklist before
   first assignment; reuse current context unless changed/uncertain. Every assignment
   supplies its resolved absolute path and explicitly directs the worker to read and follow it.
-  Batches normally last 50 minutes including cleanup/reporting. Refresh exhausted or
-  materially changed shortlists.
+  Refresh exhausted or materially changed shortlists.
 - Verify the Start heartbeat and dispatch state. While work or a concrete event can
-  advance, stay attached using bounded, interruptible native waits across workers where
-  supported. A timeout alone calls for another wait, not fresh service reads, worker
-  messages or commentary. Check when a required check is due, execution may be stalled,
-  evidence conflicts or a decision needs it; preserve deadline and readiness checks.
+  advance, stay attached using interruptible native waits across active workers where
+  supported. Process results, escalations, and user steering when the wait returns early.
+  After an unchanged timeout,
+  continue waiting unless an event, due check, deadline, or suspected stall requires action.
   Send workers concrete steering or questions when needed; request status only when
   current evidence is insufficient. Process actionable messages promptly.
   Ordinary steering changes only its stated scope; preserve unaffected execution/deadlines.

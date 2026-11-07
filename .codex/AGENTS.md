@@ -89,6 +89,8 @@ For 1Password (`op`), prefer the CLI for approved work. Select the intended acco
 
 Use a dedicated Git worktree for repository work, including subagents and standalone worker chats. Authorized repository work includes routine fetching and creating isolated worktrees and task branches without separate conversational confirmation; follow native tool permissions and preserve existing work. Do not work in the base or a shared checkout when a worktree is possible. Verify the checkout before making repository changes. If a worktree cannot be used, clearly explain the specific blocker and any proposed fallback to the user before proceeding in the base checkout; never silently fall back.
 
+For automated repository work that needs an isolated checkout, reuse a suitable managed worktree or create and attach one with the supported `create_worktree` control. A raw Git worktree is not managed merely because it is under the Codex worktree root. If managed creation is unavailable, report the blocker and continue independent work; do not silently create an unmanaged checkout. Record the prior checkout: creation may change the chat's working directory. After the owner settles and no work still needs the checkout, restore the appropriate prior managed checkout with `attach_worktree` where permitted, then use `archive_worktree` where supported, preserving needed ignored files first. Leave active, primary, shared, protected, or otherwise unarchivable worktrees intact and report the cleanup gap; do not bypass the native protection with Git removal.
+
 ## Work and personal accounts
 
 Keep work and personal data in their respective accounts. Use the private account map to select the intended service account, plugin connection, workspace, or browser profile. Select connections by account identity and workspace, not nickname or ordering. Pass the current connection identifier (such as `link_id`) whenever the tool supports it, and preserve that selection throughout the task. Reuse verified identity evidence while the connection remains unchanged; verify further only when needed to resolve uncertainty. Do not substitute another account merely because it is available or search across work and personal accounts unless the task calls for both. If the intended account remains unclear, ask before accessing either one.
@@ -154,6 +156,12 @@ chat while continuing independent approved implementation. Other workflows retai
 explicitly authorized scope.
 
 Only create PRs that are ready for review. Keep work in progress on the branch until it’s ready.
+
+Complete the requested implementation, including appropriate tests, and run focused
+authoring checks. Reuse available dependencies and avoid unnecessary installs, builds,
+code generation, or browser downloads; perform the smallest preparation needed for
+correctness and required validation. State performed and deferred validation accurately.
+Follow the owning workflow's queue handoff without duplicating its qualification work.
 
 Do not apply `noautomerge` without my explicit approval for that PR or a clearly scoped set of PRs. The [linear-ticket clarification hold](skills/linear-ticket/SKILL.md#select-and-deliver) is standing approval for that workflow only.
 
