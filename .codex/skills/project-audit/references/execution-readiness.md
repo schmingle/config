@@ -14,6 +14,20 @@ Browser use or sensitive access alone does not make a ticket human-assisted; ide
 
 ## Readiness standards
 
+### Implementation ticket gate
+
+For the scope entering supervised implementation, verify each implementation
+ticket has a saved estimate of **M or smaller** that fits its current scope.
+If Linear exposes numeric values, verify the issue team's current label mapping.
+Require a concrete outcome, bounded scope, and a brief approach grounded in
+current code. State dependencies and concrete acceptance checks. Settle material decisions about
+behavior, scope, or approach. Leave routine implementation choices to the worker.
+A missing or unverifiable estimate, an oversized ticket, or a material gap holds
+that ticket. Broad parent rollups may exceed M. Apply the gate to executable
+tickets, including any parent with its own implementation work.
+
+### Project and executor checks
+
 1. **Contract and scope.** Trace actionable tickets to approved KRs, phases, and exits; expose uncovered obligations and work without an agreed purpose. Each ticket needs an intended outcome, bounded scope, and meaningful acceptance/validation. Prefer one coherent PR per implementation ticket when practical, retaining justified exceptions and existing ownership rules.
 2. **Evaluation proof.** Evaluation tickets define a result to establish and the checks, expected results, evidence, and prerequisites that establish it. Do not create a duplicate checklist of implementation work; implementation checks stay with their implementation ticket. Human acceptance remains with its designated person.
 3. **Human checkpoints.** For assisted work, identify the checkpoint, who supplies which decision/input/approval/authentication, when the agent stops and before what action, and what preparation can proceed independently. Human-only work names its owner and concrete action or judgment. Missing owners or unsettled current-phase decisions about intended outcomes, behavior, or scope are gaps, even when listed as human checkpoints; they are not implied agent discretion. A bounded decision task naming the person, question, and required result can itself be ready human work while dependent implementation remains gated.

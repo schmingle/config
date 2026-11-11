@@ -175,7 +175,13 @@ approval requested; continue independent work.
   until verified settled. Higher caps require user approval. Reductions drain batches
   unless interruption is requested. Fill eligible idle slots without repeated permission.
 - Assign distinct prioritized work. Respect priorities, dependencies, ownership and
-  milestone review gates. Refresh shortlists and dispatch successive batches within
+  milestone review gates. Confirm each implementation ticket on the shortlist meets
+  the [implementation ticket gate](../project-audit/references/execution-readiness.md#implementation-ticket-gate)
+  before dispatch and pass the verified evidence to the worker. Reuse current audit
+  evidence and refresh affected coverage when scope, estimates, dependencies, or decisions
+  change. Check prerequisites for each item before it starts.
+  Route unready tickets to bounded discovery or an approval request. Continue independent
+  ready work within the approved scope. Refresh shortlists and dispatch successive batches within
   standing execution authority without renewed permission. Obtain still-required
   plan/execution approvals; phase completion neither expands authority nor creates
   a new approval gate within already-authorized scope.

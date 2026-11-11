@@ -62,8 +62,12 @@ execution contract for every assignment.
 
 ### Select Next Item
 
-Take the first ready shortlist item within ownership; own one active ticket. Respect
-milestone gates and cleanup/report reserve. Skip blocked paths for independent
+Take the first ready shortlist item within ownership; own one active ticket.
+Before starting each implementation item, check prerequisites and confirm current
+[readiness evidence](../../project-audit/references/execution-readiness.md#implementation-ticket-gate).
+If evidence is missing or affected by a changed scope, estimate, dependency, or
+decision, hold the item and ask the supervisor to refresh it. Respect milestone
+gates and cleanup/report reserve. Skip blocked paths for independent
 approved work; preserve other owners' files and tickets. If none is ready, report skips,
 attempted unblocks and exact input/refreshed shortlist needed.
 
