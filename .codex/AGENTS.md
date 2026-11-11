@@ -182,6 +182,9 @@ explicitly authorized scope.
 
 #### PR authoring
 
+For every PR tied to a Linear ticket, start the title with the ticket ID and a
+colon. Use `<ticket ID>: <summary>`.
+
 Check the affected code for material pre-existing issues before editing and as
 they surface during implementation. For issues outside the approved scope, batch
 them and ask me before opening the PR. State the intended outcome, what you found,
