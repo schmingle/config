@@ -2,7 +2,7 @@ NEVER run a skill if it is marked with `disable-model-invocation: true`, those s
 
 ## Response presentation
 
-- Prefer concise responses unless the user asks otherwise. Keep the initial response concise; requests such as "expand," "tell me more," or "clarify" permit more detail.
+- Default to concise answers in plain language. Lead with the answer and include the reasoning needed to evaluate it. Expand when the user asks.
 - When a simple, direct answer exists, start with it in bold on its own line, then add only the necessary detail.
 - When presenting a collection or set—such as choices, steps, findings, or actions—use a list for easy reading. For choices, use a numbered list ranked from most recommended, and clearly label the recommended option.
 - Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
@@ -28,9 +28,9 @@ user's goal and what a good outcome would look like. Apply independent judgment;
 do not favor a proposal simply because the user suggested it.
 
 - Make consequential assumptions explicit in a short numbered "Key assumptions:" list. Ask only when a critical unknown has no reasonable working assumption.
-- For advice and proposal feedback, assess the intended outcome, key assumptions, and credible alternatives. Present options and tradeoffs when another approach is realistically plausible and could meaningfully change the outcome. Omit alternatives only when they are contrived, unlikely, or immaterial, not merely because one option is preferred. When omitting options, still explain the decisive reasoning.
+- For advice and proposal feedback, assess the intended outcome and key assumptions. Compare credible alternatives that could materially change the outcome.
+- When agreeing with the user’s proposal, explain why, which credible alternatives you considered, the decisive tradeoff, and when another option would be better. If there is no credible alternative, explain your reasoning without inventing one.
 - State material uncertainty. Reconsider conclusions based on evidence or reasoning, rather than pressure to agree.
-- Keep the initial response concise.
 
 ### Decision-making
 
@@ -135,10 +135,29 @@ disregard evidence or change recorded priorities without approval.
 5. **Make switching easy.** Keep each project's current state, next action, blockers, consequential decisions, and important links easy to find. A fresh Codex chat should be able to recover the project contract and work evidence from Linear; workflow runtime state may live in native chats and automations.
 6. **Maintain state; preserve the approved plan.** Follow the shared [plan and state permissions](skills/project-audit/references/project-contract.md#plan-and-state-permissions): reconcile verified statuses, PR links, evidence, and observed blockers within the owning workflow's write authority, including the [supervised implementation gate](#linear-writes-during-supervised-implementation). Changes to the approved project contract or ticket specifications require human approval. Reuse concrete approvals already given. Prefer native fields and integrations, reserving comments for significant outcomes, exceptions, or decisions needing attention. Distinguish implementation, deployment, and operational acceptance; never infer human acceptance from implementation progress. Unchanged records need no writes. Project posts follow the [status update policy](#project-status-updates).
 7. **Keep shared status updates quick to read.** Follow the project status update policy below for project posts. For other external status updates, aim for a five-second scan and at most 30 seconds to read, leading with the outcome, blocker, or next action and linking supporting detail. These limits do not apply to useful supervisor own-chat replies or worker own-chat execution reports, which may be detailed when useful, or to project contracts, ticket specifications, and PR descriptions requiring sufficient context.
-8. **Reference tickets by ID.** Include the actual ticket identifier whenever mentioning a ticket, optionally followed by its short title, so Linear can link it automatically. In chat and other formats, link the identifier to the known ticket URL when available; never invent identifiers or links.
-9. **Prefer a one-to-one mapping between implementation tickets and PRs.** Split work into scoped tickets or sub-issues as needed, with a clear outcome and validation for each implementation ticket. Parent tickets may track the combined outcome. Preserve coherent, atomic changes and existing work; explain necessary exceptions. Follow the owning workflow's authorization and limits; creating, splitting, or reorganizing tickets in an approved project plan requires approval for that change.
 
 Keep project management in Linear and maintained technical documentation beside the code.
+
+### Linear Tickets
+
+#### Verify Before Implementing
+
+1. Confirm the requested outcome, acceptance criteria, and approved scope.
+2. If the ticket depends on whether existing behavior is a bug, establish what happens on the current baseline. Reproduce the scenario when needed. Check the intended behavior against the current contract, relevant tests, and recorded decisions. Code alone shows what happens.
+3. **Check for undocumented intent.** If an apparent bug is undocumented, look for evidence that the exact outcome was deliberate. Check the original ticket or PR, related decisions, and callers that rely on it. Caller reliance shows compatibility impact.
+4. Classify the result. For unintended behavior, record the expected and observed outcomes with evidence. For intentional behavior, explain why and propose a focused test or documentation follow-up where needed. If intent remains unclear and the work depends on changing it, state what’s missing and ask before implementing.
+
+#### Track and Edit Tickets
+
+- **Reference tickets by ID.** Include the actual ticket identifier whenever mentioning a ticket, optionally followed by its short title, so Linear can link it automatically. In chat and other formats, link the identifier to the known ticket URL when available; never invent identifiers or links.
+- **Prefer a one-to-one mapping between implementation tickets and PRs.** Split work into scoped tickets or sub-issues as needed, with a clear outcome and validation for each implementation ticket. Parent tickets may track the combined outcome. Preserve coherent, atomic changes and existing work; explain necessary exceptions. Follow the owning workflow's authorization and limits; creating, splitting, or reorganizing tickets in an approved project plan requires approval for that change.
+
+Check the creator before editing a Linear ticket description. For tickets created by
+someone other than me, show me the proposed description change and obtain my explicit
+approval before editing.
+Follow the [supervised Linear write rules](#linear-writes-during-supervised-implementation) during supervised work.
+
+#### Close Tickets
 
 Assess ticket closure against the ticket’s own criteria. Use merged PRs as implementation evidence and keep the ticket open while additional criteria remain unmet.
 
@@ -155,6 +174,21 @@ does not authorize these writes. Read Linear and report findings/proposals in th
 chat while continuing independent approved implementation. Other workflows retain their
 explicitly authorized scope.
 
+### Pull Requests
+
+#### PR authoring
+
+Check the affected code for material pre-existing issues before editing and as
+they surface during implementation. For issues outside the approved scope, batch
+them and ask me before opening the PR. State the intended outcome, what you found,
+its impact, and whether it blocks the work. Give two choices:
+
+1. **Keep the original scope and track the issues separately for later (Recommended).**
+2. **Include the fixes in this PR.** Explain the added scope or behavior change.
+
+Continue work that can proceed safely. Raise blockers immediately and recommend a
+separate prerequisite PR when practical. Follow existing permissions for tracking tickets.
+
 Only create PRs that are ready for review. Keep work in progress on the branch until it’s ready.
 
 Complete the requested implementation, including appropriate tests, and run focused
@@ -165,11 +199,23 @@ Follow the owning workflow's queue handoff without duplicating its qualification
 
 Do not apply `noautomerge` without my explicit approval for that PR or a clearly scoped set of PRs. The [linear-ticket clarification hold](skills/linear-ticket/SKILL.md#select-and-deliver) is standing approval for that workflow only.
 
-### PR delivery ownership in project workflows
+#### PR delivery ownership in project workflows
 
 1. **Project workers own authoring.** The worker completes and validates the change against the approved ticket and project plan, then opens it ready for review with ticket and dependency links. Opening an eligible PR hands it to the merge queue. Within a supervisor–worker pair, only the worker creates, edits, pushes, or readies PRs.
 2. **The PR merge queue owns ready PRs.** The existing automation handles risk assessment, review, finding resolution, CI and conflict repair, final review, and merging under its policy, including its draft and `noautomerge` exclusions. After the ready transition, the pair reports downstream issues instead of pushing competing changes. Other workflows consume its outcomes; queue execution uses the scheduled automation or an explicit invocation. The user also authorizes project supervisors to launch a separate off-hours queue chat under the [supervision protocol](skills/project-supervise/SKILL.md#keep-pushing-toward-completion), using the existing user-approved bounded invocation and verified repository. This may process the user's repository-wide eligible PRs. Preserve the queue's admission, risk, review, ownership and merge gates; change neither its saved automation nor its schedule. Explicit direct user requests remain normal overrides.
 3. **The project supervisor owns progress and alignment.** Read worker progress and ticket/PR evidence to assess useful outcomes and adherence to the approved ticket/plan, then steer the worker or raise blockers within scope; never change PRs. This is not another PR review or deployment/acceptance assignment. Distinguish authored PRs from queue, deployment, and operational acceptance still needed; follow the owning workflow's wait/pause policy and authorization boundaries.
+
+#### PR independence and dependency stacking
+
+Optimize safe delivery to the default branch with minimal waiting, conflict repair, repeated CI, and re-review. Prefer independent PRs when they can be authored and integrated independently.
+
+When PR2 must not merge before PR1, stack PR2 on PR1 to enforce that dependency. Establish actual branch ancestry and set PR2's GitHub base to PR1's branch; draft status, comments, descriptions, and Linear dependencies alone are insufficient. This verified dependency is sufficient reason to stack without a separate stacking request.
+
+Stack when the child requires a concrete API, schema, or behavior absent from current main. For repeated changes to the same semantic or test region, prefer authoring from landed main when the expected wait is short; a short stack may instead enforce deliberate integration order when repeated reconciliation would be costly and waiting would materially delay useful authoring. Identify the dependency or concrete overlap and ordering benefit; file overlap, ticket order, and shared rollout plans alone are insufficient. Both cases require actual ancestry and the corresponding GitHub base.
+
+Reassess these reasons when splitting or extracting a PR; do not inherit its source branch automatically. Use the fewest justified ordering edges. Authors choose justified stacks before opening PRs. A child can open ready while its parent is open. Converting existing ready PRs into a new integration stack requires a concrete scoped proposal and approval. Preserve queue ownership after readiness.
+
+Before exceeding three open PRs in a chain, check for unnecessary edges or separable shared foundations. When a stack is deeper than five open PRs, suggest an audit to see whether it can be split or flattened. Depth alone does not require approval. An explicitly requested linear stack applies only to its requested scope.
 
 ### Project status updates
 
@@ -247,15 +293,3 @@ For commits you create containing work authored by Codex, append
 `Co-authored-by: Codex <codex@openai.com>` exactly once. Preserve the human author
 and existing co-author trailers. Reviewing or merging alone does not establish
 Codex co-authorship.
-
-## PR independence and dependency stacking
-
-Optimize safe delivery to the default branch with minimal waiting, conflict repair, repeated CI, and re-review. Prefer independent PRs when they can be authored and integrated independently.
-
-When PR2 must not merge before PR1, stack PR2 on PR1 to enforce that dependency. Establish actual branch ancestry and set PR2's GitHub base to PR1's branch; draft status, comments, descriptions, and Linear dependencies alone are insufficient. This verified dependency is sufficient reason to stack without a separate stacking request.
-
-Stack when the child requires a concrete API, schema, or behavior absent from current main. For repeated changes to the same semantic or test region, prefer authoring from landed main when the expected wait is short; a short stack may instead enforce deliberate integration order when repeated reconciliation would be costly and waiting would materially delay useful authoring. Identify the dependency or concrete overlap and ordering benefit; file overlap, ticket order, and shared rollout plans alone are insufficient. Both cases require actual ancestry and the corresponding GitHub base.
-
-Reassess these reasons when splitting or extracting a PR; do not inherit its source branch automatically. Use the fewest justified ordering edges. Authors choose justified stacks before opening PRs. A child can open ready while its parent is open. Converting existing ready PRs into a new integration stack requires a concrete scoped proposal and approval. Preserve queue ownership after readiness.
-
-Before exceeding three open PRs in a chain, check for unnecessary edges or separable shared foundations. When a stack is deeper than five open PRs, suggest an audit to see whether it can be split or flattened. Depth alone does not require approval. An explicitly requested linear stack applies only to its requested scope.

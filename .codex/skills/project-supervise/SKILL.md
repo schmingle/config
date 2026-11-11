@@ -14,15 +14,16 @@ not implicitly stop work or request detach.
 
 ## Flow
 
-Start is one invocation by the user or the existing automation. Explicit stop
-instructions override the flow immediately. Detach from any stage follows Detach;
-it ends only the supervisor turn.
+Start is one invocation by the user or the existing automation. Apply user controls
+from any stage before dispatching affected work. When combined, apply stop first,
+then pause, then detach.
 
 ```mermaid
 flowchart TD
     A["Start"] --> B{"Are We Done?"}
     B -->|Yes| C["Verify Completion"]
-    C -->|Verified| P["Pause"]
+    C -->|Verified and execution settled or handed off| P["Pause"]
+    C -->|Verified, cleanup pending| I["Keep Monitoring"]
     C -->|Work or evidence remains| E{"Are We Blocked?"}
     B -->|No| E
 
@@ -55,19 +56,25 @@ flowchart TD
 
 ### Start
 
-- A human invocation adopts this supervisor chat and authorizes ordinary setup,
-  worker selection and scoped dispatch/steering. Resolve project, repository and
-  user direction; clarify ambiguity. Stale ticks cannot adopt supervision or
-  resume paused/stopped work.
+- A human invocation can adopt this supervisor chat and authorizes ordinary setup,
+  worker selection and scoped dispatch/steering. It also authorizes creating and
+  activating this chat's 20-minute supervision heartbeat, subject to the existing
+  stop, completion and self-pause rules. Resolve project, repository and user direction;
+  clarify ambiguity.
+- Before adoption, activation or dispatch, use targeted native checks for competing
+  supervisors and verify ownership and stop/pause state. Hold heartbeat activation
+  and dispatch when ownership conflicts or is uncertain. Record the verified owner
+  chat and heartbeat ID in native records. This check is best effort. Verify a
+  tick's origin and binding to the owner. Only the user can authorize adoption or resumption.
 - Once project execution is authorized, keep advancing that approved scope while
   supervision is active. Batch completion does not expire execution authority.
   An already-paused supervisor schedule requires user direction to resume under Pause;
   existing stop, monitoring and self-pause rules still apply.
-- Apply stops before audits or Linear access. A project stop ceases dispatch and
-  covers every owned worker/helper unless lane-scoped. Stop affected execution and
-  pause the heartbeat through supported controls; inspect and report running/unknown
-  work. Pausing does not prove settlement.
-- Otherwise recover contract, tickets, PRs and roster from this chat/current sources.
+- Apply stops and explicit pauses before audits or Linear access. A project stop
+  ceases dispatch, stops all owned execution and pauses the heartbeat. A lane stop
+  stops affected execution, records a hold until user resumption and continues
+  unaffected work. Use supported controls and report running or unknown execution.
+- Recover contract, tickets, PRs and roster from this chat/current sources.
   Reconcile recorded subagent IDs using native status, messages/results and targeted history
   before dispatch, including after a heartbeat or user message. Inspect active or uncertain assignments.
   Once the final report is captured and owned commands/helpers/writes are verified
@@ -116,9 +123,12 @@ heartbeats without exhaustive history searches; stale ticks cannot reclaim owner
    exact decision. Reuse valid challenge evidence until material changes or contradictions
    invalidate it.
 4. Preserve required deployment, operational proof and designated human acceptance.
-   Once satisfied, pause and Report criteria evidence, revision, assessor/coverage,
-   findings and remaining nonblocking obligations. Otherwise route remaining gaps
-   through the flow.
+   Once verified, stop dispatch and stop obsolete work. Settle owned execution
+   before pausing or verify an authorized monitoring handoff for useful residual
+   work or pending settlement. Until then, report **Completion verified.
+   Cleanup pending.** Keep monitoring where supported. Report criteria evidence,
+   revision, assessor/coverage, findings and remaining nonblocking obligations.
+   Route unmet completion criteria through the flow.
 
 This adds no blanket acceptance gate or Linear authority. Summarize here without
 an automatic publication question. If reported completion proves false, identify
@@ -132,10 +142,14 @@ reconciliation/reopening; change records only with scoped user authority.
 - Resolve routine blockers within authority. Delegate substantial approved discovery or
   read-only preparation; it authorizes no dependent implementation or amendment.
   Hold affected paths while independent ready work continues.
-- For user-only blockers, present the actionable request in Report and retain its
-  first timestamp for the one-hour wait. Unfinished agent preparation is not a user approval
-  request. Relay the user's actual answer to the same worker with its request context;
-  verify the handoff before treating affected work as resumed. Continue independent work.
+- For user-only blockers, bind the request to its assignment, item and decision. Retain
+  its first Report timestamp for the one-hour wait. Finish agent preparation first.
+  Verify the current owner and deadline before relaying the user's actual answer.
+  Message a running worker on that item or start an eligible idle worker's turn
+  with `followup_task`. If the assignment expired or the worker moved on, preserve
+  their current work and verify the affected item's settlement before reassigning it
+  within existing limits. Give a fresh assignment its own deadline. Confirm the handoff
+  before reporting resumption. Continue independent work.
 - Monitor identified active owners/processes or concrete pending events. An assignee
   or Todo/Backlog status alone establishes no active wait.
 - When bounded recovery is exhausted without useful human intervention or a credible
@@ -185,6 +199,7 @@ approval requested; continue independent work.
   evidence collection, and bounded operational troubleshooting. Generic delegates cover
   noncoding analysis; dedicated PR specialists retain queue work. Agent descriptions govern routing.
 - Bind roster slots to stable subagent IDs and the verified parent/supervisor chat identity.
+  Give each assignment a distinct ID.
   Use `spawn_agent` with `fork_turns="none"` and a compact assignment. Before replacement,
   settle owned execution and verify the worktree and PR handoff, preserving ownership,
   partial work, and unresolved decisions.
@@ -208,12 +223,10 @@ approval requested; continue independent work.
   current evidence is insufficient. Process actionable messages promptly.
   Ordinary steering changes only its stated scope; preserve unaffected execution/deadlines.
   Prepare the next handoff and dispatch useful work without routine batch approvals.
-  Before ending any turn, including a heartbeat or a reply to the user, reconcile worker
-  results and refill eligible settled slots. If workers are active or uncertain, or approved
-  work or a concrete wait can advance, return to bounded native waits and repeat the loop.
-  Posting a report, dispatching a worker, or asking a question does not end supervision while
-  independent work can proceed. Yield only on explicit detach, stop or pause, verified
-  completion, or when no useful execution or credible wait remains.
+  Before ending a turn, reconcile worker results and refill eligible slots while
+  dispatch is authorized. Return to bounded native waits when useful execution or
+  a concrete wait can advance. Yield on detach, project stop/pause, settled or
+  handed-off completion, or when no useful execution or credible wait remains.
   Runtime subagent capacity is separate from the approved project assignment cap.
 
 Off hours, the user authorizes a separate queue chat when project-ready PRs have
@@ -250,6 +263,12 @@ Monitor verified processes that can unblock work; investigate stalls. Do not pau
 because checks remain unchanged. Monitoring handoffs need an identified owner and
 verified supported resolution-detection mechanism.
 
+At a missed worker deadline, request settlement through supported controls and verify
+commands, helpers and writes. If bounded recovery leaves execution unknown, retain
+its ownership and slot. Report what would restore visibility and yield when neither
+independent work nor a supported wait can advance. Use an existing heartbeat for
+supported recovery checks or name the manual follow-up needed.
+
 Worker completion/escalation is not guaranteed to wake an idle supervisor. After yielding,
 retrieve pending results on the next heartbeat or relevant user turn; status requests use
 current evidence. Busy coordination can process incoming worker messages directly.
@@ -258,8 +277,8 @@ monitors any remaining grace period; do not stay busy merely waiting for a human
 
 ### Detach
 
-On an explicit user instruction to detach, finish or reconcile the current supervisor
-operation, capture agent IDs/status, assignments, deadlines and pending requests, then
+On explicit detach, stop new dispatch and reconcile the current supervisor
+operation. Capture agent IDs/status, assignments, deadlines and pending requests, then
 briefly Report and end the turn without waiting for workers to finish. Leave work/subagents,
 scope, deadlines, timers and the existing heartbeat unchanged. This is neither stop nor
 pause and does not require worker settlement. A pending parent tool may delay yielding;
@@ -271,10 +290,12 @@ a credible event can advance; a heartbeat report alone is not a reason to yield.
 
 ### Pause
 
-Pause and verify the heartbeat after verified completion or an explicit project
-stop (immediate), or after over one hour of user-only blockage or exhausted nonhuman
-idle recovery. Automatic idle pausing requires no useful work can proceed, no credible
-active wait and no running/unknown owned execution. Preserve every outstanding human
+On explicit pause, stop new dispatch and pause and verify the heartbeat. Existing
+assignments may finish within scope and deadline. Capture ownership and pending
+requests for the next authorized turn. Pause and verify the heartbeat immediately
+on project stop, after completion cleanup, or after over one hour of user-only
+blockage or exhausted nonhuman idle recovery. Automatic idle pausing requires no
+useful work, no credible active wait and no running or unknown owned execution. Preserve every outstanding human
 request's full one-hour response window. Unknown status is not evidence of idleness.
 Explicit stops still apply immediately, with unsettled execution disclosed.
 

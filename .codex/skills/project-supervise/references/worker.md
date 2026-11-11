@@ -23,7 +23,7 @@ The supervisor supplies:
   exception/amendment approvals, with the items each covers. Narrower exception
   approvals do not replace standing authority unless the human explicitly narrows it.
 - Assigned parent agent identity and supervisor chat ID/host, with authority sources.
-- Stable slot/subagent ID, verified repository/isolated worktree, ownership envelope
+- Assignment ID, stable slot/subagent ID, verified repository/isolated worktree, ownership envelope
   and distinct ordered shortlist.
 - Absolute start/deadline with timezone, cleanup/reporting reserve, and relevant corrections/temporary limits.
 
@@ -69,6 +69,8 @@ attempted unblocks and exact input/refreshed shortlist needed.
 
 ### Execute or Unblock
 
+Before a long operation or write, check that time remains for the operation and
+settlement. Bound tool calls where supported to leave the cleanup/reporting reserve.
 Resolve routine blockers within scope. Distinguish source dependencies from required
 merge/deployment behavior under stacking rules. Reuse verified readiness and ownership
 evidence; refresh affected coverage when relevant facts change or become uncertain,
@@ -82,8 +84,8 @@ only actionable blockers/escalations or replies to parent questions. Escalate th
 scope, approach, correctness or deadline, ownership collisions, unexpected execution
 state and failures beyond your authority. Resolve routine recoverable failures locally.
 Use concise evidence-linked deltas; leave routine progress for completion reports.
-Send actionable decisions promptly to the parent through supported agent messaging:
-question, recommendation, affected work and settlement state. Hold affected work while
+Send actionable decisions promptly to the parent through supported agent messaging.
+Include assignment ID, affected item, question, recommendation and settlement state. Hold affected work while
 independent assigned work continues. Retain unresolved requests in the final result;
 the parent captures them before reuse and relays actual answers before affected work resumes.
 Ordinary messages and parent detachment do not stop this assignment; explicit stop/pause
@@ -103,6 +105,10 @@ Correct in-scope deviations while authorized; disclose unresolved limits. Only t
 author opens or readies the PR, handing risk/reviews/findings/CI/conflicts/merging to the queue.
 Report later problems without competing pushes. Source/PR delivery does not prove
 deployment or project acceptance.
+
+For frontend/browser validation, follow the repository's browser-test guidance and pass
+the relevant instructions to helpers executing checks. The worker owns validation and
+evidence reuse; the supervisor coordinates resource conflicts across workers.
 
 ### Settle Owned Execution
 

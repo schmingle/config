@@ -28,8 +28,7 @@ input is needed, ownership is redirected, or another meaningful exception warran
 flowchart TD
     Start[Start Run] -->|Checks Pass| Find[Find Candidates]
     Start -->|Invalid Count, Active Run, or Inspection Error| Report[Report]
-    Find --> Project[Route Matching Tickets to Project]
-    Project --> Owner{Current Assignee}
+    Find --> Owner{Current Assignee}
     Owner -->|Unassigned| Assign[Determine Intended Owner]
     Owner -->|Someone Else| Handoff[Check for Dropped Work]
     Owner -->|User| Triage[Triage Tickets]
@@ -54,57 +53,44 @@ discovery, checkpoint reads, or ticket/PR writes; never interrupt the other run.
 
 ### Find Candidates
 
-Verify the intended Linear user/account/workspace
-through live lookup or confirmed identity, not OS/Git identity. Read `team`, `repository`, and
-the required nonempty `creatorIds` allowlist from `~/.codex/private/linear-ticket-workflows.json`;
-verify creator identities in the intended workspace, and stop if the allowlist is missing or invalid.
-Normalize `size` aliases and reject unsupported values. Use the workflow size order for
-selection.
+Verify the intended Linear user/account/workspace through live lookup or confirmed identity,
+not OS/Git identity. Read `team`, `repository`, and the required nonempty `projectId` from
+`~/.codex/private/linear-ticket-workflows.json`. Verify the project and team in the intended
+workspace; stop if the project setting is missing, invalid, or cannot be verified. Normalize
+`size` aliases and reject unsupported values. Use the workflow size order for selection.
 Legacy `maxEstimate`/`mediumEstimateLabel` don't override `size`.
 
-Verify team/statuses; discover configured-team Triage/Backlog and Todo/In Progress/In Review
-tickets across all assignees. For creator filtering only, a subticket inherits its parent's
-effective creator recursively; a root ticket uses its own creator. Verify the live parent
-chain and compare that effective creator with `creatorIds`, regardless of who created the
-subticket. Keep Linear's actual creator unchanged; inheritance grants no ownership,
-scope, size, readiness, or implementation exception. If ancestry cannot be verified,
-hold creator eligibility rather than assuming a match or excluding the ticket.
+Verify team/statuses; discover tickets directly in the configured project and team with
+Triage/Backlog and Todo/In Progress/In Review statuses across all assignees. Use supported
+server-side filters and metadata field selection; inspect the current interface rather than
+inventing arguments. Collect ID/URL, team, assignee, status, actual creator, labels, project,
+priority, estimate, parent, and creation/update times. Fully paginate each query independently
+and deduplicate. If a project filter is unavailable, discover sufficient team/status metadata
+and verify each ticket's direct project membership. Verify current direct membership before
+deep assessment and again before ticket or PR writes; inability to prove membership holds
+those actions. A parent's membership does not confer membership on a child; out-of-project
+parents are dependency context only, not executable work.
 
-Use supported server-side team/status filters and metadata
-field selection; inspect the current interface rather than inventing arguments. Collect ID/URL,
-team, assignee, status, actual creator, labels, project, priority, estimate, parent, and creation/update times.
-Do not use a server-side direct-creator filter that would omit eligible descendants;
-discover team/status metadata first, then resolve ancestry, including parents outside the
-candidate team/status scope. Paginate each query independently and deduplicate; retain
-direct-creator matches for project routing even when effective creator eligibility fails.
-Verify effective creators against `creatorIds` before deep assessment or other writes;
-the project-routing write below is the only exception. Parent metadata
-lookups alone do not consume assessment slots.
+Reuse private checkpoints/current automation memory as caches for metadata and unassessed work.
+With a trustworthy checkpoint matching the verified workspace/user/team, repository, project
+identity, and query scope, prefer metadata-first updated-since deltas with a boundary overlap
+and ID deduplication. Merge with prior candidates; don't drop older unassessed work. Verify
+likely candidates' current eligibility and relevant context live. Reconcile tracked IDs for
+closure, reopening, project and team/status moves, and reassignment. Read old out-of-project
+inventory for context only: make no ticket or PR writes, and release it only from this
+workflow's inventory while preserving holds, original sources, and history privately.
 
-Reuse existing private checkpoints/current automation memory as caches for metadata and
-unassessed work. With a trustworthy checkpoint matching the verified workspace/user/team,
-repository, creator allowlist, and query scope, prefer metadata-first updated-since deltas
-with a boundary overlap and ID deduplication. Merge with prior candidates; don't drop older
-unassessed work. Compare likely candidates from this inventory first. Verify their current
-eligibility and relevant context live. Reconcile unrelated tracked IDs after delivery or
-independently, checking across team/status for closure, reopening, moves, reassignment,
-and creator or parent changes. Refresh relevant ancestor
-metadata and recompute descendant eligibility when ancestry or an ancestor's creator changes;
-a child's timestamp alone does not cover those changes. Recover tracked work from history/live
-sources; apply the effective-creator filter to inventory/execution eligibility after project
-routing. Excluded tickets may
-appear as decision/dependency context under Report. Release nonmatching tickets only
-from this workflow's inventory, without ticket/PR writes. Parents outside the candidate scope
-remain ancestry/dependency context, not automatically executable work.
-
-Use full discovery when the checkpoint is missing/untrusted, scope/filter semantics change,
-or the interface cannot cover new/reopened/moved-in/status/creator/ancestry changes reliably. Repeat
-full discovery at least every seven days. This backstop is metadata discovery, not unlimited
-assessment. Keep due reconciliation separate from delivery when the available coverage
-supports a sound selection. Record scan start and advance the checkpoint no later than that
-time only after all required queries are fully paginated and reconciliation is saved. On partial/error/blocked
-saves, retain the previous checkpoint and unresolved inventory; report actual scan coverage
-and any save failure. Absence from partial results is never closure. Don't invent a checkpoint.
+Use full discovery when the checkpoint is missing/untrusted, project identity or scope/filter
+semantics change, or the interface cannot reliably cover new/reopened/moved-in/status changes.
+Issue `updatedAt` alone cannot prove project membership or reliably detect project moves; if
+available deltas cannot cover them, use full discovery. Reconcile project moves during deltas
+and full scans. Repeat full discovery at least every seven days. This backstop is metadata
+discovery, not unlimited assessment. Keep due reconciliation separate from delivery when the
+available coverage supports a sound selection. Record scan start and advance the checkpoint no
+later than that time only after all required queries are fully paginated and reconciliation is
+saved. On partial/error/blocked saves, retain the previous checkpoint and unresolved inventory;
+report actual scan coverage and any save failure. Absence from partial results is never closure.
+Don't invent a checkpoint.
 
 Issue `updatedAt` alone cannot detect linked PR, dependency, discussion/Slack, or human-decision
 changes. Refresh relevant source activity and newly linked references separately, including
@@ -119,21 +105,6 @@ Lightly refresh unchanged holds and queued PRs. Reopen completed assessments onl
 new evidence; finish incomplete promising assessments. Use remaining slots for new candidates.
 When shown, label inventory-only or deferred assessments Skipped with the actual reason;
 new deep investigation still consumes a slot.
-
-### Route Matching Tickets to Project
-
-For discovered tickets whose **actual creator** is in `creatorIds` and whose label matches
-the private `bugProjectRouting.labelId`, route to `bugProjectRouting.projectId` before other activity on that ticket. Verify workspace, label, target project, current creator, labels and
-project live; add an unprojected ticket and verify the result. Count each changed ticket
-toward `count`. Already-targeted tickets need no write. Preserve a different existing project;
-hold other activity and report it for the user rather than moving it. If routing is unverified,
-fails, or a required routing write would exceed the unique-ticket change budget, hold all other
-activity on that ticket and report why. A previously counted changed ticket can still be
-updated within its existing slot. Missing/invalid
-routing settings or unavailable label/project metadata hold potentially matching tickets,
-not verified nonmatches. Never infer creator from a parent
-for this routing rule. Refresh matching metadata when reopening cached inventory; changes to
-this filter require a full discovery.
 
 ### Determine Intended Owner
 
@@ -352,7 +323,7 @@ Then use these sections in order, placing each ticket once:
   Link the ticket, recommendation and what the answer unblocks; identify the actual decision
   owner after investigation. Include proposed outreach with its audience. Retain unanswered
   consequential asks with original links; silence never resolves them. Workflow exclusions
-  such as size or creator filters can merit a decision here; exclusion doesn't imply low value.
+  such as size or project scope can merit a decision here; exclusion doesn't imply low value.
 - **Active Work:** A Markdown table for the user's or unassigned ready candidates,
   implementation or PR delivery, and material scope/size comparisons. Keep decision-only tickets above.
 - **Waiting:** A compact list or sentence for prerequisites or handoffs that warrant attention.
@@ -364,17 +335,16 @@ Then use these sections in order, placing each ticket once:
 Show other-owned tickets only for assignee-flow activity: a new assignment, takeover offer,
 meaningful handoff response/change, accepted transfer, or ownership decision needing input.
 Omit actively owned work without qualifying assignee-flow activity or a pending ownership
-decision, even if its PR changes; routing to the Bugs project alone doesn't qualify. Apply the feedback-window reporting rule to unresolved handoffs, preserving their original deadlines. Report project
-routing as a concise count when useful. If reporting counts, call creator matches
-`creator-matching`, not eligible or ready; distinguish assessed and implementation-ready.
+decision, even if its PR changes. Apply the feedback-window reporting rule to unresolved
+handoffs, preserving their original deadlines. If reporting counts, distinguish discovered,
+assessed, and implementation-ready tickets.
 Apply the same inclusion rules to inbox summaries. Omit inventory-only work needing no input.
 Report material actions in the outcome sentence without repeating ticket details.
 Sort each section by explicit human direction, priority/impact, then oldest creation
 (unknown last; ID breaks ties), not by Action. Omit empty sections and routine execution receipts.
 
 Active Work table: `Ticket | Status | Creator | Assignee | Estimate | PRs | Action | Update/notes`.
-Creator: show the actual creator; when different, identify the inherited effective creator
-and source parent in notes so eligibility is clear.
+Creator: show the actual creator.
 Assignee: show the current Linear assignee's name without a qualifier. If unassigned but
 context establishes an intended or suggested owner, show `Name (inferred from Slack)` or
 `Name (inferred from Linear)` only with a concrete ownership/write blocker or exhausted
@@ -390,10 +360,9 @@ Notes explain why the ticket is included when unclear, what was checked/changed,
 disposition or next action. For Skipped, give the specific reason. If a limit was reached,
 name the limit and the operation it prevented. The assessment cap does not stop checks on
 already-counted tickets, and the change cap does not stop read-only investigation.
-Distinguish verified routing from incomplete assessment; skipped work remains pending where
-checks are unfinished. An assignee alone doesn't establish activity or staleness.
+Skipped work remains pending where checks are unfinished. An assignee alone doesn't establish activity or staleness.
 Use unknown for unverified facts, — for verified none.
-Keep the full internal inventory until verified closure, creator-filter exclusion or explicit
+Keep the full internal inventory until verified closure, project-scope exclusion or explicit
 tracking release; report omission and reassignment aren't release. Retain unresolved holds,
 offers/deadlines and incomplete checks privately; label carried-forward findings when shown.
 Do not collect closed/other-owner inventories solely for reporting. Surfacing excluded work
@@ -429,7 +398,7 @@ Retry up to 2 times.
 - Honor read-only/report-only limits. Normal runs authorize Linear assessment/updates,
   eligible stale cancellations, and one ticket's implementation/commits/pushes/PR
   handoff. Exclude merging, auto-merge, deployment, production writes, project creation/
-  reorganization except the configured bug-project routing above, email/SMS/Slack messages,
+  reorganization, email/SMS/Slack messages,
   and automation changes. Readiness/silence isn't
   authorization; follow applicable approvals.
 - `count` limits assessed tickets and, separately, changed tickets—not API calls. Count
