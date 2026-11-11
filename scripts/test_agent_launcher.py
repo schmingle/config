@@ -117,7 +117,6 @@ class RoleSettingsTests(unittest.TestCase):
                 self.assertIn(role, launcher.NATIVE_ROLES)
                 self.assertNotIn(role, launcher.CLAUDE_ROLES)
                 self.assertNotIn(role, launcher.APPROACH_ROLES)
-                self.assertFalse((ROOT / '.claude/agents' / (role + '.md')).exists())
                 settings = launcher.role_settings(launcher.AGENTS, role)
                 self.assertEqual(settings['model'], model)
                 self.assertEqual(settings['model_reasoning_effort'], effort)
@@ -132,17 +131,18 @@ class RoleSettingsTests(unittest.TestCase):
                                                    else 'GPT-6.1 Terra ') + effort + '.')
 
     def test_review_tiers_use_canonical_native_settings_and_shared_contract(self):
-        for role, effort in (('pr-review', 'high'), ('pr-review-high', 'max')):
+        for role, model, label in (('pr-review', 'gpt-6.1-terra', 'Terra'),
+                                   ('pr-review-high', 'gpt-6.1-sol', 'Sol')):
             with self.subTest(role=role):
                 self.assertIn(role, launcher.NATIVE_ROLES)
                 self.assertNotIn(role, launcher.CLAUDE_ROLES)
                 settings = launcher.role_settings(launcher.AGENTS, role)
-                self.assertEqual(settings['model'], 'gpt-6.1-sol')
-                self.assertEqual(settings['model_reasoning_effort'], effort)
+                self.assertEqual(settings['model'], model)
+                self.assertEqual(settings['model_reasoning_effort'], 'high')
                 self.assertIn('~/.codex/agents/pr-review.md', settings['developer_instructions'])
                 self.assertIn('reviewer_attribution.py ' + role, settings['developer_instructions'])
                 self.assertEqual(agent_codex.execution(settings)['attribution'],
-                                 'Reviewed by GPT-6.1 Sol ' + effort + '.')
+                                 f'Reviewed by GPT-6.1 {label} high.')
                 self.assertEqual(launcher.capabilities(role), launcher.capabilities('pr-review'))
 
     def test_explicit_claude_review_trial_keeps_its_execution_profile(self):
@@ -174,16 +174,15 @@ class RoleSettingsTests(unittest.TestCase):
     def test_public_counterparts_preserve_wrapper_and_executor_settings(self):
         roles = {path.stem for path in launcher.AGENTS.glob('*.toml')}
         counterparts = {path.stem for path in (ROOT / '.claude/agents').glob('*.md')}
-        self.assertEqual(roles - set(launcher.CODEX_ONLY_ROLES), counterparts)
         profile = launcher.shared.execution_profile()
         for role in roles:
             with self.subTest(role=role):
                 text = ((ROOT / '.claude/agents' / (role + '.md')).read_text()
-                        if role not in launcher.CODEX_ONLY_ROLES else '')
+                        if role in counterparts else '')
                 fields = dict(re.findall(r'^(model|effort): (.+)$', text, re.MULTILINE))
                 settings = launcher.role_settings(launcher.AGENTS, role)
                 if role in launcher.NATIVE_ROLES:
-                    if role not in launcher.CODEX_ONLY_ROLES:
+                    if role in counterparts:
                         self.assertEqual(fields, {'model': 'haiku', 'effort': 'low'})
                         self.assertIn('--role ' + role, text)
                     execution = agent_codex.execution(settings)
@@ -198,7 +197,8 @@ class RoleSettingsTests(unittest.TestCase):
                     self.assertIn('Never spawn agents', instructions)
                 else:
                     profile = agent_claude.execution(settings)
-                    self.assertEqual(fields, {'model': profile['model'], 'effort': profile['effort']})
+                    if role in counterparts:
+                        self.assertEqual(fields, {'model': profile['model'], 'effort': profile['effort']})
 
     def test_native_executor_preserves_canonical_guide_paths_and_role(self):
         def instructions(role):

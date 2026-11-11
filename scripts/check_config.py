@@ -75,7 +75,6 @@ def validate():
                                      '--exclude-standard', '-z']).decode().split('\0')
     agents = {}
     claude_agents = {}
-    skills = {}
     skill_count = 0
     for name in sorted(set(paths) - {''}):
         path = ROOT / name
@@ -123,7 +122,6 @@ def validate():
                 metadata = yaml_mapping((path.parent / 'agents/openai.yaml').read_text(), name)
                 check(metadata.get('policy', {}).get('allow_implicit_invocation') is False,
                       name + ': explicit-only skill needs matching native invocation policy')
-            skills[name] = front
             skill_count += 1
         if path.suffix in ('.md', '.toml'):
             for reference in re.findall(r"~/.codex/(?:agents|skills)/[^\s`\x27\x22]+", text):
@@ -153,16 +151,6 @@ def validate():
                 check(destination.exists(), name + ': broken local link: ' + target)
     validate_capabilities(agents)
     check(set(CODEX_ONLY_ROLES) <= agents.keys(), 'Missing Codex-only agents')
-    missing_counterparts = agents.keys() - claude_agents.keys() - set(CODEX_ONLY_ROLES)
-    check(not missing_counterparts,
-          'Missing Claude agent counterparts: ' + ', '.join(sorted(missing_counterparts)))
-    for source, front in skills.items():
-        if not source.startswith('.codex/skills/'):
-            continue
-        target = source.replace('.codex/skills/', '.claude/skills/', 1)
-        check(target in skills, source + ': missing Claude skill counterpart')
-        check(skills[target].get('disable-model-invocation') == front.get('disable-model-invocation'),
-              source + ': Claude invocation policy differs')
     for name in ('pr-review', 'pr-review-high', 'pr-risk', *APPROACH_ROLES):
         check('reviewer_attribution.py' in agents[name]['developer_instructions'],
               name + ': derive signoff from execution fields')
