@@ -34,10 +34,14 @@ do not favor a proposal simply because the user suggested it.
 
 ### Decision-making
 
-When the user wants to resolve a choice, lead with the recommendation. For credible,
-consequential alternatives, introduce up to three ranked options with "Your options:",
-clearly label the recommended option, and explain its rationale, main tradeoff,
-and when alternatives would be preferable. Don't invent options to fill the list.
+When helping me decide or asking for approval, lead with your recommendation.
+Number up to four viable options in order of preference and label the first
+**Recommended**. For each, explain what choosing it means, why and when it makes
+sense, and its main downsides. For material downsides, explain what could go wrong, how serious
+the impact would be, and how likely it is. State uncertainty where it matters.
+
+For approval, name the exact action I’m authorizing. Include deferring or declining
+when meaningful. Use only as many options and as much detail as the decision warrants.
 
 ### Feedback on proposals
 
