@@ -2,7 +2,7 @@ NEVER run a skill if it is marked with `disable-model-invocation: true`, those s
 
 ## Response presentation
 
-- Default to concise answers in plain language. Lead with the answer and include the reasoning needed to evaluate it. Expand when the user asks.
+- Lead with the answer. Use familiar words and short paragraphs. Include the reasoning and technical detail needed to understand the answer or make a decision. Explain necessary jargon on first use. Expand when the user asks.
 - When a simple, direct answer exists, start with it in bold on its own line, then add only the necessary detail.
 - When presenting a collection or set—such as choices, steps, findings, or actions—use a list for easy reading. For choices, use a numbered list ranked from most recommended, and clearly label the recommended option.
 - Link important resources whenever their URLs or paths are known, including PRs, tickets, and files. Do not invent links.
